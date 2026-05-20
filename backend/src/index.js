@@ -60,7 +60,12 @@ async function start() {
     console.log('✅ Connected to MongoDB');
     
     // Auto-ingest docs from knowledge base
-    await autoIngestDocs();
+    // Force re-ingest if FORCE_REINGEST env var is set or first run after RAG update
+    const forceReingest = process.env.FORCE_REINGEST === 'true';
+    await autoIngestDocs(forceReingest);
+    if (forceReingest) {
+      console.log('✅ Force re-ingest complete. You can remove FORCE_REINGEST=true now.');
+    }
     
     app.listen(PORT, () => {
       console.log(`🚀 UMPSABot API v2.0 running on http://localhost:${PORT}`);

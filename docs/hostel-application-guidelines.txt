@@ -1,165 +1,49 @@
-GUIDELINES
-HOSTEL APPLICATION
-              (NEW STUDENT) 
-User
-GUIDELINES
-User
-Browse 
-https://gading.ump.edu.my/ump/f?p=116
-GUIDELINES
-User
-Student can click on Student  Life and search for Student Residence then Hostel Application. 
-1.
-2.
-GUIDELINES
-User
-Student can view the Student Details at the main page for Hostel
-Application and click on APPLY NEW STUDENT.
-APPLICATION FOR NEW STUDENT
-EXAMPLE
-3.
-GUIDELINES
-User
-Student can click at the HOSTEL, BLOCK,  LEVEL, ROOM
-AND BED ACCORDING TO THE CAMPUS AND  
-AVAILABILITY CAPACITY.
-APPLICATION FOR NEW STUDENT
-The student residences listed are already sorted by gender. 
-GUIDELINES
-User
-APPLICATION FOR NEW STUDENT
-Students can refer to the legend to check for the availability.
-4.
-GUIDELINES
-User
-After finished select the residence, a popup of validation
-will be appeared. The students are advised to read
-carefully and understand all the conditions stated. 
-APPLICATION FOR NEW STUDENT
-If you are agree with the conditions and all information are correct,  click on the checkbox.
-You may click on the SUBMIT to procced the application.
-5.
-GUIDELINES
-User
-Once student click on the SUBMIT button, the application will be submitted and
-student will received the HOSTEL SLIP.
-APPLICATION FOR NEW STUDENT
-All students are reminded to print this slip on the day of the hostel key collection.
-EXAMPLE
-After done submitting the application, student can check again the details by clicking on the MAIN button and identify 
-roommates in the Room/Hostel Details section.
-6.
-GUIDELINES
-User
-APPLICATION FOR NEW STUDENT
-EXAMPLE
-GUIDELINES
-HOSTEL APPLICATION
-             (APPEAL/SENIOR) 
-User
-GUIDELINES
-User
-Student can click on Student  Life and search for Student Residence then Hostel Application. 
-1.
-2.
-GUIDELINES
-User
-Student can view the Student Details at the main page for Hostel
-Application and click on APPLY APPEAL/SENIOR.
-APPLICATION FOR APPEAL/SENIOR
-EXAMPLE
-3.
-GUIDELINES
-User
-Student can click at the HOSTEL, BLOCK,  LEVEL, ROOM
-AND BED ACCORDING TO THE CAMPUS AND  
-AVAILABILITY CAPACITY.
-APPLICATION FOR APPEAL/SENIOR
-The student residences listed are already sorted by gender. 
-GUIDELINES
-User
-APPLICATION FOR APPEAL/SENIOR
-Students can refer to the legend to check for the availability.
-4.
-GUIDELINES
-User
-After finished select the residence, a popup of validation
-will be appeared. The students are advised to read
-carefully and understand all the conditions stated. 
-APPLICATION FOR APPEAL/SENIOR
-If you are agree with the conditions and all information are correct,  click on the checkbox.
-You may click on the SUBMIT to procced the application.
-5.
-GUIDELINES
-User
-Once student click on the SUBMIT button, the application will be submitted and
-student will received the HOSTEL SLIP.
-APPLICATION FOR APPEAL/SENIOR
-All students are reminded to print this slip on the day of the hostel key collection.
-EXAMPLE
-After done submitting the application, student can check again the details by clicking on the MAIN button and identify 
-roommates in the Room/Hostel Details section.
-6.
-GUIDELINES
-User
-APPLICATION FOR APPEAL/SENIOR
-EXAMPLE
-GUIDELINES
-HOSTEL APPLICATION
-              (SPECIAL ENTRY)                      
-User
-GUIDELINES
-User
-Student can click on Student  Life and search for Student Residence then Hostel Application. 
-1.
-2.
-GUIDELINES
-User
-Student can view the  main page for Hostel Application which
-Student Details appeared. 
-APPLICATION FOR SPECIAL ENTRY
-EXAMPLE
-3.
-GUIDELINES
-User
-Student can view the Student Details at the main page for Hostel
-Application and click on APPLY SPECIAL ENTRY.
-APPLICATION FOR SPECIAL ENTRY
-EXAMPLE
-4.
-GUIDELINES
-User
-Student need to click here and select on the categories
-accordingly to proceed with the application.
-APPLICATION FOR SPECIAL ENTRY
-GUIDELINES
-User
-APPLICATION FOR SPECIAL ENTRY
-Students can refer to the legend to check for the availability.
-5.
-GUIDELINES
-User
-APPLICATION FOR SPECIAL ENTRY
-After finished select the residence, a popup of validation
-will be appeared. The students are advised to read
-carefully and understand all the conditions stated. 
-If you are agree with the conditions and all information are correct,  click on the checkbox.
-You may click on the SUBMIT to procced the application.
-6.
-GUIDELINES
-User
-APPLICATION FOR SPECIAL ENTRY
-Once student click on the SUBMIT button, the application will be submitted and
-student will received the HOSTEL SLIP.
-All students are reminded to print this slip on the day of the hostel key collection.
-EXAMPLE
-7.
-GUIDELINES
-User
-APPLICATION FOR SPECIAL ENTRY
-After done submitting the application, student can check again the details by clicking on the MAIN button and identify 
-roommates in the Room/Hostel Details section.
-EXAMPLE
-Thank you.
-GUIDELINES
-User
+HOSTEL APPLICATION GUIDELINES - UMPSA
+
+URL: https://gading.ump.edu.my/ump/f?p=116
+
+How to access: Go to Student Life > Student Residence > Hostel Application.
+
+=== APPLICATION FOR NEW STUDENT ===
+
+Step 1: Browse to https://gading.ump.edu.my/ump/f?p=116 or go to Student Life and search for Student Residence then Hostel Application.
+
+Step 2: View your Student Details at the main page for Hostel Application and click on APPLY NEW STUDENT.
+
+Step 3: Select the HOSTEL, BLOCK, LEVEL, ROOM AND BED according to your campus and availability capacity. The student residences listed are already sorted by gender. Refer to the legend to check for availability.
+
+Step 4: After selecting the residence, a popup of validation will appear. Read carefully and understand all the conditions stated. If you agree with the conditions and all information is correct, click on the checkbox.
+
+Step 5: Click on SUBMIT to proceed with the application. Once submitted, you will receive a HOSTEL SLIP. Print this slip on the day of hostel key collection.
+
+Step 6: After submitting, you can check your details again by clicking on the MAIN button and identify roommates in the Room/Hostel Details section.
+
+=== APPLICATION FOR APPEAL/SENIOR STUDENT ===
+
+Step 1: Browse to https://gading.ump.edu.my/ump/f?p=116 or go to Student Life and search for Student Residence then Hostel Application.
+
+Step 2: View your Student Details at the main page for Hostel Application and click on APPLY APPEAL/SENIOR.
+
+Step 3: Select the HOSTEL, BLOCK, LEVEL, ROOM AND BED according to your campus and availability capacity. The student residences listed are already sorted by gender. Refer to the legend to check for availability.
+
+Step 4: After selecting the residence, a popup of validation will appear. Read carefully and understand all the conditions stated. If you agree with the conditions and all information is correct, click on the checkbox.
+
+Step 5: Click on SUBMIT to proceed with the application. Once submitted, you will receive a HOSTEL SLIP. Print this slip on the day of hostel key collection.
+
+Step 6: After submitting, you can check your details again by clicking on the MAIN button and identify roommates in the Room/Hostel Details section.
+
+=== APPLICATION FOR SPECIAL ENTRY ===
+
+Step 1: Browse to https://gading.ump.edu.my/ump/f?p=116 or go to Student Life and search for Student Residence then Hostel Application.
+
+Step 2: View the main page for Hostel Application where your Student Details appear.
+
+Step 3: Click on APPLY SPECIAL ENTRY.
+
+Step 4: Click and select the category accordingly to proceed with the application.
+
+Step 5: Select the HOSTEL, BLOCK, LEVEL, ROOM AND BED according to your campus and availability capacity. Refer to the legend to check for availability.
+
+Step 6: After selecting the residence, a popup of validation will appear. Read carefully and understand all the conditions stated. If you agree with the conditions and all information is correct, click on the checkbox. Click on SUBMIT to proceed.
+
+Step 7: Once submitted, you will receive a HOSTEL SLIP. Print this slip on the day of hostel key collection. After submitting, you can check your details again by clicking on the MAIN button and identify roommates in the Room/Hostel Details section.

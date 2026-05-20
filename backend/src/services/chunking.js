@@ -1,90 +1,111 @@
 /**
  * Chunking Service
  * Splits documents into overlapping chunks for embedding and retrieval
+ * Uses word-based chunking (200-300 words per chunk, 50 word overlap)
  */
 
-const CHUNK_SIZE = parseInt(process.env.CHUNK_SIZE) || 500;
-const CHUNK_OVERLAP = parseInt(process.env.CHUNK_OVERLAP) || 50;
+const CHUNK_SIZE_WORDS = parseInt(process.env.CHUNK_SIZE_WORDS) || 250;
+const CHUNK_OVERLAP_WORDS = parseInt(process.env.CHUNK_OVERLAP_WORDS) || 50;
 
 /**
- * Split text into overlapping chunks
+ * Split text into overlapping chunks based on word count
  * @param {string} text - The full document text
  * @param {object} options - Chunking options
  * @returns {string[]} Array of text chunks
  */
 function chunkText(text, options = {}) {
-  const chunkSize = options.chunkSize || CHUNK_SIZE;
-  const overlap = options.overlap || CHUNK_OVERLAP;
+  const maxWords = options.chunkSizeWords || CHUNK_SIZE_WORDS;
+  const overlapWords = options.overlapWords || CHUNK_OVERLAP_WORDS;
 
   if (!text || text.trim().length === 0) {
     return [];
   }
 
-  // Clean the text
+  // Clean the text - remove noise
   const cleanedText = text
     .replace(/\r\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
+    .replace(/^(GUIDELINES|User)\s*$/gm, '') // Remove repeated headers
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
 
-  // Split by paragraphs first for more natural chunks
-  const paragraphs = cleanedText.split(/\n\n+/);
+  // Split into paragraphs
+  const paragraphs = cleanedText.split(/\n\n+/).filter(p => p.trim().length > 0);
+
   const chunks = [];
-  let currentChunk = '';
+  let currentChunkWords = [];
+  let currentChunkText = [];
 
   for (const paragraph of paragraphs) {
-    // If adding this paragraph exceeds chunk size, save current and start new
-    if (currentChunk.length + paragraph.length > chunkSize && currentChunk.length > 0) {
-      chunks.push(currentChunk.trim());
-      
-      // Keep overlap from end of current chunk
-      const words = currentChunk.split(/\s+/);
-      const overlapWords = words.slice(-Math.ceil(overlap / 5));
-      currentChunk = overlapWords.join(' ') + '\n\n' + paragraph;
-    } else {
-      currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
+    const paragraphWords = paragraph.trim().split(/\s+/);
+
+    // If adding this paragraph exceeds max words, finalize current chunk
+    if (currentChunkWords.length + paragraphWords.length > maxWords && currentChunkWords.length > 0) {
+      chunks.push(currentChunkText.join('\n\n').trim());
+
+      // Keep overlap words from end of current chunk
+      const overlapText = currentChunkWords.slice(-overlapWords).join(' ');
+      currentChunkWords = overlapText.split(/\s+/);
+      currentChunkText = [overlapText];
     }
+
+    currentChunkWords.push(...paragraphWords);
+    currentChunkText.push(paragraph.trim());
   }
 
   // Don't forget the last chunk
-  if (currentChunk.trim().length > 0) {
-    chunks.push(currentChunk.trim());
+  if (currentChunkText.length > 0) {
+    const finalText = currentChunkText.join('\n\n').trim();
+    if (finalText.length > 0) {
+      chunks.push(finalText);
+    }
   }
 
-  // If any chunk is still too large, split by sentences
+  // If any chunk is still too large (>400 words), split by sentences
   const finalChunks = [];
   for (const chunk of chunks) {
-    if (chunk.length > chunkSize * 1.5) {
-      const sentenceChunks = splitBySentences(chunk, chunkSize, overlap);
+    const wordCount = chunk.split(/\s+/).length;
+    if (wordCount > maxWords * 1.5) {
+      const sentenceChunks = splitBySentences(chunk, maxWords, overlapWords);
       finalChunks.push(...sentenceChunks);
     } else {
       finalChunks.push(chunk);
     }
   }
 
-  return finalChunks;
+  return finalChunks.filter(c => c.trim().length > 20);
 }
 
 /**
  * Split text by sentences when paragraphs are too large
  */
-function splitBySentences(text, chunkSize, overlap) {
-  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+function splitBySentences(text, maxWords, overlapWords) {
+  const sentences = text.match(/[^.!?\n]+[.!?\n]+/g) || [text];
   const chunks = [];
-  let currentChunk = '';
+  let currentWords = [];
+  let currentSentences = [];
 
   for (const sentence of sentences) {
-    if (currentChunk.length + sentence.length > chunkSize && currentChunk.length > 0) {
-      chunks.push(currentChunk.trim());
-      // Overlap: keep last sentence
-      const lastSentences = currentChunk.match(/[^.!?]+[.!?]+/g) || [];
-      currentChunk = lastSentences.slice(-1).join('') + ' ' + sentence;
-    } else {
-      currentChunk += sentence;
+    const sentenceWords = sentence.trim().split(/\s+/);
+
+    if (currentWords.length + sentenceWords.length > maxWords && currentWords.length > 0) {
+      chunks.push(currentSentences.join(' ').trim());
+
+      // Overlap: keep last few words
+      const overlapText = currentWords.slice(-overlapWords).join(' ');
+      currentWords = overlapText.split(/\s+/);
+      currentSentences = [overlapText];
     }
+
+    currentWords.push(...sentenceWords);
+    currentSentences.push(sentence.trim());
   }
 
-  if (currentChunk.trim().length > 0) {
-    chunks.push(currentChunk.trim());
+  if (currentSentences.length > 0) {
+    const finalText = currentSentences.join(' ').trim();
+    if (finalText.length > 0) {
+      chunks.push(finalText);
+    }
   }
 
   return chunks;
@@ -99,11 +120,11 @@ async function extractText(buffer, fileType) {
       const pdfParse = require('pdf-parse');
       const pdfData = await pdfParse(buffer);
       return pdfData.text;
-    
+
     case 'txt':
     case 'md':
       return buffer.toString('utf-8');
-    
+
     default:
       throw new Error(`Unsupported file type: ${fileType}`);
   }

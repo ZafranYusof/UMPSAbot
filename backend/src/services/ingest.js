@@ -1,7 +1,7 @@
 /**
  * Auto-Ingest Service
  * Loads and ingests all .txt files from the docs/ folder on server startup
- * Skips files that are already ingested (checks by originalFilename)
+ * Supports force re-ingest to refresh chunks with new settings
  */
 
 const fs = require('fs');
@@ -34,14 +34,21 @@ function categorizeFile(filename) {
 
 /**
  * Ingest all .txt files from docs/ folder
- * Skips files already in the database
+ * @param {boolean} force - If true, delete existing documents and re-ingest all
  */
-async function autoIngestDocs() {
+async function autoIngestDocs(force = false) {
   console.log('📚 Starting auto-ingest of knowledge base documents...');
 
   if (!fs.existsSync(DOCS_DIR)) {
     console.warn('⚠️  Docs directory not found:', DOCS_DIR);
     return;
+  }
+
+  // Force re-ingest: drop all existing documents
+  if (force) {
+    console.log('🔄 Force re-ingest: deleting all existing documents...');
+    await Document.deleteMany({});
+    console.log('✅ All existing documents deleted.');
   }
 
   const files = fs.readdirSync(DOCS_DIR).filter(f => f.endsWith('.txt'));
@@ -52,11 +59,13 @@ async function autoIngestDocs() {
 
   for (const filename of files) {
     try {
-      // Check if already ingested
-      const existing = await Document.findOne({ originalFilename: filename });
-      if (existing) {
-        skipped++;
-        continue;
+      // Check if already ingested (skip if not forcing)
+      if (!force) {
+        const existing = await Document.findOne({ originalFilename: filename });
+        if (existing) {
+          skipped++;
+          continue;
+        }
       }
 
       const filePath = path.join(DOCS_DIR, filename);

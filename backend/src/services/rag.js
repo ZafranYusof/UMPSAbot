@@ -9,9 +9,9 @@ const { chunkText, extractText } = require('./chunking');
 const { classifyIntent, getGreetingResponse } = require('./intent');
 const Document = require('../models/Document');
 
-const TOP_K = parseInt(process.env.TOP_K_RESULTS) || 5;
-const CONFIDENCE_THRESHOLD = parseFloat(process.env.CONFIDENCE_THRESHOLD) || 0.3;
-const HANDOFF_THRESHOLD = parseFloat(process.env.HANDOFF_THRESHOLD) || 0.2;
+const TOP_K = parseInt(process.env.TOP_K_RESULTS) || 8;
+const CONFIDENCE_THRESHOLD = parseFloat(process.env.CONFIDENCE_THRESHOLD) || 0.2;
+const HANDOFF_THRESHOLD = parseFloat(process.env.HANDOFF_THRESHOLD) || 0.15;
 
 // Track low-confidence attempts per session for handoff logic
 const lowConfidenceTracker = new Map();
@@ -62,7 +62,6 @@ async function queryRAG(query, options = {}) {
   // Step 2: Handle greetings without RAG
   if (!intentResult.needsRAG) {
     const greetingResponse = getGreetingResponse(language);
-    // Reset low confidence tracker on greeting
     lowConfidenceTracker.delete(sessionId);
     return {
       content: greetingResponse,
@@ -97,20 +96,14 @@ async function queryRAG(query, options = {}) {
     if (tracker + 1 >= 2) {
       handoff = true;
       handoffContact = HANDOFF_CONTACTS[intentResult.intent] || HANDOFF_CONTACTS.general;
-      // Reset tracker after handoff
       lowConfidenceTracker.delete(sessionId);
     }
   } else {
-    // Reset tracker on successful retrieval
     lowConfidenceTracker.set(sessionId, 0);
   }
 
   // Step 7: If confidence is too low and no results, return fallback
   if (confidence < CONFIDENCE_THRESHOLD && searchResults.length === 0) {
-    const disclaimer = language === 'ms'
-      ? 'Saya tidak pasti tentang jawapan ini. Sila hubungi pejabat berkaitan.'
-      : "I'm not confident about this answer. Please contact the relevant office.";
-
     return {
       content: getLowConfidenceResponse(language),
       sources: [],
@@ -123,8 +116,10 @@ async function queryRAG(query, options = {}) {
     };
   }
 
-  // Step 8: Extract context texts from search results
-  const contexts = searchResults.map(r => r.chunk.content);
+  // Step 8: Format context texts with source labels for LLM
+  const contexts = searchResults.map((r, i) => {
+    return `Document: ${r.documentTitle}\nContent: ${r.chunk.content}`;
+  });
 
   // Step 9: Generate response using LLM with retrieved context
   const llmResponse = await generateResponse(query, contexts, {
@@ -174,12 +169,13 @@ async function queryRAG(query, options = {}) {
 /**
  * Search for chunks similar to the query embedding
  * Uses in-memory cosine similarity search across all document chunks
+ * Lower similarity threshold to include more relevant results
  */
 async function searchSimilarChunks(queryEmbedding, topK = TOP_K) {
-  // Get all processed documents with their chunks
   const documents = await Document.find({ isProcessed: true }).lean();
 
   const results = [];
+  const MIN_SIMILARITY = 0.1; // Low threshold to include more chunks
 
   for (const doc of documents) {
     if (!doc.chunks || doc.chunks.length === 0) continue;
@@ -188,13 +184,16 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K) {
       if (!chunk.embedding || chunk.embedding.length === 0) continue;
 
       const score = cosineSimilarity(queryEmbedding, chunk.embedding);
-      
-      results.push({
-        documentId: doc._id,
-        documentTitle: doc.title,
-        chunk,
-        score
-      });
+
+      // Only include chunks above minimum similarity
+      if (score >= MIN_SIMILARITY) {
+        results.push({
+          documentId: doc._id,
+          documentTitle: doc.title,
+          chunk,
+          score
+        });
+      }
     }
   }
 
@@ -259,9 +258,9 @@ async function ingestDocument(fileBuffer, metadata) {
  */
 function getLowConfidenceResponse(language) {
   if (language === 'ms') {
-    return 'Maaf, saya tidak menemui maklumat yang cukup dalam pangkalan data untuk menjawab soalan ini dengan yakin. Sila hubungi pejabat akademik UMPSA atau semak portal pelajar untuk maklumat terkini.';
+    return 'Maaf, saya tidak menemui maklumat yang cukup dalam pangkalan data untuk menjawab soalan ini. Sila hubungi pejabat akademik UMPSA atau semak portal pelajar untuk maklumat terkini.';
   }
-  return "I don't have enough information in my knowledge base to answer this question confidently. Please check the UMPSA student portal or contact the academic office for the most up-to-date information.";
+  return "I don't have enough information in my knowledge base to answer this question. Please check the UMPSA student portal or contact the academic office for the most up-to-date information.";
 }
 
 /**
@@ -272,13 +271,13 @@ function getSuggestionsForGreeting(language) {
     return [
       'Bagaimana cara mendaftar kursus?',
       'Berapa yuran semester ini?',
-      'Apa jadual peperiksaan?'
+      'Macam mana nak apply hostel?'
     ];
   }
   return [
     'How do I register for courses?',
     'What are the semester fees?',
-    'Where can I find the exam schedule?'
+    'How do I apply for hostel?'
   ];
 }
 
