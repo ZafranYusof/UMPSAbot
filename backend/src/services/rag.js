@@ -7,6 +7,7 @@ const { generateEmbedding, cosineSimilarity } = require('./embedding');
 const { generateResponse, generateSuggestions, estimateConfidence } = require('./llm');
 const { chunkText, extractText } = require('./chunking');
 const { classifyIntent, getGreetingResponse } = require('./intent');
+const { getCachedResponse, cacheResponse } = require('./cache');
 const Document = require('../models/Document');
 
 const TOP_K = parseInt(process.env.TOP_K_RESULTS) || 8;
@@ -59,7 +60,7 @@ async function queryRAG(query, options = {}) {
   // Step 1: Classify intent
   const intentResult = classifyIntent(query);
 
-  // Step 2: Handle greetings without RAG
+  // Step 2: Handle greetings without RAG (skip caching for greetings)
   if (!intentResult.needsRAG) {
     const greetingResponse = getGreetingResponse(language);
     lowConfidenceTracker.delete(sessionId);
@@ -73,6 +74,27 @@ async function queryRAG(query, options = {}) {
       handoff: false,
       handoffContact: null
     };
+  }
+
+  // Step 2.5: Check cache before running full RAG pipeline
+  try {
+    const cached = await getCachedResponse(query, language);
+    if (cached) {
+      console.log(`[${new Date().toISOString()}] Cache HIT for: "${query.substring(0, 50)}..."`);
+      return {
+        content: cached.content,
+        sources: cached.sources || [],
+        confidence: cached.confidence || 0.8,
+        isLowConfidence: false,
+        intent: cached.intent || intentResult.intent,
+        suggestions: cached.suggestions || [],
+        handoff: false,
+        handoffContact: null,
+        fromCache: true
+      };
+    }
+  } catch (cacheErr) {
+    console.error(`[${new Date().toISOString()}] Cache lookup failed:`, cacheErr.message);
   }
 
   // Step 3: Generate embedding for the query
@@ -153,7 +175,7 @@ async function queryRAG(query, options = {}) {
     console.error(`[${new Date().toISOString()}] Failed to generate suggestions:`, err.message);
   }
 
-  return {
+  const finalResult = {
     content: responseContent,
     sources,
     confidence,
@@ -164,6 +186,13 @@ async function queryRAG(query, options = {}) {
     handoffContact,
     metadata: llmResponse.metadata
   };
+
+  // Step 13: Save to cache (non-blocking, don't await)
+  cacheResponse(query, queryEmbedding, finalResult, language).catch(err => {
+    console.error(`[${new Date().toISOString()}] Cache save failed:`, err.message);
+  });
+
+  return finalResult;
 }
 
 /**

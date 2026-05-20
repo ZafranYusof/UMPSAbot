@@ -6,6 +6,7 @@
 const Message = require('../models/Message');
 const Feedback = require('../models/Feedback');
 const Document = require('../models/Document');
+const { getCacheStats, clearCache } = require('../services/cache');
 
 /**
  * Get dashboard stats
@@ -54,13 +55,17 @@ async function getStats(req, res, next) {
       { $sort: { _id: 1 } }
     ]);
 
+    // Cache stats
+    const cacheStats = await getCacheStats();
+
     res.json({
       totalChats,
       totalMessages,
       avgConfidence: Math.round(avgConfidence * 1000) / 1000,
       topQuestions,
       feedback: feedbackCounts,
-      messagesPerDay
+      messagesPerDay,
+      cache: cacheStats
     });
   } catch (error) {
     next(error);
@@ -129,8 +134,22 @@ async function getDocuments(req, res, next) {
   }
 }
 
+/**
+ * Clear response cache
+ * POST /api/admin/cache/clear
+ */
+async function clearCacheHandler(req, res, next) {
+  try {
+    const result = await clearCache();
+    res.json({ success: true, ...result });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   getStats,
   getFeedback,
-  getDocuments
+  getDocuments,
+  clearCacheHandler
 };
