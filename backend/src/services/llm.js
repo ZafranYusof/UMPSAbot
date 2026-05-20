@@ -7,7 +7,15 @@ const Groq = require('groq-sdk');
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-const LLM_MODEL = process.env.LLM_MODEL || 'llama-3.3-70b-versatile';
+// Model fallback chain — if primary hits rate limit, try next
+const MODEL_CHAIN = [
+  process.env.LLM_MODEL || 'llama-3.3-70b-versatile',
+  'llama-3.1-8b-instant',
+  'gemma2-9b-it',
+  'mixtral-8x7b-32768'
+];
+
+const LLM_MODEL = MODEL_CHAIN[0];
 
 /**
  * Generate a response using the LLM with context from RAG
@@ -29,41 +37,57 @@ async function generateResponse(query, contexts = [], options = {}) {
 
   const startTime = Date.now();
 
-  try {
-    const completion = await groq.chat.completions.create({
-      model: LLM_MODEL,
-      messages,
-      temperature: 0.2,
-      max_tokens: 1500,
-      top_p: 0.85,
-      stream: false
-    });
+  // Try each model in the fallback chain
+  for (let i = 0; i < MODEL_CHAIN.length; i++) {
+    const model = MODEL_CHAIN[i];
+    try {
+      const completion = await groq.chat.completions.create({
+        model,
+        messages,
+        temperature: 0.2,
+        max_tokens: 1500,
+        top_p: 0.85,
+        stream: false
+      });
 
-    const responseTime = Date.now() - startTime;
-    const response = completion.choices[0]?.message?.content || '';
-    const tokensUsed = completion.usage?.total_tokens || 0;
+      const responseTime = Date.now() - startTime;
+      const response = completion.choices[0]?.message?.content || '';
+      const tokensUsed = completion.usage?.total_tokens || 0;
 
-    return {
-      content: response,
-      metadata: {
-        tokensUsed,
-        responseTime,
-        model: LLM_MODEL,
-        contextsUsed: contexts.length
+      if (i > 0) {
+        console.log(`[${new Date().toISOString()}] Used fallback model: ${model}`);
       }
-    };
-  } catch (error) {
-    console.error(`[${new Date().toISOString()}] LLM generation error:`, error.message);
 
-    return {
-      content: getFallbackResponse(language),
-      metadata: {
-        tokensUsed: 0,
-        responseTime: Date.now() - startTime,
-        model: 'fallback',
-        error: error.message
+      return {
+        content: response,
+        metadata: {
+          tokensUsed,
+          responseTime,
+          model,
+          contextsUsed: contexts.length
+        }
+      };
+    } catch (error) {
+      const isRateLimit = error.message && (error.message.includes('429') || error.message.includes('rate_limit'));
+      console.error(`[${new Date().toISOString()}] LLM error (${model}):`, error.message.substring(0, 150));
+
+      // If rate limited, try next model
+      if (isRateLimit && i < MODEL_CHAIN.length - 1) {
+        console.log(`[${new Date().toISOString()}] Rate limited on ${model}, trying next...`);
+        continue;
       }
-    };
+
+      // If last model or non-rate-limit error, return fallback
+      return {
+        content: getFallbackResponse(language),
+        metadata: {
+          tokensUsed: 0,
+          responseTime: Date.now() - startTime,
+          model: 'fallback',
+          error: error.message
+        }
+      };
+    }
   }
 }
 
@@ -78,24 +102,34 @@ async function generateSuggestions(query, response, intent = 'general', language
         ? 'Generate questions in English.'
         : 'Generate questions in the same language mix as the original query.';
 
-    const completion = await groq.chat.completions.create({
-      model: LLM_MODEL,
-      messages: [
-        {
-          role: 'system',
-          content: `You are a helpful assistant that suggests follow-up questions for UMPSA students. Given a question and answer, suggest 2-3 natural follow-up questions the student might want to ask next. ${langInstruction}
+    let completion;
+    for (const model of MODEL_CHAIN) {
+      try {
+        completion = await groq.chat.completions.create({
+          model,
+          messages: [
+            {
+              role: 'system',
+              content: `You are a helpful assistant that suggests follow-up questions for UMPSA students. Given a question and answer, suggest 2-3 natural follow-up questions the student might want to ask next. ${langInstruction}
 
 Return ONLY the questions, one per line, no numbering, no bullets, no extra text.`
-        },
-        {
-          role: 'user',
-          content: `Original question: ${query}\n\nAnswer given: ${response.substring(0, 500)}\n\nTopic category: ${intent}\n\nSuggest 2-3 follow-up questions:`
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 256,
-      stream: false
-    });
+            },
+            {
+              role: 'user',
+              content: `Original question: ${query}\n\nAnswer given: ${response.substring(0, 500)}\n\nTopic category: ${intent}\n\nSuggest 2-3 follow-up questions:`
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 256,
+          stream: false
+        });
+        break;
+      } catch (err) {
+        if (err.message && err.message.includes('429') && model !== MODEL_CHAIN[MODEL_CHAIN.length - 1]) continue;
+        throw err;
+      }
+    }
+    if (!completion) return [];
 
     const suggestionsText = completion.choices[0]?.message?.content || '';
     const suggestions = suggestionsText

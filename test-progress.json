@@ -1,0 +1,170 @@
+[
+  {
+    "num": 1,
+    "question": "Bila exam semester 2 2025/2026?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.47363828460593377
+  },
+  {
+    "num": 2,
+    "question": "Bila mid-semester break?",
+    "response": "Mid-semester break untuk Semester 1 2026/2027 adalah dari 14 November 2026 (Sabtu) hingga 22 November 2026 (Ahad), iaitu selama 1 minggu. \n\nManakala, mid-semester break untuk Semester 2 2026/2027 adalah dari 10 April 2027 (Sabtu) hingga 18 April 2027 (Ahad), juga selama 1 minggu.",
+    "confidence": 0.3695761505437685
+  },
+  {
+    "num": 3,
+    "question": "Bila kuliah bermula semester 1 2026/2027?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.540463763612559
+  },
+  {
+    "num": 4,
+    "question": "Bila pendaftaran pelajar baru?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.4118246326136535
+  },
+  {
+    "num": 5,
+    "question": "Apa public holidays semester ni?",
+    "response": "Maaf, saya tidak menemui maklumat ini dalam dokumen saya. Dokumen yang saya miliki hanya menyediakan maklumat tentang akademik, fasiliti, dan proses pendaftaran di Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA), tetapi tidak menyediakan maklumat tentang cuti umum semester ini.",
+    "confidence": 0.3677059737071113
+  },
+  {
+    "num": 6,
+    "question": "Apa jadual kelas hari Isnin?",
+    "response": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+    "confidence": 0.2905942474702482
+  },
+  {
+    "num": 7,
+    "question": "Apa courses yang ada sem ni?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.31420237696582826
+  },
+  {
+    "num": 8,
+    "question": "Kelas AI Techniques bila?",
+    "response": "ERROR: timeout-60s",
+    "confidence": "N/A"
+  },
+  {
+    "num": 9,
+    "question": "Apa bilik untuk Software Engineering Practices?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.35654902376687586
+  },
+  {
+    "num": 10,
+    "question": "Macam mana nak apply hostel?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.4037180645295462
+  },
+  {
+    "num": 11,
+    "question": "Apa steps untuk permohonan hostel pelajar baru?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.42499201897466027
+  },
+  {
+    "num": 12,
+    "question": "Macam mana nak check availability hostel?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.406387792721919
+  },
+  {
+    "num": 13,
+    "question": "Apa contact number UMPSA?",
+    "response": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+    "confidence": 0.34729359004485594
+  },
+  {
+    "num": 14,
+    "question": "UMPSA ada berapa kampus?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.37398469989554545
+  },
+  {
+    "num": 15,
+    "question": "Apa email untuk admission?",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 16,
+    "question": "Macam mana nak hubungi JHEPA?",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 17,
+    "question": "Apa programme yang ditawarkan UMPSA?",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 18,
+    "question": "Macam mana nak apply masuk UMPSA?",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 19,
+    "question": "Ada dual degree programme?",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 20,
+    "question": "Macam mana nak guna ADAB app?",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 21,
+    "question": "Apa features dalam E-Comm portal?",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 22,
+    "question": "Macam mana nak buat aduan?",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 23,
+    "question": "Macam mana nak bayar yuran?",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 24,
+    "question": "Apa contact untuk student finance?",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 25,
+    "question": "Apa itu UMPSA?",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 26,
+    "question": "Siapa chancellor UMPSA?",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 27,
+    "question": "Hello",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  },
+  {
+    "num": 28,
+    "question": "Terima kasih",
+    "response": "{\"error\":\"Too many requests. Please try again later.\"}",
+    "confidence": "N/A"
+  }
+]
