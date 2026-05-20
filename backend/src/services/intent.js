@@ -3,14 +3,21 @@
  * Classifies user intent before RAG processing
  */
 
+// Course code pattern: 3 uppercase letters + 4 digits
+const COURSE_CODE_REGEX = /[A-Z]{3}\d{4}/g;
+
 // Keyword patterns for each intent category
 const INTENT_PATTERNS = {
   greeting: {
     keywords: ['hi', 'hello', 'hey', 'assalamualaikum', 'salam', 'hai', 'helo', 'good morning', 'good afternoon', 'good evening', 'selamat pagi', 'selamat petang', 'selamat malam', 'apa khabar', 'how are you'],
     priority: 10
   },
+  timetable: {
+    keywords: ['plan timetable', 'jadual', 'timetable', 'schedule', 'clash', 'plan course', 'plan kursus', 'susun jadual'],
+    priority: 15
+  },
   academic: {
-    keywords: ['course', 'kursus', 'subject', 'subjek', 'credit', 'kredit', 'gpa', 'cgpa', 'exam', 'peperiksaan', 'lecture', 'kuliah', 'tutorial', 'assignment', 'tugasan', 'semester', 'syllabus', 'silibus', 'faculty', 'fakulti', 'program', 'degree', 'diploma', 'master', 'phd', 'thesis', 'fyp', 'final year project', 'academic', 'akademik', 'class', 'kelas', 'schedule', 'jadual', 'timetable', 'lecturer', 'pensyarah', 'dean', 'dekan'],
+    keywords: ['course', 'kursus', 'subject', 'subjek', 'credit', 'kredit', 'gpa', 'cgpa', 'exam', 'peperiksaan', 'lecture', 'kuliah', 'tutorial', 'assignment', 'tugasan', 'semester', 'syllabus', 'silibus', 'faculty', 'fakulti', 'program', 'degree', 'diploma', 'master', 'phd', 'thesis', 'fyp', 'final year project', 'academic', 'akademik', 'class', 'kelas', 'lecturer', 'pensyarah', 'dean', 'dekan'],
     priority: 5
   },
   hostel: {
@@ -51,6 +58,12 @@ function classifyIntent(message) {
   const lowerMessage = message.toLowerCase().trim();
   const words = lowerMessage.split(/\s+/);
   
+  // Check for multiple course codes → timetable intent
+  const courseCodes = message.match(COURSE_CODE_REGEX) || [];
+  if (courseCodes.length >= 2) {
+    return { intent: 'timetable', confidence: 0.95, needsRAG: false, courseCodes };
+  }
+
   const scores = {};
 
   for (const [intent, config] of Object.entries(INTENT_PATTERNS)) {
@@ -96,6 +109,11 @@ function classifyIntent(message) {
     return { intent: 'general', confidence: 0.5, needsRAG: true };
   }
 
+  // Timetable intent from keywords (single course code or keyword match)
+  if (topIntent === 'timetable') {
+    return { intent: 'timetable', confidence: Math.min(0.95, 0.5 + (topScore * 0.1)), needsRAG: false, courseCodes };
+  }
+
   const confidence = Math.min(0.95, 0.5 + (topScore * 0.1));
   return { intent: topIntent, confidence, needsRAG: true };
 }
@@ -112,5 +130,6 @@ function getGreetingResponse(language) {
 module.exports = {
   classifyIntent,
   getGreetingResponse,
-  INTENT_PATTERNS
+  INTENT_PATTERNS,
+  COURSE_CODE_REGEX
 };
