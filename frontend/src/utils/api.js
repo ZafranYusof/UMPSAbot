@@ -67,6 +67,18 @@ export const authAPI = {
     api.get(`/auth/profile/${userId}`)
 };
 
+// Timetable API
+export const timetableAPI = {
+  plan: (courses, semester) =>
+    api.post('/timetable/plan', { courses, semester }),
+  
+  getCourses: (semester) =>
+    api.get('/timetable/courses', { params: { semester } }),
+  
+  importSlots: (slots) =>
+    api.post('/timetable/import', { slots })
+};
+
 // Health check
 export const healthCheck = () => api.get('/health');
 

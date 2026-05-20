@@ -11,6 +11,7 @@ const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
 const notificationRoutes = require('./routes/notifications');
 const whatsappRoutes = require('./routes/whatsapp');
+const timetableRoutes = require('./routes/timetable');
 const { autoIngestDocs } = require('./services/ingest');
 const { errorHandler, chatRateLimiter, generalRateLimiter } = require('./middleware');
 
@@ -35,6 +36,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
+app.use('/api/timetable', timetableRoutes);
 
 // Direct POST /api/chat endpoint (alias for /api/chat/send) with chat rate limit
 const { sendMessage } = require('./controllers/chatController');

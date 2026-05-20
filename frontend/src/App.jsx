@@ -4,6 +4,7 @@ import { LanguageProvider } from './context/LanguageContext';
 import Landing from './pages/Landing';
 import Chat from './pages/Chat';
 import Admin from './pages/Admin';
+import TimetablePlanner from './pages/TimetablePlanner';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
               <Route path="/" element={<Landing />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/planner" element={<TimetablePlanner />} />
             </Routes>
           </div>
         </Router>

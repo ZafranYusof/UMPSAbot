@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MessageSquare, BookOpen, Globe, Shield, ArrowRight } from 'lucide-react';
+import { MessageSquare, BookOpen, Globe, Shield, ArrowRight, Calendar } from 'lucide-react';
 
 function Landing() {
   const features = [
@@ -36,6 +36,9 @@ function Landing() {
           <span className="font-semibold text-white">UMPSABot</span>
         </div>
         <div className="flex items-center gap-4">
+          <a href="/planner" className="text-sm text-gray-400 hover:text-white transition-colors">
+            Planner
+          </a>
           <a href="/admin" className="text-sm text-gray-400 hover:text-white transition-colors">
             Admin
           </a>
@@ -80,11 +83,11 @@ function Landing() {
               Start Chatting
             </a>
             <a
-              href="/admin"
+              href="/planner"
               className="btn-secondary text-base px-6 py-3 flex items-center justify-center gap-2"
             >
-              <BookOpen size={18} />
-              Manage Knowledge Base
+              <Calendar size={18} />
+              Timetable Planner
             </a>
           </div>
         </motion.div>
