@@ -6,7 +6,7 @@
 const CachedResponse = require('../models/CachedResponse');
 const { generateEmbedding, cosineSimilarity } = require('./embedding');
 
-const SIMILARITY_THRESHOLD = 0.85;
+const SIMILARITY_THRESHOLD = parseFloat(process.env.CACHE_SIMILARITY_THRESHOLD) || 0.92;
 
 /**
  * Normalize a query string for exact-match lookup

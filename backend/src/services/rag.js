@@ -5,6 +5,7 @@
 
 const { generateEmbedding, cosineSimilarity } = require('./embedding');
 const { generateResponse, generateSuggestions, estimateConfidence } = require('./llm');
+const { generateTemplateFallback } = require('./templateFallback');
 const { chunkText, extractText } = require('./chunking');
 const { classifyIntent, getGreetingResponse } = require('./intent');
 const { getCachedResponse, cacheResponse } = require('./cache');
@@ -149,6 +150,36 @@ async function queryRAG(query, options = {}) {
     conversationHistory,
     intent: intentResult.intent
   });
+
+  // Step 9.5: If LLM returned fallback (all providers failed), try template fallback
+  if (llmResponse.metadata?.model === 'fallback' && searchResults.length > 0) {
+    console.log(`[${new Date().toISOString()}] LLM failed, trying template fallback...`);
+    const templateResult = generateTemplateFallback(searchResults, language);
+    if (templateResult) {
+      const templateResponse = {
+        content: templateResult.content,
+        sources: templateResult.sources,
+        confidence,
+        isLowConfidence: confidence < CONFIDENCE_THRESHOLD,
+        intent: intentResult.intent,
+        suggestions: [],
+        handoff,
+        handoffContact,
+        metadata: {
+          ...llmResponse.metadata,
+          model: 'template-fallback',
+          provider: 'template'
+        }
+      };
+
+      // Cache template response too (non-blocking)
+      cacheResponse(query, queryEmbedding, templateResponse, language).catch(err => {
+        console.error(`[${new Date().toISOString()}] Cache save failed:`, err.message);
+      });
+
+      return templateResponse;
+    }
+  }
 
   // Step 10: Add disclaimer if low confidence
   let responseContent = llmResponse.content;

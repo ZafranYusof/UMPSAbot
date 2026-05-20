@@ -1,13 +1,14 @@
 /**
  * LLM Service
- * Handles communication with Groq API for text generation
+ * Handles communication with LLM providers for text generation
+ * 3-layer resilience: Groq → OpenRouter → Cerebras → Template fallback
  */
 
 const Groq = require('groq-sdk');
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// Model fallback chain — if primary hits rate limit, try next
+// Model fallback chain for Groq — if primary hits rate limit, try next
 const MODEL_CHAIN = [
   process.env.LLM_MODEL || 'llama-3.3-70b-versatile',
   'llama-3.1-8b-instant',
@@ -16,6 +17,16 @@ const MODEL_CHAIN = [
 ];
 
 const LLM_MODEL = MODEL_CHAIN[0];
+
+// Secondary provider: OpenRouter (OpenAI-compatible)
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
+const OPENROUTER_MODEL = process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.3-70b-instruct:free';
+const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1/chat/completions';
+
+// Tertiary provider: Cerebras (OpenAI-compatible)
+const CEREBRAS_API_KEY = process.env.CEREBRAS_API_KEY;
+const CEREBRAS_MODEL = process.env.CEREBRAS_MODEL || 'llama-3.3-70b';
+const CEREBRAS_BASE_URL = 'https://api.cerebras.ai/v1/chat/completions';
 
 /**
  * Generate a response using the LLM with context from RAG
@@ -37,7 +48,74 @@ async function generateResponse(query, contexts = [], options = {}) {
 
   const startTime = Date.now();
 
-  // Try each model in the fallback chain
+  // Layer 1: Try Groq model chain
+  const groqResult = await tryGroqChain(messages);
+  if (groqResult) {
+    const responseTime = Date.now() - startTime;
+    return {
+      content: groqResult.content,
+      metadata: {
+        tokensUsed: groqResult.tokensUsed,
+        responseTime,
+        model: groqResult.model,
+        provider: 'groq',
+        contextsUsed: contexts.length
+      }
+    };
+  }
+
+  // Layer 2: Try OpenRouter
+  const openRouterResult = await tryOpenRouter(messages);
+  if (openRouterResult) {
+    const responseTime = Date.now() - startTime;
+    console.log(`[${new Date().toISOString()}] Used OpenRouter fallback: ${OPENROUTER_MODEL}`);
+    return {
+      content: openRouterResult.content,
+      metadata: {
+        tokensUsed: openRouterResult.tokensUsed,
+        responseTime,
+        model: OPENROUTER_MODEL,
+        provider: 'openrouter',
+        contextsUsed: contexts.length
+      }
+    };
+  }
+
+  // Layer 3: Try Cerebras
+  const cerebrasResult = await tryCerebras(messages);
+  if (cerebrasResult) {
+    const responseTime = Date.now() - startTime;
+    console.log(`[${new Date().toISOString()}] Used Cerebras fallback: ${CEREBRAS_MODEL}`);
+    return {
+      content: cerebrasResult.content,
+      metadata: {
+        tokensUsed: cerebrasResult.tokensUsed,
+        responseTime,
+        model: CEREBRAS_MODEL,
+        provider: 'cerebras',
+        contextsUsed: contexts.length
+      }
+    };
+  }
+
+  // All providers failed — return fallback marker
+  console.error(`[${new Date().toISOString()}] All LLM providers failed`);
+  return {
+    content: getFallbackResponse(language),
+    metadata: {
+      tokensUsed: 0,
+      responseTime: Date.now() - startTime,
+      model: 'fallback',
+      provider: 'none',
+      contextsUsed: contexts.length
+    }
+  };
+}
+
+/**
+ * Try Groq model chain — returns result or null if all models fail
+ */
+async function tryGroqChain(messages) {
   for (let i = 0; i < MODEL_CHAIN.length; i++) {
     const model = MODEL_CHAIN[i];
     try {
@@ -50,44 +128,113 @@ async function generateResponse(query, contexts = [], options = {}) {
         stream: false
       });
 
-      const responseTime = Date.now() - startTime;
-      const response = completion.choices[0]?.message?.content || '';
+      const content = completion.choices[0]?.message?.content || '';
       const tokensUsed = completion.usage?.total_tokens || 0;
 
       if (i > 0) {
-        console.log(`[${new Date().toISOString()}] Used fallback model: ${model}`);
+        console.log(`[${new Date().toISOString()}] Used Groq fallback model: ${model}`);
       }
 
-      return {
-        content: response,
-        metadata: {
-          tokensUsed,
-          responseTime,
-          model,
-          contextsUsed: contexts.length
-        }
-      };
+      return { content, tokensUsed, model };
     } catch (error) {
       const isRateLimit = error.message && (error.message.includes('429') || error.message.includes('rate_limit'));
-      console.error(`[${new Date().toISOString()}] LLM error (${model}):`, error.message.substring(0, 150));
+      console.error(`[${new Date().toISOString()}] Groq error (${model}):`, (error.message || '').substring(0, 150));
 
-      // If rate limited, try next model
       if (isRateLimit && i < MODEL_CHAIN.length - 1) {
-        console.log(`[${new Date().toISOString()}] Rate limited on ${model}, trying next...`);
+        console.log(`[${new Date().toISOString()}] Rate limited on ${model}, trying next Groq model...`);
         continue;
       }
 
-      // If last model or non-rate-limit error, return fallback
-      return {
-        content: getFallbackResponse(language),
-        metadata: {
-          tokensUsed: 0,
-          responseTime: Date.now() - startTime,
-          model: 'fallback',
-          error: error.message
-        }
-      };
+      // Non-rate-limit error or last model — Groq chain exhausted
+      if (!isRateLimit || i === MODEL_CHAIN.length - 1) {
+        return null;
+      }
     }
+  }
+  return null;
+}
+
+/**
+ * Try OpenRouter (OpenAI-compatible API)
+ * Returns result or null on failure
+ */
+async function tryOpenRouter(messages) {
+  if (!OPENROUTER_API_KEY) return null;
+
+  try {
+    const response = await fetch(OPENROUTER_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+        'HTTP-Referer': 'https://umpsa-chatbot.onrender.com',
+        'X-Title': 'UMPSABot'
+      },
+      body: JSON.stringify({
+        model: OPENROUTER_MODEL,
+        messages,
+        temperature: 0.2,
+        max_tokens: 1500,
+        top_p: 0.85
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => 'unknown');
+      console.error(`[${new Date().toISOString()}] OpenRouter HTTP ${response.status}: ${errText.substring(0, 150)}`);
+      return null;
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
+    const tokensUsed = data.usage?.total_tokens || 0;
+
+    if (!content) return null;
+    return { content, tokensUsed };
+  } catch (error) {
+    console.error(`[${new Date().toISOString()}] OpenRouter error:`, (error.message || '').substring(0, 150));
+    return null;
+  }
+}
+
+/**
+ * Try Cerebras (OpenAI-compatible API)
+ * Returns result or null on failure
+ */
+async function tryCerebras(messages) {
+  if (!CEREBRAS_API_KEY) return null;
+
+  try {
+    const response = await fetch(CEREBRAS_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${CEREBRAS_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: CEREBRAS_MODEL,
+        messages,
+        temperature: 0.2,
+        max_tokens: 1500,
+        top_p: 0.85
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => 'unknown');
+      console.error(`[${new Date().toISOString()}] Cerebras HTTP ${response.status}: ${errText.substring(0, 150)}`);
+      return null;
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
+    const tokensUsed = data.usage?.total_tokens || 0;
+
+    if (!content) return null;
+    return { content, tokensUsed };
+  } catch (error) {
+    console.error(`[${new Date().toISOString()}] Cerebras error:`, (error.message || '').substring(0, 150));
+    return null;
   }
 }
 
