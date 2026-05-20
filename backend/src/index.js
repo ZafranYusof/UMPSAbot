@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 5005;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5176', 'http://localhost:5173'],
+  origin: ['http://localhost:5176', 'http://localhost:5173', 'https://frontend-kappa-six-83.vercel.app', 'https://frontend-o1lsq1o5n-vexcczs-projects.vercel.app'],
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
