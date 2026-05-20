@@ -1,0 +1,289 @@
+/**
+ * RAG (Retrieval Augmented Generation) Service
+ * Orchestrates the full RAG pipeline: embed query → search → generate
+ */
+
+const { generateEmbedding, cosineSimilarity } = require('./embedding');
+const { generateResponse, generateSuggestions, estimateConfidence } = require('./llm');
+const { chunkText, extractText } = require('./chunking');
+const { classifyIntent, getGreetingResponse } = require('./intent');
+const Document = require('../models/Document');
+
+const TOP_K = parseInt(process.env.TOP_K_RESULTS) || 5;
+const CONFIDENCE_THRESHOLD = parseFloat(process.env.CONFIDENCE_THRESHOLD) || 0.3;
+const HANDOFF_THRESHOLD = parseFloat(process.env.HANDOFF_THRESHOLD) || 0.2;
+
+// Track low-confidence attempts per session for handoff logic
+const lowConfidenceTracker = new Map();
+
+/**
+ * UMPSA contact info for live agent handoff
+ */
+const HANDOFF_CONTACTS = {
+  academic: {
+    office: 'Pejabat Akademik UMPSA',
+    phone: '09-424 5000',
+    email: 'akademik@umpsa.edu.my'
+  },
+  hostel: {
+    office: 'Pejabat Pengurusan Kolej Kediaman',
+    phone: '09-424 5500',
+    email: 'kolej@umpsa.edu.my'
+  },
+  fees: {
+    office: 'Pejabat Bendahari',
+    phone: '09-424 5100',
+    email: 'bendahari@umpsa.edu.my'
+  },
+  registration: {
+    office: 'Pejabat Pendaftar',
+    phone: '09-424 5200',
+    email: 'pendaftar@umpsa.edu.my'
+  },
+  general: {
+    office: 'Pusat Perkhidmatan Pelajar (One Stop Centre)',
+    phone: '09-424 5000',
+    email: 'osc@umpsa.edu.my'
+  }
+};
+
+/**
+ * Process a user query through the RAG pipeline
+ * @param {string} query - User's question
+ * @param {object} options - Query options
+ * @returns {object} Response with sources, confidence, suggestions, handoff
+ */
+async function queryRAG(query, options = {}) {
+  const { language = 'mixed', conversationHistory = [], topK = TOP_K, sessionId = 'default' } = options;
+
+  // Step 1: Classify intent
+  const intentResult = classifyIntent(query);
+
+  // Step 2: Handle greetings without RAG
+  if (!intentResult.needsRAG) {
+    const greetingResponse = getGreetingResponse(language);
+    // Reset low confidence tracker on greeting
+    lowConfidenceTracker.delete(sessionId);
+    return {
+      content: greetingResponse,
+      sources: [],
+      confidence: 1.0,
+      isLowConfidence: false,
+      intent: intentResult.intent,
+      suggestions: getSuggestionsForGreeting(language),
+      handoff: false,
+      handoffContact: null
+    };
+  }
+
+  // Step 3: Generate embedding for the query
+  const queryEmbedding = await generateEmbedding(query);
+
+  // Step 4: Search for similar chunks in the vector store
+  const searchResults = await searchSimilarChunks(queryEmbedding, topK);
+
+  // Step 5: Check confidence
+  const scores = searchResults.map(r => r.score);
+  const confidence = estimateConfidence(scores);
+
+  // Step 6: Check handoff logic
+  let handoff = false;
+  let handoffContact = null;
+
+  if (confidence < HANDOFF_THRESHOLD) {
+    const tracker = lowConfidenceTracker.get(sessionId) || 0;
+    lowConfidenceTracker.set(sessionId, tracker + 1);
+
+    if (tracker + 1 >= 2) {
+      handoff = true;
+      handoffContact = HANDOFF_CONTACTS[intentResult.intent] || HANDOFF_CONTACTS.general;
+      // Reset tracker after handoff
+      lowConfidenceTracker.delete(sessionId);
+    }
+  } else {
+    // Reset tracker on successful retrieval
+    lowConfidenceTracker.set(sessionId, 0);
+  }
+
+  // Step 7: If confidence is too low and no results, return fallback
+  if (confidence < CONFIDENCE_THRESHOLD && searchResults.length === 0) {
+    const disclaimer = language === 'ms'
+      ? 'Saya tidak pasti tentang jawapan ini. Sila hubungi pejabat berkaitan.'
+      : "I'm not confident about this answer. Please contact the relevant office.";
+
+    return {
+      content: getLowConfidenceResponse(language),
+      sources: [],
+      confidence,
+      isLowConfidence: true,
+      intent: intentResult.intent,
+      suggestions: [],
+      handoff,
+      handoffContact
+    };
+  }
+
+  // Step 8: Extract context texts from search results
+  const contexts = searchResults.map(r => r.chunk.content);
+
+  // Step 9: Generate response using LLM with retrieved context
+  const llmResponse = await generateResponse(query, contexts, {
+    language,
+    conversationHistory,
+    intent: intentResult.intent
+  });
+
+  // Step 10: Add disclaimer if low confidence
+  let responseContent = llmResponse.content;
+  if (confidence < CONFIDENCE_THRESHOLD) {
+    const disclaimer = language === 'ms'
+      ? '\n\n⚠️ Saya tidak pasti tentang jawapan ini. Sila hubungi pejabat berkaitan untuk pengesahan.'
+      : "\n\n⚠️ I'm not fully confident about this answer. Please contact the relevant office for confirmation.";
+    responseContent += disclaimer;
+  }
+
+  // Step 11: Format sources for citation
+  const sources = searchResults.map(r => ({
+    documentId: r.documentId,
+    title: r.documentTitle,
+    chunk: r.chunk.content.substring(0, 200) + '...',
+    score: r.score
+  }));
+
+  // Step 12: Generate follow-up suggestions
+  let suggestions = [];
+  try {
+    suggestions = await generateSuggestions(query, responseContent, intentResult.intent, language);
+  } catch (err) {
+    console.error(`[${new Date().toISOString()}] Failed to generate suggestions:`, err.message);
+  }
+
+  return {
+    content: responseContent,
+    sources,
+    confidence,
+    isLowConfidence: confidence < CONFIDENCE_THRESHOLD,
+    intent: intentResult.intent,
+    suggestions,
+    handoff,
+    handoffContact,
+    metadata: llmResponse.metadata
+  };
+}
+
+/**
+ * Search for chunks similar to the query embedding
+ * Uses in-memory cosine similarity search across all document chunks
+ */
+async function searchSimilarChunks(queryEmbedding, topK = TOP_K) {
+  // Get all processed documents with their chunks
+  const documents = await Document.find({ isProcessed: true }).lean();
+
+  const results = [];
+
+  for (const doc of documents) {
+    if (!doc.chunks || doc.chunks.length === 0) continue;
+
+    for (const chunk of doc.chunks) {
+      if (!chunk.embedding || chunk.embedding.length === 0) continue;
+
+      const score = cosineSimilarity(queryEmbedding, chunk.embedding);
+      
+      results.push({
+        documentId: doc._id,
+        documentTitle: doc.title,
+        chunk,
+        score
+      });
+    }
+  }
+
+  // Sort by similarity score (descending) and return top K
+  results.sort((a, b) => b.score - a.score);
+  return results.slice(0, topK);
+}
+
+/**
+ * Ingest a document: extract text, chunk, embed, and store
+ * @param {Buffer} fileBuffer - File content buffer
+ * @param {object} metadata - Document metadata
+ * @returns {object} Processed document info
+ */
+async function ingestDocument(fileBuffer, metadata) {
+  const { title, filename, fileType, fileSize, category, language } = metadata;
+
+  // Step 1: Extract text from file
+  const text = await extractText(fileBuffer, fileType);
+
+  // Step 2: Chunk the text
+  const chunks = chunkText(text);
+
+  // Step 3: Generate embeddings for each chunk
+  const chunksWithEmbeddings = [];
+  for (let i = 0; i < chunks.length; i++) {
+    const embedding = await generateEmbedding(chunks[i]);
+    chunksWithEmbeddings.push({
+      content: chunks[i],
+      embedding,
+      index: i
+    });
+  }
+
+  // Step 4: Store in MongoDB
+  const document = new Document({
+    title,
+    originalFilename: filename,
+    content: text,
+    chunks: chunksWithEmbeddings,
+    fileType,
+    fileSize,
+    category: category || 'general',
+    language: language || 'mixed',
+    isProcessed: true,
+    chunkCount: chunks.length
+  });
+
+  await document.save();
+
+  return {
+    id: document._id,
+    title: document.title,
+    chunkCount: chunks.length,
+    fileType,
+    fileSize
+  };
+}
+
+/**
+ * Get low confidence response
+ */
+function getLowConfidenceResponse(language) {
+  if (language === 'ms') {
+    return 'Maaf, saya tidak menemui maklumat yang cukup dalam pangkalan data untuk menjawab soalan ini dengan yakin. Sila hubungi pejabat akademik UMPSA atau semak portal pelajar untuk maklumat terkini.';
+  }
+  return "I don't have enough information in my knowledge base to answer this question confidently. Please check the UMPSA student portal or contact the academic office for the most up-to-date information.";
+}
+
+/**
+ * Get default suggestions for greeting
+ */
+function getSuggestionsForGreeting(language) {
+  if (language === 'ms') {
+    return [
+      'Bagaimana cara mendaftar kursus?',
+      'Berapa yuran semester ini?',
+      'Apa jadual peperiksaan?'
+    ];
+  }
+  return [
+    'How do I register for courses?',
+    'What are the semester fees?',
+    'Where can I find the exam schedule?'
+  ];
+}
+
+module.exports = {
+  queryRAG,
+  ingestDocument,
+  searchSimilarChunks
+};
