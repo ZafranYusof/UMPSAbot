@@ -439,6 +439,7 @@ RULES:
 6. You MAY provide general guidance (e.g., "hubungi pejabat akademik") alongside document-based answers.
 7. When listing steps, include ALL steps from the documents with full details.
 8. Respond in the same language the user asks in (Bahasa Melayu or English or mixed).
+9. Do NOT use markdown bold (**text**) or any markdown formatting. Write plain text only. Use numbered lists or dashes for steps.
 
 `;
 
