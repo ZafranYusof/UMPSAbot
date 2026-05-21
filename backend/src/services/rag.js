@@ -102,7 +102,7 @@ async function queryRAG(query, options = {}) {
   const queryEmbedding = await generateEmbedding(query);
 
   // Step 4: Search for similar chunks in the vector store
-  const searchResults = await searchSimilarChunks(queryEmbedding, topK);
+  const searchResults = await searchSimilarChunks(queryEmbedding, topK, query);
 
   // Step 5: Check confidence
   const scores = searchResults.map(r => r.score);
@@ -228,14 +228,54 @@ async function queryRAG(query, options = {}) {
 
 /**
  * Search for chunks similar to the query embedding
- * Uses in-memory cosine similarity search across all document chunks
+ * Hybrid approach: vector similarity + keyword matching
  * Lower similarity threshold to include more relevant results
  */
-async function searchSimilarChunks(queryEmbedding, topK = TOP_K) {
+async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
   const documents = await Document.find({ isProcessed: true }).lean();
 
   const results = [];
   const MIN_SIMILARITY = 0.1; // Low threshold to include more chunks
+
+  // Synonym map for BM/EN cross-language matching
+  const synonyms = {
+    'club': ['kelab', 'persatuan', 'societies', 'society', 'clubs'],
+    'kelab': ['club', 'persatuan', 'societies'],
+    'persatuan': ['club', 'kelab', 'society'],
+    'gym': ['gimnasium', 'kecergasan', 'fitness', 'sports', 'sukan'],
+    'sukan': ['sports', 'gym', 'recreation', 'rekreasi'],
+    'library': ['perpustakaan', 'pustaka'],
+    'perpustakaan': ['library', 'pustaka'],
+    'hostel': ['asrama', 'kolej', 'kediaman', 'accommodation'],
+    'asrama': ['hostel', 'kolej', 'kediaman'],
+    'clinic': ['klinik', 'kesihatan', 'health', 'medical'],
+    'klinik': ['clinic', 'health', 'kesihatan'],
+    'health': ['kesihatan', 'klinik', 'clinic', 'medical'],
+    'wifi': ['internet', 'rangkaian', 'network', 'ict'],
+    'bus': ['bas', 'shuttle', 'pengangkutan', 'transport'],
+    'transport': ['pengangkutan', 'bas', 'bus', 'shuttle'],
+    'fees': ['yuran', 'bayaran', 'payment', 'kewangan'],
+    'yuran': ['fees', 'bayaran', 'payment', 'tuition'],
+    'bayar': ['payment', 'fees', 'yuran', 'kewangan'],
+    'gpa': ['cgpa', 'gred', 'grade', 'akademik', 'pointer'],
+    'exam': ['peperiksaan', 'result', 'keputusan'],
+    'result': ['keputusan', 'exam', 'peperiksaan'],
+    'course': ['kursus', 'subjek', 'program', 'programme'],
+    'kursus': ['course', 'subjek', 'program'],
+    'register': ['daftar', 'pendaftaran', 'registration'],
+    'daftar': ['register', 'pendaftaran', 'registration'],
+    'scholarship': ['biasiswa', 'bantuan', 'financial'],
+    'biasiswa': ['scholarship', 'bantuan', 'financial'],
+    'graduate': ['graduan', 'konvokesyen', 'convocation', 'tamat'],
+    'counselling': ['kaunseling', 'bimbingan'],
+    'parking': ['tempat letak kereta', 'parkir'],
+    'contact': ['hubungi', 'telefon', 'phone', 'nombor'],
+  };
+
+  // Extract keywords from query + expand with synonyms
+  const rawWords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+  const queryWords = [...new Set([...rawWords, ...rawWords.flatMap(w => synonyms[w] || [])])];
+
 
   for (const doc of documents) {
     if (!doc.chunks || doc.chunks.length === 0) continue;
@@ -243,7 +283,21 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K) {
     for (const chunk of doc.chunks) {
       if (!chunk.embedding || chunk.embedding.length === 0) continue;
 
-      const score = cosineSimilarity(queryEmbedding, chunk.embedding);
+      let score = cosineSimilarity(queryEmbedding, chunk.embedding);
+
+      // Keyword boost: if query words appear in chunk content or doc title, boost score
+      if (queryWords.length > 0) {
+        const chunkLower = (chunk.content || '').toLowerCase();
+        const titleLower = (doc.title || '').toLowerCase();
+        let keywordHits = 0;
+        for (const word of queryWords) {
+          if (chunkLower.includes(word)) keywordHits++;
+          if (titleLower.includes(word)) keywordHits += 0.5;
+        }
+        // Boost score based on keyword matches (up to 0.3 bonus)
+        const keywordBoost = Math.min(0.3, (keywordHits / queryWords.length) * 0.3);
+        score += keywordBoost;
+      }
 
       // Only include chunks above minimum similarity
       if (score >= MIN_SIMILARITY) {
