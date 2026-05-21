@@ -12,7 +12,7 @@ function App() {
     <ThemeProvider>
       <LanguageProvider>
         <Router>
-          <div className="min-h-screen bg-navy-900 dark:bg-navy-900">
+          <div className="min-h-screen bg-primary">
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/chat" element={<Chat />} />
