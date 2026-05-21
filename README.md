@@ -1,55 +1,66 @@
 # UMPSABot 🤖
 
-AI-powered university assistant chatbot for UMPSA students. Built for **FinTech Forward 2026** (Track 2: AI For Good — Chatbots That Actually Help).
+AI-powered chatbot for UMPSA students. Answers questions about fees, registration, hostel, academic calendar, and more — using official UMPSA documents.
 
-## Features
+Built for **FinTech Forward 2026** (PETAKOM UMPSA).
 
-- 💬 Intelligent chat interface (mobile-first, dark theme)
-- 📚 RAG (Retrieval Augmented Generation) pipeline for accurate answers
-- 📄 Document ingestion (PDF/text → chunk → embed → store)
-- 🔍 Semantic search over UMPSA knowledge base
-- 🌐 Bilingual support (Bahasa Melayu + English)
-- 📎 Source citation in responses
-- ⚠️ Confidence-based fallback messages
-- 🛡️ Admin panel for knowledge base management
+## Live Demo
+
+- **Web:** [https://frontend-kappa-six-83.vercel.app](https://frontend-kappa-six-83.vercel.app)
+- **API:** [https://umpsa-chatbot-api.onrender.com](https://umpsa-chatbot-api.onrender.com)
+- **Mobile:** Android APK available in Releases
+
+## What It Does
+
+Students ask questions in BM, English, or Manglish. The chatbot searches through 96 official UMPSA documents and generates answers with source citations.
+
+Not a generic ChatGPT wrapper — trained specifically on UMPSA data.
+
+### Key Features
+
+- **RAG Pipeline** — Retrieval-Augmented Generation for accurate, sourced answers
+- **96 Knowledge Base Documents** — fees, registration, hostel, academic calendar, clubs, facilities
+- **Jina AI Embeddings** — semantic search (768-dim vectors) with keyword boosting
+- **5-Layer LLM Failover** — DeepSeek → Groq → OpenRouter → Cerebras → Template fallback
+- **Timetable Planner** — input course codes, get non-clashing combinations
+- **Streaming Responses** — SSE-based real-time response streaming
+- **Conversation Memory** — remembers last 5 messages for follow-up questions
+- **Multi-language** — BM, English, Manglish with auto-detection
+- **Smart Caching** — popular answers cached with TTL refresh
+- **Feedback System** — thumbs up/down to track answer quality
+- **Source Citations** — every answer shows which document it came from
+- **WhatsApp Integration** — chat via WhatsApp (Twilio)
+- **Mobile App** — Flutter Android app with full chat functionality
+- **Admin Panel** — document upload, stats, popular questions tracking
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 18 + Vite + Tailwind CSS + Framer Motion |
-| Backend | Node.js + Express |
+| Frontend | React 18 + Vite + Tailwind CSS |
+| Backend | Node.js + Express 5 |
 | Database | MongoDB Atlas |
-| AI/LLM | Groq API (fast inference) |
-| RAG | Vector embeddings + cosine similarity |
-| Embeddings | sentence-transformers via Groq |
+| LLM | DeepSeek (primary) + 4 fallback providers |
+| Embeddings | Jina AI (jina-embeddings-v2-base-en, 768d) |
+| Mobile | Flutter 3.29 |
+| Deploy | Vercel (frontend) + Render (backend) |
 
 ## Project Structure
 
 ```
 umpsa-chatbot/
-├── frontend/          (React + Vite)
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── hooks/
-│   │   ├── utils/
-│   │   └── App.jsx
-│   ├── package.json
-│   └── vite.config.js
+├── frontend/          React + Vite web app
 ├── backend/
 │   ├── src/
-│   │   ├── routes/
-│   │   ├── controllers/
-│   │   ├── services/
-│   │   ├── models/
-│   │   ├── middleware/
-│   │   └── index.js
-│   ├── package.json
-│   └── .env.example
-├── docs/              (sample UMPSA docs for testing)
-├── README.md
-└── .gitignore
+│   │   ├── controllers/   Chat, feedback, reingest
+│   │   ├── services/      RAG, LLM, embedding, cache, chunking, ingest
+│   │   ├── models/        MongoDB schemas
+│   │   ├── routes/        API routes
+│   │   ├── middleware/    Rate limiting, auth, error handling
+│   │   └── jobs/          Auto-scrape cron
+│   └── docs/              96 UMPSA knowledge base files (.txt)
+├── mobile/            Flutter Android app
+└── README.md
 ```
 
 ## Setup
@@ -57,8 +68,9 @@ umpsa-chatbot/
 ### Prerequisites
 
 - Node.js 18+
-- MongoDB Atlas account (or local MongoDB)
-- Groq API key (free tier: https://console.groq.com)
+- MongoDB Atlas account
+- DeepSeek API key (free: https://platform.deepseek.com)
+- Jina AI API key (free 1M tokens/month: https://jina.ai)
 
 ### Backend
 
@@ -66,11 +78,11 @@ umpsa-chatbot/
 cd backend
 npm install
 cp .env.example .env
-# Fill in your API keys in .env
+# Fill in API keys
 npm run dev
 ```
 
-Backend runs on **http://localhost:5005**
+Runs on `http://localhost:5005`
 
 ### Frontend
 
@@ -80,31 +92,73 @@ npm install
 npm run dev
 ```
 
-Frontend runs on **http://localhost:5176**
+Runs on `http://localhost:5173`
+
+### Mobile (Flutter)
+
+```bash
+cd mobile
+flutter pub get
+flutter run
+```
+
+APK build:
+```bash
+cd mobile/android
+./gradlew assembleRelease
+```
 
 ## Environment Variables
 
-Copy `backend/.env.example` and fill in:
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `MONGODB_URI` | Yes | MongoDB connection string |
+| `DEEPSEEK_API_KEY` | Yes | DeepSeek API key (primary LLM) |
+| `JINA_API_KEY` | Yes | Jina AI embeddings key |
+| `GROQ_API_KEY` | No | Groq fallback |
+| `OPENROUTER_API_KEY` | No | OpenRouter fallback |
+| `CEREBRAS_API_KEY` | No | Cerebras fallback |
+| `PORT` | No | Server port (default: 5005) |
+| `FORCE_REINGEST` | No | Set `true` to re-embed all docs on startup |
 
-| Variable | Description |
-|----------|-------------|
-| `PORT` | Server port (default: 5005) |
-| `MONGODB_URI` | MongoDB connection string |
-| `GROQ_API_KEY` | Groq API key for LLM inference |
-| `EMBEDDING_MODEL` | Model for embeddings (default: sentence-transformers) |
-| `LLM_MODEL` | Groq model name (default: llama-3.3-70b-versatile) |
-| `CHUNK_SIZE` | Document chunk size (default: 500) |
-| `CHUNK_OVERLAP` | Chunk overlap (default: 50) |
+## API Endpoints
 
-## Usage
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/chat/send` | Send message, get AI response |
+| POST | `/api/chat/stream` | Stream response via SSE |
+| POST | `/api/chat/feedback` | Submit thumbs up/down |
+| GET | `/api/chat/conversations` | List conversations |
+| POST | `/api/timetable/plan` | Plan non-clashing timetable |
+| GET | `/api/timetable/courses` | List available courses |
+| GET | `/api/admin/stats` | Dashboard stats |
+| GET | `/api/admin/popular-questions` | Top 20 queries |
+| GET | `/api/admin/reingest` | Re-embed all documents |
+| POST/GET | `/api/user/preferences` | Student personalization |
 
-1. Start backend and frontend
-2. Upload UMPSA documents via Admin panel
-3. Start chatting! The bot will answer based on uploaded knowledge
+## How RAG Works
 
-## Team
+1. Student asks a question
+2. Query embedded using Jina AI (768-dim vector)
+3. Cosine similarity search across all document chunks
+4. Keyword boosting + BM/EN synonym expansion
+5. Top 8 relevant chunks sent to DeepSeek LLM
+6. LLM generates answer based only on retrieved documents
+7. Response includes source citations
 
-Built with ❤️ for FinTech Forward 2026 Hackathon
+## Performance
+
+- **Accuracy:** 80%+ on test queries
+- **Response time:** < 3 seconds
+- **Knowledge base:** 96 documents, 400+ chunks
+- **Uptime:** 5-layer failover ensures near-zero downtime
+- **Cost:** $0 (all free tiers)
+
+## Built By
+
+**Zafran** (CB23109) — Faculty of Computing, UMPSA
+
+Solo project for FinTech Forward 2026 Hackathon.
 
 ## License
 
