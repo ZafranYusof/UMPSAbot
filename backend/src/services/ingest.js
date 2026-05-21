@@ -83,7 +83,14 @@ async function autoIngestDocs(force = false) {
       // Generate embeddings for each chunk
       const chunksWithEmbeddings = [];
       for (let i = 0; i < chunks.length; i++) {
-        const embedding = await generateEmbedding(chunks[i]);
+        let embedding;
+        try {
+          embedding = await generateEmbedding(chunks[i]);
+        } catch (embErr) {
+          console.warn(`  ⚠️  Embedding failed for chunk ${i} of ${filename}, using fallback`);
+          const { localEmbedding } = require('./embedding');
+          embedding = localEmbedding(chunks[i]);
+        }
         chunksWithEmbeddings.push({
           content: chunks[i],
           embedding,
