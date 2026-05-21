@@ -71,11 +71,18 @@ app.get('/api/debug/chat', async (req, res) => {
 app.post('/api/debug/send', async (req, res) => {
   try {
     const { sendMessage } = require('./controllers/chatController');
-    await sendMessage(req, res, (err) => {
-      if (err) res.status(500).json({ debugError: err.message, stack: err.stack?.substring(0, 500) });
+    let responded = false;
+    const fakeRes = {
+      status: (code) => ({ json: (data) => { responded = true; res.status(code).json({ debugStatus: code, ...data }); } }),
+      json: (data) => { responded = true; res.json({ debugDirect: true, ...data }); }
+    };
+    await sendMessage(req, fakeRes, (err) => {
+      if (err && !responded) {
+        res.status(500).json({ debugError: err.message, name: err.name, status: err.status, stack: err.stack?.substring(0, 800) });
+      }
     });
   } catch (e) {
-    res.status(500).json({ debugCatch: e.message, stack: e.stack?.substring(0, 500) });
+    res.status(500).json({ debugCatch: e.message, name: e.name, stack: e.stack?.substring(0, 800) });
   }
 });
 
