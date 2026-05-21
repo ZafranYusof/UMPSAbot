@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 5005;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5176', 'http://localhost:5173', 'https://frontend-kappa-six-83.vercel.app', 'https://frontend-o1lsq1o5n-vexcczs-projects.vercel.app'],
+  origin: ['http://localhost:5176', 'http://localhost:5173', 'https://frontend-kappa-six-83.vercel.app', 'https://frontend-o1lsq1o5n-vexcczs-projects.vercel.app', 'capacitor://localhost', 'http://localhost'],
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -42,6 +42,19 @@ app.use('/api/timetable', timetableRoutes);
 // Direct POST /api/chat endpoint (alias for /api/chat/send) with chat rate limit
 const { sendMessage } = require('./controllers/chatController');
 app.post('/api/chat', chatRateLimiter, sendMessage);
+
+// Debug endpoint (check env vars on Render)
+app.get('/api/debug', (req, res) => {
+  res.json({
+    hasDeepSeek: !!process.env.DEEPSEEK_API_KEY,
+    hasGroq: !!process.env.GROQ_API_KEY,
+    hasOpenRouter: !!process.env.OPENROUTER_API_KEY,
+    hasCerebras: !!process.env.CEREBRAS_API_KEY,
+    hasMongo: !!process.env.MONGODB_URI,
+    nodeVersion: process.version,
+    uptime: process.uptime()
+  });
+});
 
 // Health check
 app.get('/api/health', (req, res) => {
