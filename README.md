@@ -1,4 +1,4 @@
-# UMPSABot 🤖
+# UMPSABot
 
 AI-powered chatbot for UMPSA students. Answers questions about fees, registration, hostel, academic calendar, and more — using official UMPSA documents.
 
