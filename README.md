@@ -52,7 +52,6 @@ Not a generic ChatGPT wrapper — trained specifically on UMPSA data.
 | OpenRouter | Secondary fallback LLM routing |
 | Cerebras | Tertiary fallback LLM provider |
 | Jina AI Embeddings | Semantic vector embeddings (768-dim) for document search |
-| MongoDB Atlas | Cloud database for storing documents and conversations |
 
 ## Project Structure
 
