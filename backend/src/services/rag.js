@@ -284,37 +284,50 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
 
   // Synonym map for BM/EN cross-language matching
   const synonyms = {
-    'club': ['kelab', 'persatuan', 'societies', 'society', 'clubs'],
-    'kelab': ['club', 'persatuan', 'societies'],
-    'persatuan': ['club', 'kelab', 'society'],
-    'gym': ['gimnasium', 'kecergasan', 'fitness', 'sports', 'sukan'],
-    'sukan': ['sports', 'gym', 'recreation', 'rekreasi'],
-    'library': ['perpustakaan', 'pustaka'],
+    'club': ['kelab', 'persatuan', 'societies', 'society', 'clubs', 'organization', 'organisasi'],
+    'kelab': ['club', 'persatuan', 'societies', 'organization'],
+    'persatuan': ['club', 'kelab', 'society', 'organization'],
+    'gym': ['gimnasium', 'kecergasan', 'fitness', 'sports', 'sukan', 'recreation', 'rekreasi', 'centre'],
+    'sukan': ['sports', 'gym', 'recreation', 'rekreasi', 'fitness', 'centre'],
+    'sports': ['sukan', 'gym', 'recreation', 'rekreasi', 'fitness', 'centre'],
+    'library': ['perpustakaan', 'pustaka', 'lib'],
     'perpustakaan': ['library', 'pustaka'],
-    'hostel': ['asrama', 'kolej', 'kediaman', 'accommodation'],
-    'asrama': ['hostel', 'kolej', 'kediaman'],
-    'clinic': ['klinik', 'kesihatan', 'health', 'medical'],
-    'klinik': ['clinic', 'health', 'kesihatan'],
-    'health': ['kesihatan', 'klinik', 'clinic', 'medical'],
-    'wifi': ['internet', 'rangkaian', 'network', 'ict'],
-    'bus': ['bas', 'shuttle', 'pengangkutan', 'transport'],
-    'transport': ['pengangkutan', 'bas', 'bus', 'shuttle'],
-    'fees': ['yuran', 'bayaran', 'payment', 'kewangan'],
-    'yuran': ['fees', 'bayaran', 'payment', 'tuition'],
-    'bayar': ['payment', 'fees', 'yuran', 'kewangan'],
-    'gpa': ['cgpa', 'gred', 'grade', 'akademik', 'pointer'],
-    'exam': ['peperiksaan', 'result', 'keputusan'],
-    'result': ['keputusan', 'exam', 'peperiksaan'],
-    'course': ['kursus', 'subjek', 'program', 'programme'],
-    'kursus': ['course', 'subjek', 'program'],
+    'hostel': ['asrama', 'kolej', 'kediaman', 'accommodation', 'residential'],
+    'asrama': ['hostel', 'kolej', 'kediaman', 'residential'],
+    'peraturan': ['rules', 'regulations', 'discipline', 'disiplin', 'kaedah', 'tatatertib'],
+    'rules': ['peraturan', 'regulations', 'discipline', 'disiplin', 'kaedah'],
+    'disiplin': ['discipline', 'peraturan', 'rules', 'tatatertib', 'kaedah'],
+    'clinic': ['klinik', 'kesihatan', 'health', 'medical', 'pusat', 'hospital'],
+    'klinik': ['clinic', 'health', 'kesihatan', 'medical', 'pusat'],
+    'health': ['kesihatan', 'klinik', 'clinic', 'medical', 'pusat', 'centre'],
+    'kesihatan': ['health', 'klinik', 'clinic', 'medical', 'centre'],
+    'wifi': ['internet', 'rangkaian', 'network', 'ict', 'eduroam'],
+    'internet': ['wifi', 'rangkaian', 'network', 'ict', 'eduroam'],
+    'bus': ['bas', 'shuttle', 'pengangkutan', 'transport', 'transportation'],
+    'transport': ['pengangkutan', 'bas', 'bus', 'shuttle', 'transportation'],
+    'fees': ['yuran', 'bayaran', 'payment', 'kewangan', 'tuition', 'bayar'],
+    'yuran': ['fees', 'bayaran', 'payment', 'tuition', 'bayar', 'kewangan'],
+    'bayar': ['payment', 'fees', 'yuran', 'kewangan', 'cara', 'kaedah'],
+    'payment': ['bayar', 'bayaran', 'fees', 'yuran', 'fpx', 'bank'],
+    'gpa': ['cgpa', 'gred', 'grade', 'akademik', 'pointer', 'kedudukan'],
+    'exam': ['peperiksaan', 'result', 'keputusan', 'examination'],
+    'result': ['keputusan', 'exam', 'peperiksaan', 'semak'],
+    'course': ['kursus', 'subjek', 'program', 'programme', 'pengajian'],
+    'kursus': ['course', 'subjek', 'program', 'programme'],
+    'computer': ['komputer', 'computing', 'software', 'it', 'teknologi'],
+    'computing': ['computer', 'komputer', 'software', 'fakulti'],
     'register': ['daftar', 'pendaftaran', 'registration'],
     'daftar': ['register', 'pendaftaran', 'registration'],
-    'scholarship': ['biasiswa', 'bantuan', 'financial'],
+    'scholarship': ['biasiswa', 'bantuan', 'financial', 'aid'],
     'biasiswa': ['scholarship', 'bantuan', 'financial'],
     'graduate': ['graduan', 'konvokesyen', 'convocation', 'tamat'],
-    'counselling': ['kaunseling', 'bimbingan'],
+    'convocation': ['konvokesyen', 'graduan', 'graduate', 'majlis'],
+    'konvokesyen': ['convocation', 'graduan', 'graduate', 'majlis'],
+    'counselling': ['kaunseling', 'bimbingan', 'wellness', 'sejahtera'],
+    'kaunseling': ['counselling', 'bimbingan', 'wellness', 'sejahtera'],
     'parking': ['tempat letak kereta', 'parkir'],
-    'contact': ['hubungi', 'telefon', 'phone', 'nombor'],
+    'contact': ['hubungi', 'telefon', 'phone', 'nombor', 'number'],
+    'telefon': ['contact', 'phone', 'hubungi', 'nombor'],
   };
 
   // Extract keywords from query + expand with synonyms
@@ -325,22 +338,35 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
   for (const doc of documents) {
     if (!doc.chunks || doc.chunks.length === 0) continue;
 
+    // Document-level title boost: if query keywords match doc title, boost ALL chunks
+    const titleLower = (doc.title || '').toLowerCase();
+    let titleBoost = 0;
+    if (queryWords.length > 0) {
+      let titleHits = 0;
+      for (const word of queryWords) {
+        if (titleLower.includes(word)) titleHits++;
+      }
+      // Strong title boost (up to 0.4) — title match is very strong signal
+      titleBoost = Math.min(0.4, (titleHits / queryWords.length) * 0.5);
+    }
+
     for (const chunk of doc.chunks) {
       if (!chunk.embedding || chunk.embedding.length === 0) continue;
 
       let score = cosineSimilarity(queryEmbedding, chunk.embedding);
 
-      // Keyword boost: if query words appear in chunk content or doc title, boost score
+      // Apply title boost to all chunks in matching document
+      score += titleBoost;
+
+      // Keyword boost: if query words appear in chunk content, boost score
       if (queryWords.length > 0) {
         const chunkLower = (chunk.content || '').toLowerCase();
-        const titleLower = (doc.title || '').toLowerCase();
         let keywordHits = 0;
         for (const word of queryWords) {
           if (chunkLower.includes(word)) keywordHits++;
-          if (titleLower.includes(word)) keywordHits += 0.5;
         }
-        // Boost score based on keyword matches (up to 0.3 bonus)
-        const keywordBoost = Math.min(0.3, (keywordHits / queryWords.length) * 0.3);
+        // Chunk keyword boost (up to 0.35 bonus)
+        const keywordBoost = Math.min(0.35, (keywordHits / queryWords.length) * 0.4);
         score += keywordBoost;
       }
 

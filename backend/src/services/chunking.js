@@ -9,10 +9,10 @@
  * 4. Overlap between chunks for context continuity
  */
 
-const CHUNK_SIZE_CHARS = parseInt(process.env.CHUNK_SIZE_CHARS) || 800;
-const CHUNK_MIN_CHARS = parseInt(process.env.CHUNK_MIN_CHARS) || 200;
-const CHUNK_MAX_CHARS = parseInt(process.env.CHUNK_MAX_CHARS) || 1200;
-const CHUNK_OVERLAP_CHARS = parseInt(process.env.CHUNK_OVERLAP_CHARS) || 100;
+const CHUNK_SIZE_CHARS = parseInt(process.env.CHUNK_SIZE_CHARS) || 1000;
+const CHUNK_MIN_CHARS = parseInt(process.env.CHUNK_MIN_CHARS) || 400;
+const CHUNK_MAX_CHARS = parseInt(process.env.CHUNK_MAX_CHARS) || 1500;
+const CHUNK_OVERLAP_CHARS = parseInt(process.env.CHUNK_OVERLAP_CHARS) || 150;
 
 /**
  * Split text into chunks using section-aware strategy
