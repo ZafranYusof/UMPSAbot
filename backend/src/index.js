@@ -19,6 +19,13 @@ const { errorHandler, chatRateLimiter, generalRateLimiter } = require('./middlew
 const app = express();
 const PORT = process.env.PORT || 5005;
 
+// Ultra-early debug (before ANY middleware)
+app.post('/api/debug/raw0', (req, res) => {
+  let body = '';
+  req.on('data', chunk => body += chunk);
+  req.on('end', () => res.json({ rawBody: body, headers: req.headers['content-type'] }));
+});
+
 // Middleware
 app.use(cors({
   origin: ['http://localhost:5176', 'http://localhost:5173', 'https://frontend-kappa-six-83.vercel.app', 'https://frontend-o1lsq1o5n-vexcczs-projects.vercel.app', 'capacitor://localhost', 'http://localhost'],
