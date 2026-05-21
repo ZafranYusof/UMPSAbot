@@ -109,9 +109,10 @@ function classifyIntent(message) {
     return { intent: 'general', confidence: 0.5, needsRAG: true };
   }
 
-  // Timetable intent from keywords (single course code or keyword match)
+  // Timetable intent from keywords — only skip RAG if course codes present (for planner)
   if (topIntent === 'timetable') {
-    return { intent: 'timetable', confidence: Math.min(0.95, 0.5 + (topScore * 0.1)), needsRAG: false, courseCodes };
+    const needsRAG = courseCodes.length === 0; // no course codes = general timetable question, use RAG
+    return { intent: 'timetable', confidence: Math.min(0.95, 0.5 + (topScore * 0.1)), needsRAG, courseCodes };
   }
 
   const confidence = Math.min(0.95, 0.5 + (topScore * 0.1));
