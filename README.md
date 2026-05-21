@@ -3,8 +3,6 @@
 AI-powered chatbot for UMPSA students. Answers questions about fees, registration, hostel, academic calendar, and more using official UMPSA documents.
 
 ## Live Demo
-
-- **Web:** [https://frontend-kappa-six-83.vercel.app](https://frontend-kappa-six-83.vercel.app)
 - **API:** [https://umpsa-chatbot-api.onrender.com](https://umpsa-chatbot-api.onrender.com)
 - **Mobile:** Android APK available in Releases
 
