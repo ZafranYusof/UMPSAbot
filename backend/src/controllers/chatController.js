@@ -5,7 +5,7 @@
  */
 
 const { queryRAG } = require('../services/rag');
-const { streamGenerateResponse, generateSuggestions } = require('../services/llm');
+const { streamGenerateResponse, generateSuggestions, stripMarkdown } = require('../services/llm');
 const { generateEmbedding, cosineSimilarity } = require('../services/embedding');
 const { classifyIntent, getGreetingResponse } = require('../services/intent');
 const { getCachedResponse } = require('../services/cache');
@@ -153,7 +153,7 @@ async function sendMessage(req, res, next) {
     const response = {
       conversationId: convId,
       messageId: savedAssistantMsg ? savedAssistantMsg._id : null,
-      message: ragResponse.content,
+      message: stripMarkdown(ragResponse.content),
       sources: ragResponse.sources || [],
       suggestions: ragResponse.suggestions || [],
       confidence: ragResponse.confidence,

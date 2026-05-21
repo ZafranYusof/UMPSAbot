@@ -8,6 +8,22 @@ const Groq = require('groq-sdk');
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
+/**
+ * Strip markdown formatting from LLM output
+ * Removes bold, italic, headers, etc. Keeps plain text readable
+ */
+function stripMarkdown(text) {
+  if (!text) return text;
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '$1')  // **bold** → bold
+    .replace(/\*(.+?)\*/g, '$1')      // *italic* → italic
+    .replace(/__(.+?)__/g, '$1')      // __bold__ → bold
+    .replace(/_(.+?)_/g, '$1')        // _italic_ → italic
+    .replace(/^#{1,6}\s+/gm, '')      // ### headers → plain
+    .replace(/```[\s\S]*?```/g, m => m.replace(/```\w*\n?/g, '').trim()) // code blocks → content only
+    .replace(/`(.+?)`/g, '$1');       // `code` → code
+}
+
 // Local provider: Ollama (self-hosted, no API key needed)
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3.1:8b';
@@ -600,5 +616,6 @@ module.exports = {
   streamGenerateResponse,
   generateSuggestions,
   estimateConfidence,
-  getFallbackResponse
+  getFallbackResponse,
+  stripMarkdown
 };
