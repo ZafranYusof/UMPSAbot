@@ -70,17 +70,13 @@ app.get('/api/debug/chat', async (req, res) => {
 // Debug: test sendMessage directly without rate limiter
 app.post('/api/debug/send', async (req, res) => {
   try {
-    const { sendMessage } = require('./controllers/chatController');
-    let responded = false;
-    const fakeRes = {
-      status: (code) => ({ json: (data) => { responded = true; res.status(code).json({ debugStatus: code, ...data }); } }),
-      json: (data) => { responded = true; res.json({ debugDirect: true, ...data }); }
-    };
-    await sendMessage(req, fakeRes, (err) => {
-      if (err && !responded) {
-        res.status(500).json({ debugError: err.message, name: err.name, status: err.status, stack: err.stack?.substring(0, 800) });
-      }
-    });
+    const { queryRAG } = require('./services/rag');
+    const { v4: uuidv4 } = require('uuid');
+    const message = req.body.message;
+    const convId = req.body.conversationId || uuidv4();
+    if (!message) return res.json({ debugError: 'no message in body', body: req.body });
+    const result = await queryRAG(message, { language: 'en' });
+    res.json({ ok: true, convId, content: result.content?.substring(0, 150), provider: result.metadata?.provider, sources: result.sources?.length || 0 });
   } catch (e) {
     res.status(500).json({ debugCatch: e.message, name: e.name, stack: e.stack?.substring(0, 800) });
   }
