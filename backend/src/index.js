@@ -56,6 +56,17 @@ app.get('/api/debug', (req, res) => {
   });
 });
 
+// Debug chat test
+app.get('/api/debug/chat', async (req, res) => {
+  try {
+    const { queryRAG } = require('./services/rag');
+    const result = await queryRAG('apa itu umpsa', { language: 'ms' });
+    res.json({ ok: true, content: result.content?.substring(0, 100), provider: result.metadata?.provider });
+  } catch (e) {
+    res.json({ ok: false, error: e.message, stack: e.stack?.substring(0, 300) });
+  }
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ 
