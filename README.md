@@ -173,8 +173,6 @@ cd mobile/android
 
 **Zafran** (CB23109) — Faculty of Computing, UMPSA
 
-Solo project for FinTech Forward 2026 Hackathon.
-
 ## License
 
 MIT
