@@ -59,19 +59,19 @@
 
 @layer components {
   .chat-bubble-user {
-    @apply bg-accent/20 border border-accent/30 text-white rounded-2xl rounded-br-md px-4 py-3;
+    @apply bg-accent/10 border border-accent/20 text-white rounded-2xl rounded-br-md px-4 py-3;
   }
 
   .chat-bubble-assistant {
-    @apply bg-navy-700/80 border border-navy-600/50 text-gray-100 rounded-2xl rounded-bl-md px-4 py-3;
+    @apply bg-[#0a2040] border border-navy-600/50 text-gray-100 rounded-2xl rounded-bl-md px-4 py-3;
   }
 
   .btn-primary {
-    @apply bg-accent hover:bg-accent-dark text-white font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-accent/25 hover:scale-[1.02] active:scale-[0.98];
+    @apply bg-accent hover:bg-accent-dark text-navy-900 font-semibold px-4 py-2 rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-accent/25 hover:scale-[1.02] active:scale-[0.98];
   }
 
   .btn-secondary {
-    @apply bg-navy-700 hover:bg-navy-600 text-gray-200 font-medium px-4 py-2 rounded-lg border border-navy-600 transition-all duration-200 hover:shadow-lg hover:shadow-navy-900/50 hover:scale-[1.02] active:scale-[0.98];
+    @apply bg-transparent hover:bg-accent/10 text-accent font-medium px-4 py-2 rounded-lg border border-accent/50 hover:border-accent transition-all duration-200 hover:scale-[1.02] active:scale-[0.98];
   }
 
   .input-field {
@@ -79,11 +79,11 @@
   }
 
   .glass-card {
-    @apply bg-navy-800/40 backdrop-blur-md border border-navy-700/40 rounded-xl shadow-lg shadow-black/10;
+    @apply bg-navy-800/50 backdrop-blur-sm border border-navy-700/50 rounded-xl;
   }
 
   .glass-card-hover {
-    @apply glass-card hover:border-accent/30 hover:shadow-accent/5 hover:bg-navy-800/60 transition-all duration-300;
+    @apply glass-card hover:border-accent/30 hover:bg-navy-800/70 transition-all duration-300;
   }
 
   /* Safe area for notch phones */
@@ -97,40 +97,7 @@
 
   /* Gradient text */
   .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent via-accent-light to-cyan-300;
-  }
-
-  /* Noise texture overlay */
-  .noise-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.015;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-  }
-
-  /* Gradient orbs for backgrounds */
-  .gradient-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.15;
-  }
-
-  .gradient-orb-cyan {
-    background: radial-gradient(circle, #00BCD4 0%, transparent 70%);
-  }
-
-  .gradient-orb-gold {
-    background: radial-gradient(circle, #D4AF37 0%, transparent 70%);
-  }
-
-  .gradient-orb-blue {
-    background: radial-gradient(circle, #1c3661 0%, transparent 70%);
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-accent via-accent-light to-accent;
   }
 }
 
@@ -157,12 +124,4 @@ html {
     min-height: 44px;
     min-width: 44px;
   }
-}
-
-/* Subtle grid pattern for landing */
-.grid-pattern {
-  background-image: 
-    linear-gradient(rgba(0, 188, 212, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 188, 212, 0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
 }

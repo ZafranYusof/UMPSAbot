@@ -35,7 +35,7 @@ function MessageBubble({ message, conversationId }) {
         {/* Avatar + Name for bot */}
         {!isUser && (
           <div className="flex items-center gap-2 mb-1.5 ml-1">
-            <div className="w-6 h-6 rounded-full bg-accent/15 border border-accent/25 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center">
               <span className="text-[10px] font-bold text-accent">U</span>
             </div>
             <span className={`text-xs font-medium ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -50,14 +50,13 @@ function MessageBubble({ message, conversationId }) {
             relative rounded-2xl px-4 py-3 border transition-shadow duration-200
             ${isUser
               ? isDark
-                ? 'bg-accent/15 border-accent/25 text-white rounded-br-sm ml-auto'
+                ? 'bg-accent/10 border-accent/20 text-white rounded-br-sm ml-auto'
                 : 'bg-accent/10 border-accent/20 text-gray-900 rounded-br-sm ml-auto'
               : isDark
-                ? 'bg-navy-700/60 border-navy-600/40 text-gray-100 rounded-bl-sm'
+                ? 'bg-[#0a2040] border-navy-600/40 text-gray-100 rounded-bl-sm'
                 : 'bg-white border-gray-200 text-gray-800 rounded-bl-sm shadow-sm'
             }
             ${isError ? 'border-red-500/30 bg-red-900/20' : ''}
-            ${!isUser ? 'hover:shadow-md hover:shadow-black/5' : ''}
           `}
         >
           <p className="text-sm leading-relaxed whitespace-pre-wrap">

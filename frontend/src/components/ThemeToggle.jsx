@@ -13,7 +13,7 @@ function ThemeToggle() {
       onClick={toggleTheme}
       className={`p-2 rounded-lg transition-colors relative overflow-hidden ${
         isDark
-          ? 'hover:bg-navy-700 text-gray-400 hover:text-yellow-400'
+          ? 'hover:bg-navy-700 text-gray-400 hover:text-accent'
           : 'hover:bg-gray-100 text-gray-500 hover:text-navy-800'
       }`}
       aria-label={isDark ? t.lightMode : t.darkMode}

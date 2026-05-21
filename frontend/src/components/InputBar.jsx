@@ -45,10 +45,10 @@ function InputBar({ onSend, isLoading }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className={`border-t backdrop-blur-md px-3 sm:px-4 py-3 safe-area-bottom ${
+      className={`border-t px-3 sm:px-4 py-3 safe-area-bottom ${
         isDark
-          ? 'border-navy-700/60 bg-navy-800/90'
-          : 'border-gray-200 bg-white/90'
+          ? 'border-navy-700/60 bg-navy-800'
+          : 'border-gray-200 bg-white'
       }`}
     >
       <div className="flex items-end gap-2 max-w-4xl mx-auto">
@@ -102,7 +102,7 @@ function InputBar({ onSend, isLoading }) {
           aria-label={t.send}
         >
           <Send size={16} className={`transition-transform duration-200 ${
-            message.trim() && !isLoading ? 'text-white -rotate-12' : isDark ? 'text-gray-500' : 'text-gray-400'
+            message.trim() && !isLoading ? 'text-navy-900 -rotate-12' : isDark ? 'text-gray-500' : 'text-gray-400'
           }`} />
         </motion.button>
       </div>

@@ -34,8 +34,8 @@ function Sidebar({ isOpen, onClose, conversations, onSelect, onNewChat, onDelete
           border-r flex flex-col
           ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
           ${isDark
-            ? 'bg-navy-800/95 backdrop-blur-md border-navy-700/60'
-            : 'bg-white/95 backdrop-blur-md border-gray-200'
+            ? 'bg-navy-800 border-navy-700/60'
+            : 'bg-white border-gray-200'
           }
         `}
       >
@@ -74,11 +74,13 @@ function Sidebar({ isOpen, onClose, conversations, onSelect, onNewChat, onDelete
         <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
           {(!conversations || conversations.length === 0) ? (
             <div className={`text-center py-12 px-4 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-              <div className="w-12 h-12 rounded-full bg-navy-700/40 flex items-center justify-center mx-auto mb-3">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 ${
+                isDark ? 'bg-navy-700/40' : 'bg-gray-100'
+              }`}>
                 <MessageSquare size={18} className="text-gray-500" />
               </div>
               <p className="text-sm">{t.noConversations}</p>
-              <p className="text-xs mt-1 text-gray-600">Start a new chat to begin</p>
+              <p className={`text-xs mt-1 ${isDark ? 'text-gray-600' : 'text-gray-400'}`}>Start a new chat to begin</p>
             </div>
           ) : (
             conversations.map((conv) => (
@@ -89,7 +91,7 @@ function Sidebar({ isOpen, onClose, conversations, onSelect, onNewChat, onDelete
                   group flex items-center gap-2.5 px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-150
                   ${activeId === conv._id
                     ? isDark
-                      ? 'bg-accent/10 border border-accent/20'
+                      ? 'bg-accent/10 border border-accent/25'
                       : 'bg-accent/5 border border-accent/15'
                     : isDark
                       ? 'hover:bg-navy-700/60 border border-transparent'
@@ -110,7 +112,7 @@ function Sidebar({ isOpen, onClose, conversations, onSelect, onNewChat, onDelete
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm truncate ${
                     activeId === conv._id
-                      ? 'text-white font-medium'
+                      ? isDark ? 'text-white font-medium' : 'text-gray-900 font-medium'
                       : isDark ? 'text-gray-300' : 'text-gray-700'
                   }`}>
                     {truncate(conv.lastMessage, 35)}
