@@ -12,7 +12,7 @@ AI-powered chatbot for UMPSA students. Answers questions about fees, registratio
 
 Students ask questions in BM, English, or Manglish. The chatbot searches through 96 official UMPSA documents and generates answers with source citations.
 
-Not a generic ChatGPT wrapper — trained specifically on UMPSA data.
+Not a generic ChatGPT wrapper, trained specifically on UMPSA data.
 
 ### Key Features
 
@@ -161,10 +161,6 @@ cd mobile/android
 - **Knowledge base:** 96 documents, 400+ chunks
 - **Uptime:** 5-layer failover ensures near-zero downtime
 - **Cost:** $0 (all free tiers)
-
-## Built By
-
-**Zafran** (CB23109) — Faculty of Computing, UMPSA
 
 ## License
 
