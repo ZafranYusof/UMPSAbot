@@ -1,8 +1,6 @@
 # UMPSABot
 
-AI-powered chatbot for UMPSA students. Answers questions about fees, registration, hostel, academic calendar, and more — using official UMPSA documents.
-
-Built for **FinTech Forward 2026** (PETAKOM UMPSA).
+AI-powered chatbot for UMPSA students. Answers questions about fees, registration, hostel, academic calendar, and more using official UMPSA documents.
 
 ## Live Demo
 
