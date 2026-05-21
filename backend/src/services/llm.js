@@ -1,12 +1,17 @@
 /**
  * LLM Service
  * Handles communication with LLM providers for text generation
- * 3-layer resilience: Groq → OpenRouter → Cerebras → Template fallback
+ * 4-layer resilience: Ollama (local) → Groq → OpenRouter → Cerebras → Template fallback
  */
 
 const Groq = require('groq-sdk');
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// Local provider: Ollama (self-hosted, no API key needed)
+const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3.1:8b';
+const OLLAMA_ENABLED = process.env.OLLAMA_ENABLED !== 'false'; // enabled by default if available
 
 // Model fallback chain for Groq — if primary hits rate limit, try next
 const MODEL_CHAIN = [
@@ -47,6 +52,25 @@ async function generateResponse(query, contexts = [], options = {}) {
   ];
 
   const startTime = Date.now();
+
+  // Layer 0: Try Ollama (local, fastest, free)
+  if (OLLAMA_ENABLED) {
+    const ollamaResult = await tryOllama(messages);
+    if (ollamaResult) {
+      const responseTime = Date.now() - startTime;
+      console.log(`[${new Date().toISOString()}] Used Ollama local: ${OLLAMA_MODEL}`);
+      return {
+        content: ollamaResult.content,
+        metadata: {
+          tokensUsed: ollamaResult.tokensUsed,
+          responseTime,
+          model: OLLAMA_MODEL,
+          provider: 'ollama',
+          contextsUsed: contexts.length
+        }
+      };
+    }
+  }
 
   // Layer 1: Try Groq model chain
   const groqResult = await tryGroqChain(messages);
@@ -110,6 +134,45 @@ async function generateResponse(query, contexts = [], options = {}) {
       contextsUsed: contexts.length
     }
   };
+}
+
+/**
+ * Try Ollama local LLM — returns result or null if unavailable
+ */
+async function tryOllama(messages) {
+  try {
+    const response = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: OLLAMA_MODEL,
+        messages,
+        stream: false,
+        options: {
+          temperature: 0.2,
+          top_p: 0.85,
+          num_predict: 1500
+        }
+      }),
+      signal: AbortSignal.timeout(30000) // 30s timeout for local model
+    });
+
+    if (!response.ok) {
+      console.error(`[${new Date().toISOString()}] Ollama HTTP ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+    const content = data.message?.content || '';
+    const tokensUsed = (data.eval_count || 0) + (data.prompt_eval_count || 0);
+
+    if (!content) return null;
+    return { content, tokensUsed };
+  } catch (error) {
+    // Ollama not running or unreachable — silently skip
+    console.warn(`[${new Date().toISOString()}] Ollama unavailable: ${(error.message || '').substring(0, 100)}`);
+    return null;
+  }
 }
 
 /**
