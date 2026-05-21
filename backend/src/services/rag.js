@@ -3,7 +3,7 @@
  * Orchestrates the full RAG pipeline: embed query → search → generate
  */
 
-const { generateEmbedding, cosineSimilarity } = require('./embedding');
+const { generateEmbedding, cosineSimilarity, isJinaEnabled, getEmbeddingDimension } = require('./embedding');
 const { generateResponse, generateSuggestions, estimateConfidence } = require('./llm');
 const { generateTemplateFallback } = require('./templateFallback');
 const { chunkText, extractText } = require('./chunking');
@@ -336,6 +336,8 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
 
   const results = [];
   const MIN_SIMILARITY = 0.1; // Low threshold to include more chunks
+  const expectedDims = getEmbeddingDimension();
+  let dimensionMismatchWarned = false;
 
   // Synonym map for BM/EN cross-language matching
   const synonyms = {
@@ -407,6 +409,12 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
 
     for (const chunk of doc.chunks) {
       if (!chunk.embedding || chunk.embedding.length === 0) continue;
+
+      // Warn once if stored embeddings have different dimensions (needs re-ingestion)
+      if (!dimensionMismatchWarned && chunk.embedding.length !== expectedDims) {
+        console.warn(`[${new Date().toISOString()}] ⚠️ Embedding dimension mismatch: query=${expectedDims}d, stored=${chunk.embedding.length}d. Run GET /api/admin/reingest to re-embed documents with Jina AI.`);
+        dimensionMismatchWarned = true;
+      }
 
       let score = cosineSimilarity(queryEmbedding, chunk.embedding);
 

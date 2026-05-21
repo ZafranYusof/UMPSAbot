@@ -1,48 +1,149 @@
 /**
  * Embedding Service
- * Generates vector embeddings for text chunks using Groq API
+ * Generates vector embeddings for text chunks using Jina AI API
  * Falls back to simple TF-IDF-like embeddings when API is unavailable
  */
 
-const Groq = require('groq-sdk');
-
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const JINA_API_URL = 'https://api.jina.ai/v1/embeddings';
+const JINA_MODEL = 'jina-embeddings-v2-base-en';
+const JINA_DIMS = 768;
+const JINA_BATCH_SIZE = 100; // Max texts per request
+const LOCAL_DIMS = 384;
 
 /**
- * Generate embedding for a single text using Groq
- * Since Groq doesn't have a dedicated embedding endpoint,
- * we use a lightweight approach: generate a semantic hash via the LLM
- * or fall back to local TF-IDF embeddings
+ * Check if Jina AI is configured
+ */
+function isJinaEnabled() {
+  return !!process.env.JINA_API_KEY;
+}
+
+/**
+ * Get the current embedding dimension based on provider
+ */
+function getEmbeddingDimension() {
+  return isJinaEnabled() ? JINA_DIMS : LOCAL_DIMS;
+}
+
+/**
+ * Generate embedding using Jina AI API
+ * @param {string} text - Text to embed
+ * @returns {number[]} Embedding vector (768 dims)
+ */
+async function jinaEmbed(text) {
+  const response = await fetch(JINA_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.JINA_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: JINA_MODEL,
+      input: [text],
+      encoding_type: 'float'
+    })
+  });
+
+  if (!response.ok) {
+    const errBody = await response.text().catch(() => '');
+    throw new Error(`Jina API error ${response.status}: ${errBody}`);
+  }
+
+  const data = await response.json();
+  if (!data.data || !data.data[0] || !data.data[0].embedding) {
+    throw new Error('Jina API returned unexpected response format');
+  }
+
+  return data.data[0].embedding;
+}
+
+/**
+ * Generate embeddings for multiple texts using Jina AI API (batch)
+ * @param {string[]} texts - Array of texts to embed
+ * @returns {number[][]} Array of embedding vectors
+ */
+async function jinaBatchEmbed(texts) {
+  const response = await fetch(JINA_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.JINA_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: JINA_MODEL,
+      input: texts,
+      encoding_type: 'float'
+    })
+  });
+
+  if (!response.ok) {
+    const errBody = await response.text().catch(() => '');
+    throw new Error(`Jina API error ${response.status}: ${errBody}`);
+  }
+
+  const data = await response.json();
+  if (!data.data || data.data.length === 0) {
+    throw new Error('Jina API returned no embeddings');
+  }
+
+  // Sort by index to maintain order
+  const sorted = data.data.sort((a, b) => a.index - b.index);
+  return sorted.map(item => item.embedding);
+}
+
+/**
+ * Generate embedding for a single text
+ * Uses Jina AI if configured, falls back to local TF-IDF hash
  */
 async function generateEmbedding(text) {
-  try {
-    // Use local embedding as primary (fast, no API cost)
-    return localEmbedding(text);
-  } catch (error) {
-    console.error('Embedding generation failed:', error.message);
-    return localEmbedding(text);
+  if (isJinaEnabled()) {
+    try {
+      return await jinaEmbed(text);
+    } catch (error) {
+      console.error(`[${new Date().toISOString()}] Jina embedding failed, falling back to local:`, error.message);
+      return localEmbedding(text);
+    }
   }
+  return localEmbedding(text);
 }
 
 /**
- * Generate embeddings for multiple texts
+ * Generate embeddings for multiple texts (batch)
+ * Uses Jina AI batch API if configured, falls back to local
  */
 async function generateEmbeddings(texts) {
-  const embeddings = [];
-  for (const text of texts) {
-    const embedding = await generateEmbedding(text);
-    embeddings.push(embedding);
+  if (isJinaEnabled()) {
+    try {
+      const allEmbeddings = [];
+      // Process in batches of JINA_BATCH_SIZE
+      for (let i = 0; i < texts.length; i += JINA_BATCH_SIZE) {
+        const batch = texts.slice(i, i + JINA_BATCH_SIZE);
+        const batchEmbeddings = await jinaBatchEmbed(batch);
+        allEmbeddings.push(...batchEmbeddings);
+
+        // Small delay between batches to respect rate limits
+        if (i + JINA_BATCH_SIZE < texts.length) {
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+      }
+      return allEmbeddings;
+    } catch (error) {
+      console.error(`[${new Date().toISOString()}] Jina batch embedding failed, falling back to local:`, error.message);
+      // Fallback: generate locally one by one
+      return texts.map(text => localEmbedding(text));
+    }
   }
-  return embeddings;
+
+  // Local fallback
+  return texts.map(text => localEmbedding(text));
 }
 
 /**
- * Local TF-IDF-like embedding generation
+ * Local TF-IDF-like embedding generation (fallback)
  * Creates a fixed-size vector based on word frequencies and character n-grams
  * Dimension: 384 (matches common sentence-transformer output)
  */
 function localEmbedding(text) {
-  const DIMS = 384;
+  const DIMS = LOCAL_DIMS;
   const vector = new Array(DIMS).fill(0);
   
   if (!text || text.trim().length === 0) {
@@ -100,8 +201,12 @@ function simpleHash(str) {
 
 /**
  * Compute cosine similarity between two vectors
+ * Handles dimension mismatch by comparing only up to the shorter vector's length
  */
 function cosineSimilarity(vecA, vecB) {
+  if (!vecA || !vecB || vecA.length === 0 || vecB.length === 0) return 0;
+  
+  // If dimensions don't match, vectors are from different embedding providers — low similarity
   if (vecA.length !== vecB.length) return 0;
   
   let dotProduct = 0;
@@ -126,5 +231,9 @@ module.exports = {
   generateEmbedding,
   generateEmbeddings,
   cosineSimilarity,
-  localEmbedding
+  localEmbedding,
+  isJinaEnabled,
+  getEmbeddingDimension,
+  JINA_DIMS,
+  LOCAL_DIMS
 };

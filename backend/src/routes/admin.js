@@ -4,6 +4,7 @@ const multer = require('multer');
 const { adminAuth } = require('../middleware');
 const { getStats, getFeedback, getDocuments, clearCacheHandler } = require('../controllers/adminController');
 const { uploadDocument, deleteDocument } = require('../controllers/documentController');
+const { reingestDocuments } = require('../controllers/reingestController');
 const QueryLog = require('../models/QueryLog');
 
 // Configure multer for admin uploads
@@ -39,6 +40,9 @@ router.delete('/documents/:id', deleteDocument);
 
 // Cache management
 router.post('/cache/clear', clearCacheHandler);
+
+// Re-ingest all documents with current embedding provider (Jina AI)
+router.get('/reingest', reingestDocuments);
 
 // Popular questions - aggregates top 20 queries
 router.get('/popular-questions', async (req, res, next) => {
