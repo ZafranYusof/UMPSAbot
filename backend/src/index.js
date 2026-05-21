@@ -67,6 +67,18 @@ app.get('/api/debug/chat', async (req, res) => {
   }
 });
 
+// Debug: test sendMessage directly without rate limiter
+app.post('/api/debug/send', async (req, res) => {
+  try {
+    const { sendMessage } = require('./controllers/chatController');
+    await sendMessage(req, res, (err) => {
+      if (err) res.status(500).json({ debugError: err.message, stack: err.stack?.substring(0, 500) });
+    });
+  } catch (e) {
+    res.status(500).json({ debugCatch: e.message, stack: e.stack?.substring(0, 500) });
+  }
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ 
