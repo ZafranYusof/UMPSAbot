@@ -120,21 +120,23 @@ async function start() {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('✅ Connected to MongoDB');
     
-    // Auto-ingest docs from knowledge base
-    // Force re-ingest if FORCE_REINGEST env var is set or first run after RAG update
-    const forceReingest = process.env.FORCE_REINGEST === 'true';
-    await autoIngestDocs(forceReingest);
-    if (forceReingest) {
-      console.log('✅ Force re-ingest complete. You can remove FORCE_REINGEST=true now.');
-    }
-
-    // Initialize weekly auto-scrape cron job
-    initAutoScrape();
-    
+    // Start listening FIRST so Render detects the port immediately
     app.listen(PORT, () => {
       console.log(`🚀 UMPSABot API v2.0 running on http://localhost:${PORT}`);
       console.log(`📊 Admin dashboard: http://localhost:${PORT}/api/admin/stats`);
     });
+
+    // Auto-ingest docs AFTER server is up (non-blocking)
+    const forceReingest = process.env.FORCE_REINGEST === 'true';
+    autoIngestDocs(forceReingest).then(() => {
+      if (forceReingest) {
+        console.log('✅ Force re-ingest complete. You can remove FORCE_REINGEST=true now.');
+      }
+      console.log('✅ Auto-ingest complete');
+    }).catch(err => console.error('⚠️ Ingest error:', err.message));
+
+    // Initialize weekly auto-scrape cron job
+    initAutoScrape();
   } catch (error) {
     console.error('❌ Failed to connect to MongoDB:', error.message);
     console.log('⚠️  Starting server without database connection...');
