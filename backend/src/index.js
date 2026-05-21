@@ -67,6 +67,11 @@ app.get('/api/debug/chat', async (req, res) => {
   }
 });
 
+// Debug: echo body to test JSON parsing
+app.post('/api/debug/echo', (req, res) => {
+  res.json({ body: req.body, hasMessage: !!req.body?.message });
+});
+
 // Debug: test sendMessage directly without rate limiter
 app.post('/api/debug/send', async (req, res) => {
   try {
