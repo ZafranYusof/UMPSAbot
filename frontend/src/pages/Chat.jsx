@@ -63,6 +63,9 @@ function Chat() {
 
   return (
     <div className={`h-screen flex overflow-hidden ${isDark ? 'bg-navy-900' : 'bg-light-bg'}`}>
+      {/* Noise overlay */}
+      <div className="noise-overlay" />
+
       {/* Onboarding */}
       {showOnboarding && (
         <Onboarding onComplete={() => setShowOnboarding(false)} />
@@ -82,10 +85,10 @@ function Chat() {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
-        <header className={`flex items-center justify-between px-4 py-3 border-b backdrop-blur-sm ${
+        <header className={`flex items-center justify-between px-4 py-3 border-b backdrop-blur-md ${
           isDark
-            ? 'border-navy-700 bg-navy-800/80'
-            : 'border-gray-200 bg-white/80'
+            ? 'border-navy-700/60 bg-navy-800/90'
+            : 'border-gray-200 bg-white/90'
         }`}>
           <div className="flex items-center gap-3">
             <button
@@ -97,15 +100,22 @@ function Chat() {
             >
               <Menu size={20} />
             </button>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center">
-                <span className="text-sm">🎓</span>
+            <div className="flex items-center gap-2.5">
+              <div className="relative">
+                <div className="w-9 h-9 rounded-full bg-accent/15 border border-accent/25 flex items-center justify-center">
+                  <span className="text-sm font-bold text-accent">U</span>
+                </div>
+                {/* Online status dot */}
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-navy-800" />
               </div>
               <div>
                 <h1 className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                   {t.title}
                 </h1>
-                <p className="text-[10px] text-accent">{t.subtitle}</p>
+                <p className="text-[10px] text-emerald-400 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-slow" />
+                  Online
+                </p>
               </div>
             </div>
           </div>

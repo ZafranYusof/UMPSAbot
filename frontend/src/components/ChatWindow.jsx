@@ -23,7 +23,7 @@ function ChatWindow({ messages, isLoading, suggestedQuestions, onSendMessage, co
   ];
 
   return (
-    <div className={`flex-1 overflow-y-auto px-4 py-6 space-y-4 ${
+    <div className={`flex-1 overflow-y-auto px-3 sm:px-4 py-6 space-y-4 ${
       isDark ? '' : 'bg-light-bg'
     }`}>
       {messages.length === 0 && (
@@ -33,29 +33,29 @@ function ChatWindow({ messages, isLoading, suggestedQuestions, onSendMessage, co
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mb-4 mx-auto">
-              <span className="text-3xl">🎓</span>
+            <div className="w-16 h-16 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-5 mx-auto">
+              <span className="text-2xl font-bold text-accent">U</span>
             </div>
             <h2 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               {t.welcome}
             </h2>
-            <p className={`max-w-md ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`max-w-md text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               {t.welcomeDesc}
             </p>
-            <div className="mt-6 flex flex-wrap gap-2 justify-center">
+            <div className="mt-6 flex flex-wrap gap-2 justify-center max-w-md">
               {welcomeSuggestions.map((suggestion, i) => (
                 <motion.button
                   key={i}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 * i + 0.3 }}
-                  whileHover={{ scale: 1.03 }}
+                  whileHover={{ scale: 1.03, y: -1 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => onSendMessage(suggestion)}
-                  className={`text-sm px-3 py-1.5 rounded-full border cursor-pointer transition-all duration-200 ${
+                  className={`text-sm px-4 py-2 rounded-full border cursor-pointer transition-all duration-200 ${
                     isDark
-                      ? 'bg-navy-700 border-navy-600 text-gray-300 hover:border-accent hover:text-accent hover:bg-accent/10'
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-accent hover:text-accent hover:bg-accent/5'
+                      ? 'bg-navy-700/60 border-navy-600/60 text-gray-300 hover:border-accent/40 hover:text-accent hover:bg-accent/10'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-accent/40 hover:text-accent hover:bg-accent/5 shadow-sm'
                   }`}
                 >
                   {suggestion}
@@ -73,7 +73,7 @@ function ChatWindow({ messages, isLoading, suggestedQuestions, onSendMessage, co
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.25 }}
           >
             <MessageBubble message={msg} conversationId={conversationId} />
             {/* Show suggested chips after the last bot message */}

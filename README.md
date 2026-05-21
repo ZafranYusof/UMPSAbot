@@ -43,7 +43,7 @@ Not a generic ChatGPT wrapper — trained specifically on UMPSA data.
 | Mobile | Flutter 3.29 |
 | Deploy | Vercel (frontend) + Render (backend) |
 
-## AI Tools & Techniques
+## AI Tools Used
 
 | Tool | Purpose |
 |------|----------|
@@ -52,11 +52,7 @@ Not a generic ChatGPT wrapper — trained specifically on UMPSA data.
 | OpenRouter | Secondary fallback LLM routing |
 | Cerebras | Tertiary fallback LLM provider |
 | Jina AI Embeddings | Semantic vector embeddings (768-dim) for document search |
-| RAG Pipeline | Custom retrieval-augmented generation with hybrid search |
-| TF-IDF + BM25 | Keyword boosting and synonym expansion alongside semantic search |
-| Cosine Similarity | Vector similarity scoring for document chunk retrieval |
-| Intent Classification | Keyword-based intent detection (timetable, fees, hostel, etc.) |
-| Language Detection | Auto-detect BM/EN/Manglish from user input |
+| MongoDB Atlas | Cloud database for storing documents and conversations |
 
 ## Project Structure
 
