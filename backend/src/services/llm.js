@@ -366,57 +366,62 @@ async function tryCerebras(messages) {
 }
 
 /**
- * Generate follow-up question suggestions
+ * Generate follow-up question suggestions based on knowledge base topics
+ * Only suggests questions that the chatbot can actually answer
  */
-async function generateSuggestions(query, response, intent = 'general', language = 'mixed') {
-  try {
-    const langInstruction = language === 'ms'
-      ? 'Generate questions in Bahasa Melayu.'
-      : language === 'en'
-        ? 'Generate questions in English.'
-        : 'Generate questions in the same language mix as the original query.';
-
-    let completion;
-    for (const model of MODEL_CHAIN) {
-      try {
-        completion = await groq.chat.completions.create({
-          model,
-          messages: [
-            {
-              role: 'system',
-              content: `You are a helpful assistant that suggests follow-up questions for UMPSA students. Given a question and answer, suggest 2-3 natural follow-up questions the student might want to ask next. ${langInstruction}
-
-Return ONLY the questions, one per line, no numbering, no bullets, no extra text.`
-            },
-            {
-              role: 'user',
-              content: `Original question: ${query}\n\nAnswer given: ${response.substring(0, 500)}\n\nTopic category: ${intent}\n\nSuggest 2-3 follow-up questions:`
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 256,
-          stream: false
-        });
-        break;
-      } catch (err) {
-        if (err.message && err.message.includes('429') && model !== MODEL_CHAIN[MODEL_CHAIN.length - 1]) continue;
-        throw err;
-      }
+function generateSuggestions(query, response, intent = 'general', language = 'mixed') {
+  // Topic-based suggestions from actual knowledge base
+  const topicSuggestions = {
+    ms: {
+      fees: ['Macam mana nak bayar yuran?', 'Berapa yuran hostel?', 'Macam mana nak apply PTPTN?'],
+      hostel: ['Berapa yuran hostel per semester?', 'Macam mana nak daftar kursus?', 'Apa syarat tinggal di hostel?'],
+      registration: ['Macam mana nak drop kursus?', 'Bila tarikh pendaftaran kursus?', 'Macam mana nak check jadual?'],
+      academic: ['Bila tarikh peperiksaan?', 'Macam mana nak check result?', 'Apa kalendar akademik semester ni?'],
+      general: ['Macam mana nak daftar kursus?', 'Berapa yuran semester?', 'Macam mana nak apply hostel?'],
+      greeting: ['Macam mana nak daftar kursus?', 'Berapa yuran semester?', 'Macam mana nak apply hostel?'],
+      facilities: ['Apa perkhidmatan pusat kesihatan?', 'Macam mana nak guna perpustakaan?', 'Apa aktiviti sukan yang ada?'],
+      financial: ['Apa syarat PTPTN?', 'Ada biasiswa apa di UMPSA?', 'Macam mana nak bayar yuran online?'],
+      clubs: ['Apa kelab dan persatuan yang ada?', 'Macam mana nak join kelab?', 'Apa aktiviti kokurikulum?'],
+    },
+    en: {
+      fees: ['How do I pay my fees?', 'What is the hostel fee?', 'How to apply for PTPTN?'],
+      hostel: ['How much is hostel per semester?', 'How to register courses?', 'What are hostel requirements?'],
+      registration: ['How to drop a course?', 'When is course registration?', 'How to check my timetable?'],
+      academic: ['When are the exams?', 'How to check results?', 'What is the academic calendar?'],
+      general: ['How do I register for courses?', 'What are the semester fees?', 'How do I apply for hostel?'],
+      greeting: ['How do I register for courses?', 'What are the semester fees?', 'How do I apply for hostel?'],
+      facilities: ['What health centre services are available?', 'How to use the library?', 'What sports activities are available?'],
+      financial: ['What are PTPTN requirements?', 'What scholarships are available?', 'How to pay fees online?'],
+      clubs: ['What clubs and societies are available?', 'How to join a club?', 'What co-curricular activities are there?'],
     }
-    if (!completion) return [];
+  };
 
-    const suggestionsText = completion.choices[0]?.message?.content || '';
-    const suggestions = suggestionsText
-      .split('\n')
-      .map(s => s.replace(/^[\d\.\-\*\)]+\s*/, '').trim())
-      .filter(s => s.length > 5 && s.length < 200)
-      .slice(0, 3);
+  // Determine language bucket
+  const lang = (language === 'ms') ? 'ms' : 'en';
+  const bucket = topicSuggestions[lang];
 
-    return suggestions;
-  } catch (error) {
-    console.error(`[${new Date().toISOString()}] Suggestions generation error:`, error.message);
-    return [];
-  }
+  // Map intent to suggestion category
+  let category = 'general';
+  if (intent === 'greeting') category = 'greeting';
+  else if (/fee|yuran|bayar|payment|ptptn|biasiswa|financial/.test(query.toLowerCase())) category = 'fees';
+  else if (/hostel|asrama|kolej|residence/.test(query.toLowerCase())) category = 'hostel';
+  else if (/daftar|register|kursus|course|drop|add/.test(query.toLowerCase())) category = 'registration';
+  else if (/exam|peperiksaan|result|keputusan|calendar|kalendar|semester/.test(query.toLowerCase())) category = 'academic';
+  else if (/perpustakaan|library|kesihatan|health|sukan|sport|gym/.test(query.toLowerCase())) category = 'facilities';
+  else if (/kelab|club|persatuan|society|aktiviti|activity/.test(query.toLowerCase())) category = 'clubs';
+
+  const suggestions = bucket[category] || bucket['general'];
+  
+  // Filter out suggestions too similar to the original query
+  const queryLower = query.toLowerCase();
+  return suggestions.filter(s => {
+    const sLower = s.toLowerCase();
+    // Skip if >60% word overlap with query
+    const queryWords = queryLower.split(/\s+/);
+    const sWords = sLower.split(/\s+/);
+    const overlap = queryWords.filter(w => sWords.includes(w)).length;
+    return overlap / Math.max(queryWords.length, 1) < 0.6;
+  }).slice(0, 3);
 }
 
 /**
