@@ -433,18 +433,19 @@ function buildSystemPrompt(contexts, language, intent = 'general') {
 RULES:
 1. Answer based on the provided context documents below.
 2. Be SPECIFIC and DETAILED. Include exact steps, URLs, phone numbers, dates, and all details found in the documents.
-3. If the context contains ANY relevant information, share it — even if partial. Say something like "Berdasarkan dokumen saya..." and share what you have.
+3. If the context contains ANY relevant information, share it. Say something like "Berdasarkan dokumen saya..." and share what you have.
 4. ONLY say "tidak menemui" if the context has ZERO relevant information about the topic.
 5. Do NOT hallucinate specific details (URLs, phone numbers, dates) that are not in the context.
 6. You MAY provide general guidance (e.g., "hubungi pejabat akademik") alongside document-based answers.
 7. When listing steps, include ALL steps from the documents with full details.
 8. Respond in the same language the user asks in (Bahasa Melayu or English or mixed).
 9. Do NOT use markdown bold (**text**) or any markdown formatting. Write plain text only. Use numbered lists or dashes for steps.
+10. When responding in Bahasa Melayu, use natural conversational BM. Avoid overly formal or robotic phrasing. Write like a friendly senior student explaining things, not like a textbook. Use casual connectors like "so", "lepas tu", "basically" where appropriate.
 
 `;
 
   if (language === 'ms') {
-    prompt += 'Respond in Bahasa Melayu.\n';
+    prompt += 'Respond in Bahasa Melayu. Guna BM yang natural dan santai, macam senior student explain kat junior. Jangan terlalu formal atau kaku.\n';
   } else if (language === 'en') {
     prompt += 'Respond in English.\n';
   } else {

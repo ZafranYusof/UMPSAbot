@@ -63,6 +63,20 @@ async function queryRAG(query, options = {}) {
 
   // Step 2: Handle greetings without RAG (skip caching for greetings)
   if (!intentResult.needsRAG) {
+    // Timetable intent with course codes → use planner
+    if (intentResult.intent === 'timetable' && intentResult.courseCodes?.length >= 2) {
+      const greetingResponse = getGreetingResponse(language);
+      return {
+        content: greetingResponse,
+        sources: [],
+        confidence: 1.0,
+        isLowConfidence: false,
+        intent: intentResult.intent,
+        suggestions: getSuggestionsForGreeting(language),
+        handoff: false,
+        handoffContact: null
+      };
+    }
     const greetingResponse = getGreetingResponse(language);
     lowConfidenceTracker.delete(sessionId);
     return {
@@ -72,6 +86,25 @@ async function queryRAG(query, options = {}) {
       isLowConfidence: false,
       intent: intentResult.intent,
       suggestions: getSuggestionsForGreeting(language),
+      handoff: false,
+      handoffContact: null
+    };
+  }
+
+  // Step 2.1: Timetable intent without course codes - give helpful guidance
+  if (intentResult.intent === 'timetable' && (!intentResult.courseCodes || intentResult.courseCodes.length < 2)) {
+    const timetableGuide = language === 'en'
+      ? 'To plan your timetable, please provide at least 2 course codes. For example: "Plan timetable BCS2313 BCS3133 BUM1433". I will find non-clashing combinations for you. You can check your course codes at the E-Comm Student Portal (https://std-comm.ump.edu.my).'
+      : 'Untuk plan jadual, sila bagi sekurang-kurangnya 2 kod kursus. Contoh: "Plan jadual BCS2313 BCS3133 BUM1433". Saya akan cari kombinasi yang tak clash. Boleh check kod kursus kat E-Comm Student Portal (https://std-comm.ump.edu.my).';
+    return {
+      content: timetableGuide,
+      sources: [],
+      confidence: 0.9,
+      isLowConfidence: false,
+      intent: 'timetable',
+      suggestions: language === 'en'
+        ? ['How to register courses?', 'When is course registration?', 'What are the semester fees?']
+        : ['Macam mana nak daftar kursus?', 'Bila tarikh pendaftaran kursus?', 'Berapa yuran semester?'],
       handoff: false,
       handoffContact: null
     };
