@@ -11,7 +11,12 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 // Local provider: Ollama (self-hosted, no API key needed)
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3.1:8b';
-const OLLAMA_ENABLED = process.env.OLLAMA_ENABLED !== 'false'; // enabled by default if available
+const OLLAMA_ENABLED = process.env.OLLAMA_ENABLED === 'true'; // disabled by default, enable explicitly
+
+// Primary provider: DeepSeek (OpenAI-compatible, cheap & powerful)
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+const DEEPSEEK_BASE_URL = 'https://api.deepseek.com/v1/chat/completions';
 
 // Model fallback chain for Groq — if primary hits rate limit, try next
 const MODEL_CHAIN = [
@@ -72,7 +77,24 @@ async function generateResponse(query, contexts = [], options = {}) {
     }
   }
 
-  // Layer 1: Try Groq model chain
+  // Layer 1: Try DeepSeek (primary cloud provider)
+  const deepseekResult = await tryDeepSeek(messages);
+  if (deepseekResult) {
+    const responseTime = Date.now() - startTime;
+    console.log(`[${new Date().toISOString()}] Used DeepSeek: ${DEEPSEEK_MODEL}`);
+    return {
+      content: deepseekResult.content,
+      metadata: {
+        tokensUsed: deepseekResult.tokensUsed,
+        responseTime,
+        model: DEEPSEEK_MODEL,
+        provider: 'deepseek',
+        contextsUsed: contexts.length
+      }
+    };
+  }
+
+  // Layer 2: Try Groq model chain
   const groqResult = await tryGroqChain(messages);
   if (groqResult) {
     const responseTime = Date.now() - startTime;
@@ -88,7 +110,7 @@ async function generateResponse(query, contexts = [], options = {}) {
     };
   }
 
-  // Layer 2: Try OpenRouter
+  // Layer 3: Try OpenRouter
   const openRouterResult = await tryOpenRouter(messages);
   if (openRouterResult) {
     const responseTime = Date.now() - startTime;
@@ -105,7 +127,7 @@ async function generateResponse(query, contexts = [], options = {}) {
     };
   }
 
-  // Layer 3: Try Cerebras
+  // Layer 4: Try Cerebras
   const cerebrasResult = await tryCerebras(messages);
   if (cerebrasResult) {
     const responseTime = Date.now() - startTime;
@@ -134,6 +156,48 @@ async function generateResponse(query, contexts = [], options = {}) {
       contextsUsed: contexts.length
     }
   };
+}
+
+/**
+ * Try DeepSeek (OpenAI-compatible API, primary cloud provider)
+ * Returns result or null on failure
+ */
+async function tryDeepSeek(messages) {
+  if (!DEEPSEEK_API_KEY) return null;
+
+  try {
+    const response = await fetch(DEEPSEEK_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: DEEPSEEK_MODEL,
+        messages,
+        temperature: 0.2,
+        max_tokens: 1500,
+        top_p: 0.85
+      }),
+      signal: AbortSignal.timeout(30000)
+    });
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => 'unknown');
+      console.error(`[${new Date().toISOString()}] DeepSeek HTTP ${response.status}: ${errText.substring(0, 150)}`);
+      return null;
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || '';
+    const tokensUsed = data.usage?.total_tokens || 0;
+
+    if (!content) return null;
+    return { content, tokensUsed };
+  } catch (error) {
+    console.error(`[${new Date().toISOString()}] DeepSeek error:`, (error.message || '').substring(0, 150));
+    return null;
+  }
 }
 
 /**
