@@ -69,7 +69,7 @@ function MessageBubble({ message, conversationId }) {
             </div>
           )}
 
-          {/* Sources */}
+          {/* Sources - collapsible citation section */}
           {message.sources && message.sources.length > 0 && (
             <div className={`mt-2 pt-2 border-t ${isDark ? 'border-navy-600/50' : 'border-gray-200'}`}>
               <button
@@ -77,7 +77,7 @@ function MessageBubble({ message, conversationId }) {
                 className="flex items-center gap-1 text-xs text-accent hover:text-accent-light transition-colors"
               >
                 <ExternalLink size={12} />
-                {message.sources.length} {t.sources}
+                {message.sources.length} {t.sources || 'sources'}
                 {showSources ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
               </button>
 
@@ -85,21 +85,35 @@ function MessageBubble({ message, conversationId }) {
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
-                  className="mt-2 space-y-1"
+                  className="mt-2 space-y-1.5"
                 >
                   {message.sources.map((source, i) => (
                     <div
                       key={i}
-                      className={`text-xs rounded px-2 py-1.5 ${
-                        isDark ? 'bg-navy-800/50 text-gray-400' : 'bg-gray-50 text-gray-600'
+                      className={`text-xs rounded-lg px-3 py-2 ${
+                        isDark ? 'bg-navy-800/50 text-gray-400 border border-navy-700/50' : 'bg-gray-50 text-gray-600 border border-gray-100'
                       }`}
                     >
-                      <span className="text-accent font-medium">[{i + 1}]</span>{' '}
-                      {source.title}
-                      {source.score && (
-                        <span className={`ml-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                          ({Math.round(source.score * 100)}% match)
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-accent">
+                          Sumber: {source.title || 'Unknown Document'}
                         </span>
+                        {source.score && (
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                            source.score > 0.7
+                              ? 'bg-green-500/10 text-green-400'
+                              : source.score > 0.4
+                                ? 'bg-yellow-500/10 text-yellow-400'
+                                : 'bg-gray-500/10 text-gray-400'
+                          }`}>
+                            {Math.round(source.score * 100)}% relevance
+                          </span>
+                        )}
+                      </div>
+                      {source.chunk && (
+                        <p className={`mt-1 text-[11px] line-clamp-2 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+                          {source.chunk.substring(0, 150)}...
+                        </p>
                       )}
                     </div>
                   ))}

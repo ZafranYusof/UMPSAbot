@@ -40,16 +40,16 @@ export function useChat() {
         sources: data.sources,
         confidence: data.confidence,
         isLowConfidence: data.isLowConfidence,
-        suggestedQuestions: data.suggestedQuestions || [],
+        suggestedQuestions: data.suggestions || data.suggestedQuestions || [],
         timestamp: new Date().toISOString()
       };
       setMessages(prev => [...prev, assistantMessage]);
 
-      // Set suggested follow-up questions
-      if (data.suggestedQuestions && data.suggestedQuestions.length > 0) {
-        setSuggestedQuestions(data.suggestedQuestions);
+      // Set suggested follow-up questions (backend returns "suggestions")
+      const suggestions = data.suggestions || data.suggestedQuestions || [];
+      if (suggestions.length > 0) {
+        setSuggestedQuestions(suggestions);
       } else {
-        // Fallback suggestions based on context
         setSuggestedQuestions([]);
       }
     } catch (err) {

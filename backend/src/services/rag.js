@@ -56,7 +56,7 @@ const HANDOFF_CONTACTS = {
  * @returns {object} Response with sources, confidence, suggestions, handoff
  */
 async function queryRAG(query, options = {}) {
-  const { language = 'mixed', conversationHistory = [], topK = TOP_K, sessionId = 'default' } = options;
+  const { language = 'mixed', conversationHistory = [], topK = TOP_K, sessionId = 'default', followUpContext = null } = options;
 
   // Step 1: Classify intent
   const intentResult = classifyIntent(query);
@@ -98,7 +98,52 @@ async function queryRAG(query, options = {}) {
     console.error(`[${new Date().toISOString()}] Cache lookup failed:`, cacheErr.message);
   }
 
-  // Step 3: Generate embedding for the query
+  // Step 3: Handle follow-up queries — use previous context instead of fresh RAG
+  if (followUpContext && followUpContext.previousAnswer) {
+    console.log(`[${new Date().toISOString()}] Follow-up detected, using previous context`);
+    
+    // Build context from previous answer + sources
+    const followUpContexts = [
+      `Previous question: ${followUpContext.previousQuery}\nPrevious answer: ${followUpContext.previousAnswer}`
+    ];
+    
+    // Also include previous sources for richer context
+    if (followUpContext.previousSources && followUpContext.previousSources.length > 0) {
+      for (const src of followUpContext.previousSources.slice(0, 3)) {
+        if (src.chunk) {
+          followUpContexts.push(`Document: ${src.title}\nContent: ${src.chunk}`);
+        }
+      }
+    }
+
+    const llmResponse = await generateResponse(query, followUpContexts, {
+      language,
+      conversationHistory,
+      intent: followUpContext.previousIntent || intentResult.intent
+    });
+
+    // Generate suggestions for follow-up too
+    let suggestions = [];
+    try {
+      suggestions = await generateSuggestions(query, llmResponse.content, followUpContext.previousIntent || intentResult.intent, language);
+    } catch (err) {
+      console.error(`[${new Date().toISOString()}] Failed to generate suggestions:`, err.message);
+    }
+
+    return {
+      content: llmResponse.content,
+      sources: followUpContext.previousSources || [],
+      confidence: 0.7,
+      isLowConfidence: false,
+      intent: followUpContext.previousIntent || intentResult.intent,
+      suggestions,
+      handoff: false,
+      handoffContact: null,
+      metadata: { ...llmResponse.metadata, isFollowUp: true }
+    };
+  }
+
+  // Step 3b: Generate embedding for the query
   const queryEmbedding = await generateEmbedding(query);
 
   // Step 4: Search for similar chunks in the vector store

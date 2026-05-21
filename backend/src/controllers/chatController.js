@@ -1,11 +1,42 @@
 /**
  * Chat Controller
  * Handles chat message processing and conversation management
+ * Includes conversation memory (last 5 messages) and follow-up detection
  */
 
 const { queryRAG } = require('../services/rag');
 const Message = require('../models/Message');
+const Conversation = require('../models/Conversation');
 const { v4: uuidv4 } = require('uuid');
+
+// Follow-up detection patterns (BM + EN + Manglish)
+const FOLLOWUP_PATTERNS = [
+  /^(tell me more|explain more|more details|elaborate|go on|continue)/i,
+  /^(lagi|terangkan lagi|lebih detail|sambung|jelaskan|huraikan)/i,
+  /^(details|what else|anything else|can you explain)/i,
+  /^(apa lagi|ada lagi|boleh terangkan|macam mana tu)/i,
+  /^(why|how come|kenapa|macam mana|camne)/i,
+  /^(what do you mean|maksud|apa maksud)/i,
+];
+
+/**
+ * Detect if a query is a follow-up to previous answer
+ */
+function isFollowUpQuery(query) {
+  const trimmed = query.trim().toLowerCase();
+  // Short queries that reference previous context
+  if (trimmed.length < 40) {
+    for (const pattern of FOLLOWUP_PATTERNS) {
+      if (pattern.test(trimmed)) return true;
+    }
+  }
+  // Very short queries (< 4 words) are likely follow-ups
+  const wordCount = trimmed.split(/\s+/).length;
+  if (wordCount <= 3 && (trimmed.includes('?') || trimmed.includes('lagi') || trimmed.includes('more'))) {
+    return true;
+  }
+  return false;
+}
 
 /**
  * Send a message and get AI response
@@ -20,7 +51,18 @@ async function sendMessage(req, res, next) {
 
     const convId = conversationId || uuidv4();
 
-    // Get conversation history for context
+    // Load or create conversation session
+    let conversation = null;
+    try {
+      conversation = await Conversation.findOne({ conversationId: convId });
+      if (!conversation) {
+        conversation = new Conversation({ conversationId: convId });
+      }
+    } catch (dbError) {
+      console.warn(`[${new Date().toISOString()}] Could not load conversation:`, dbError.message);
+    }
+
+    // Get conversation history (last 5 messages for context)
     let conversationHistory = [];
     try {
       const previousMessages = await Message.find({ conversationId: convId })
@@ -30,21 +72,35 @@ async function sendMessage(req, res, next) {
       
       conversationHistory = previousMessages
         .reverse()
+        .slice(-5) // Keep last 5 messages
         .map(m => ({ role: m.role, content: m.content }));
     } catch (dbError) {
-      // Continue without history if DB is unavailable
       console.warn(`[${new Date().toISOString()}] Could not fetch conversation history:`, dbError.message);
     }
 
     // Detect language from message
     const detectedLanguage = language || detectLanguage(message);
 
-    // Process through RAG pipeline (now includes intent, suggestions, handoff)
-    const ragResponse = await queryRAG(message, {
+    // Check if this is a follow-up query
+    const isFollowUp = isFollowUpQuery(message);
+    let ragOptions = {
       language: detectedLanguage,
       conversationHistory,
       sessionId: convId
-    });
+    };
+
+    // If follow-up, pass previous answer as additional context
+    if (isFollowUp && conversation?.lastAnswer?.content) {
+      ragOptions.followUpContext = {
+        previousQuery: conversation.lastAnswer.query,
+        previousAnswer: conversation.lastAnswer.content,
+        previousSources: conversation.lastAnswer.sources || [],
+        previousIntent: conversation.lastAnswer.intent
+      };
+    }
+
+    // Process through RAG pipeline
+    const ragResponse = await queryRAG(message, ragOptions);
 
     // Save user message
     let savedAssistantMsg = null;
@@ -70,6 +126,24 @@ async function sendMessage(req, res, next) {
       console.warn(`[${new Date().toISOString()}] Could not save messages to DB:`, dbError.message);
     }
 
+    // Update conversation session with last answer
+    try {
+      if (conversation) {
+        conversation.lastAnswer = {
+          content: ragResponse.content,
+          query: message,
+          sources: ragResponse.sources || [],
+          intent: ragResponse.intent || 'general'
+        };
+        conversation.messageCount = (conversation.messageCount || 0) + 2;
+        conversation.language = detectedLanguage;
+        conversation.lastActiveAt = new Date();
+        await conversation.save();
+      }
+    } catch (dbError) {
+      console.warn(`[${new Date().toISOString()}] Could not update conversation:`, dbError.message);
+    }
+
     // Build response in unified format
     const response = {
       conversationId: convId,
@@ -80,7 +154,8 @@ async function sendMessage(req, res, next) {
       confidence: ragResponse.confidence,
       language: detectedLanguage,
       intent: ragResponse.intent,
-      isLowConfidence: ragResponse.isLowConfidence
+      isLowConfidence: ragResponse.isLowConfidence,
+      isFollowUp
     };
 
     // Add handoff info if triggered
@@ -152,6 +227,7 @@ async function deleteConversation(req, res, next) {
   try {
     const { conversationId } = req.params;
     await Message.deleteMany({ conversationId });
+    await Conversation.deleteOne({ conversationId });
     res.json({ success: true, conversationId });
   } catch (error) {
     next(error);
@@ -159,23 +235,71 @@ async function deleteConversation(req, res, next) {
 }
 
 /**
- * Simple language detection (BM vs English)
+ * Improved language detection (BM vs English vs Manglish)
+ * Uses word frequency analysis with weighted scoring
  */
 function detectLanguage(text) {
-  const bmWords = ['apa', 'ini', 'itu', 'saya', 'nak', 'macam', 'mana', 'bila', 'kenapa', 'bagaimana', 'boleh', 'tidak', 'ada', 'untuk', 'dengan', 'yang', 'dan', 'di', 'ke', 'dari', 'berapa', 'siapa', 'dimana', 'mengapa', 'adakah', 'pelajar', 'universiti', 'fakulti', 'kursus', 'semester'];
-  
-  const words = text.toLowerCase().split(/\s+/);
-  const bmCount = words.filter(w => bmWords.includes(w)).length;
-  const ratio = bmCount / words.length;
+  const words = text.toLowerCase().split(/\s+/).filter(w => w.length > 1);
+  if (words.length === 0) return 'mixed';
 
-  if (ratio > 0.3) return 'ms';
-  if (ratio > 0.1) return 'mixed';
-  return 'en';
+  // Common BM words (high frequency in Malay text)
+  const bmWords = new Set([
+    'apa', 'ini', 'itu', 'saya', 'nak', 'macam', 'mana', 'bila', 'kenapa',
+    'bagaimana', 'boleh', 'tidak', 'ada', 'untuk', 'dengan', 'yang', 'dan',
+    'di', 'ke', 'dari', 'berapa', 'siapa', 'dimana', 'mengapa', 'adakah',
+    'pelajar', 'universiti', 'fakulti', 'kursus', 'semester', 'adalah',
+    'akan', 'telah', 'sudah', 'belum', 'juga', 'atau', 'tetapi', 'kerana',
+    'oleh', 'pada', 'dalam', 'lagi', 'sahaja', 'hanya', 'perlu', 'hendak',
+    'mereka', 'kami', 'kita', 'awak', 'kamu', 'dia', 'ia', 'bagi',
+    'tentang', 'antara', 'setiap', 'semua', 'banyak', 'sedikit', 'lebih',
+    'paling', 'sangat', 'amat', 'terlalu', 'agak', 'cukup', 'masih',
+    'sedang', 'sering', 'selalu', 'kadang', 'jarang', 'tak', 'takde',
+    'camne', 'camna', 'mcm', 'nk', 'ade', 'xde', 'dah', 'blm', 'dgn',
+    'utk', 'yg', 'ni', 'tu', 'je', 'la', 'lah', 'kan', 'eh', 'wei'
+  ]);
+
+  // Common English words
+  const enWords = new Set([
+    'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has',
+    'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may',
+    'might', 'shall', 'can', 'need', 'must', 'ought', 'what', 'which',
+    'who', 'whom', 'this', 'that', 'these', 'those', 'how', 'when', 'where',
+    'why', 'all', 'each', 'every', 'both', 'few', 'more', 'most', 'other',
+    'some', 'such', 'than', 'too', 'very', 'just', 'because', 'about',
+    'between', 'through', 'during', 'before', 'after', 'above', 'below',
+    'from', 'with', 'without', 'again', 'further', 'then', 'once', 'here',
+    'there', 'where', 'when', 'why', 'how', 'not', 'only', 'own', 'same',
+    'also', 'but', 'and', 'for', 'nor', 'yet', 'so', 'if', 'or'
+  ]);
+
+  let bmScore = 0;
+  let enScore = 0;
+
+  for (const word of words) {
+    if (bmWords.has(word)) bmScore++;
+    if (enWords.has(word)) enScore++;
+  }
+
+  const bmRatio = bmScore / words.length;
+  const enRatio = enScore / words.length;
+
+  // Clear BM majority
+  if (bmRatio > 0.3 && bmRatio > enRatio * 1.5) return 'ms';
+  // Clear EN majority
+  if (enRatio > 0.3 && enRatio > bmRatio * 1.5) return 'en';
+  // Mixed (Manglish) - both present or neither dominant
+  if (bmRatio > 0.1 && enRatio > 0.1) return 'mixed';
+  // Default based on higher score
+  if (bmRatio > enRatio) return 'ms';
+  if (enRatio > bmRatio) return 'en';
+  
+  return 'mixed';
 }
 
 module.exports = {
   sendMessage,
   getConversation,
   listConversations,
-  deleteConversation
+  deleteConversation,
+  detectLanguage
 };

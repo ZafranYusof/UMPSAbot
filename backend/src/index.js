@@ -13,6 +13,7 @@ const notificationRoutes = require('./routes/notifications');
 const whatsappRoutes = require('./routes/whatsapp');
 const timetableRoutes = require('./routes/timetable');
 const { autoIngestDocs } = require('./services/ingest');
+const { initAutoScrape } = require('./jobs/autoScrape');
 const { errorHandler, chatRateLimiter, generalRateLimiter } = require('./middleware');
 
 const app = express();
@@ -68,6 +69,9 @@ async function start() {
     if (forceReingest) {
       console.log('✅ Force re-ingest complete. You can remove FORCE_REINGEST=true now.');
     }
+
+    // Initialize weekly auto-scrape cron job
+    initAutoScrape();
     
     app.listen(PORT, () => {
       console.log(`🚀 UMPSABot API v2.0 running on http://localhost:${PORT}`);
