@@ -1,12 +1,29 @@
 /**
  * Cache Service
  * Handles response caching with exact match and semantic similarity lookup
+ * Smart caching: hit counter, TTL refresh on access, popularity-based TTL
  */
 
 const CachedResponse = require('../models/CachedResponse');
 const { generateEmbedding, cosineSimilarity } = require('./embedding');
 
 const SIMILARITY_THRESHOLD = parseFloat(process.env.CACHE_SIMILARITY_THRESHOLD) || 0.92;
+
+// TTL tiers based on hit count
+const BASE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const POPULAR_TTL_MS = 72 * 60 * 60 * 1000; // 72 hours (3 days)
+const VERY_POPULAR_TTL_MS = 168 * 60 * 60 * 1000; // 7 days
+const POPULAR_THRESHOLD = 5; // hits to be considered popular
+const VERY_POPULAR_THRESHOLD = 20; // hits to be considered very popular
+
+/**
+ * Calculate TTL based on hit count
+ */
+function getTTLForHitCount(hitCount) {
+  if (hitCount >= VERY_POPULAR_THRESHOLD) return VERY_POPULAR_TTL_MS;
+  if (hitCount >= POPULAR_THRESHOLD) return POPULAR_TTL_MS;
+  return BASE_TTL_MS;
+}
 
 /**
  * Normalize a query string for exact-match lookup
@@ -18,6 +35,7 @@ function normalizeQuery(query) {
 
 /**
  * Look up cache — first exact match, then semantic similarity
+ * On hit: increment counter, refresh TTL based on popularity
  * @param {string} query - Raw user query
  * @param {string} language - Language code
  * @returns {object|null} Cached response or null
@@ -30,6 +48,8 @@ async function getCachedResponse(query, language) {
   if (exact) {
     exact.hitCount += 1;
     exact.lastAccessedAt = new Date();
+    // Refresh TTL based on new hit count
+    exact.expiresAt = new Date(Date.now() + getTTLForHitCount(exact.hitCount));
     await exact.save();
     return exact.response;
   }
@@ -42,10 +62,17 @@ async function getCachedResponse(query, language) {
     if (!candidate.queryEmbedding || candidate.queryEmbedding.length === 0) continue;
     const similarity = cosineSimilarity(queryEmbedding, candidate.queryEmbedding);
     if (similarity >= SIMILARITY_THRESHOLD) {
-      // Update hit count on the matched document
+      // Update hit count and refresh TTL on the matched document
+      const newHitCount = (candidate.hitCount || 0) + 1;
       await CachedResponse.updateOne(
         { _id: candidate._id },
-        { $inc: { hitCount: 1 }, $set: { lastAccessedAt: new Date() } }
+        {
+          $inc: { hitCount: 1 },
+          $set: {
+            lastAccessedAt: new Date(),
+            expiresAt: new Date(Date.now() + getTTLForHitCount(newHitCount))
+          }
+        }
       );
       return candidate.response;
     }
@@ -80,7 +107,8 @@ async function cacheResponse(query, queryEmbedding, response, language) {
         },
         language,
         lastAccessedAt: new Date(),
-        createdAt: new Date()
+        createdAt: new Date(),
+        expiresAt: new Date(Date.now() + BASE_TTL_MS)
       },
       { upsert: true, new: true }
     );
@@ -103,12 +131,15 @@ async function getCacheStats() {
   const topCachedQueries = await CachedResponse.find()
     .sort({ hitCount: -1 })
     .limit(10)
-    .select('query hitCount lastAccessedAt language')
+    .select('query hitCount lastAccessedAt language expiresAt')
     .lean();
+
+  const popularCount = await CachedResponse.countDocuments({ hitCount: { $gte: POPULAR_THRESHOLD } });
 
   return {
     totalCachedResponses,
     totalHits: totalHits[0]?.total || 0,
+    popularCount,
     topCachedQueries
   };
 }

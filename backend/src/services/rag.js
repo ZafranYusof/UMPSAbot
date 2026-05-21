@@ -10,6 +10,7 @@ const { chunkText, extractText } = require('./chunking');
 const { classifyIntent, getGreetingResponse } = require('./intent');
 const { getCachedResponse, cacheResponse } = require('./cache');
 const Document = require('../models/Document');
+const UserPreference = require('../models/UserPreference');
 
 const TOP_K = parseInt(process.env.TOP_K_RESULTS) || 8;
 const CONFIDENCE_THRESHOLD = parseFloat(process.env.CONFIDENCE_THRESHOLD) || 0.2;
@@ -56,7 +57,26 @@ const HANDOFF_CONTACTS = {
  * @returns {object} Response with sources, confidence, suggestions, handoff
  */
 async function queryRAG(query, options = {}) {
-  const { language = 'mixed', conversationHistory = [], topK = TOP_K, sessionId = 'default', followUpContext = null } = options;
+  const { language = 'mixed', conversationHistory = [], topK = TOP_K, sessionId = 'default', followUpContext = null, userId = null } = options;
+
+  // Step 0: Load user preferences for personalization
+  let userContext = '';
+  if (userId) {
+    try {
+      const prefs = await UserPreference.findOne({ userId }).lean();
+      if (prefs) {
+        const parts = [];
+        if (prefs.faculty) parts.push(`Faculty: ${prefs.faculty}`);
+        if (prefs.programme) parts.push(`Programme: ${prefs.programme}`);
+        if (prefs.year) parts.push(`Year ${prefs.year} student`);
+        if (parts.length > 0) {
+          userContext = `[Student context: ${parts.join(', ')}] `;
+        }
+      }
+    } catch (prefErr) {
+      // Non-critical
+    }
+  }
 
   // Step 1: Classify intent
   const intentResult = classifyIntent(query);
@@ -152,7 +172,8 @@ async function queryRAG(query, options = {}) {
     const llmResponse = await generateResponse(query, followUpContexts, {
       language,
       conversationHistory,
-      intent: followUpContext.previousIntent || intentResult.intent
+      intent: followUpContext.previousIntent || intentResult.intent,
+      userContext
     });
 
     // Generate suggestions for follow-up too
@@ -226,7 +247,8 @@ async function queryRAG(query, options = {}) {
   const llmResponse = await generateResponse(query, contexts, {
     language,
     conversationHistory,
-    intent: intentResult.intent
+    intent: intentResult.intent,
+    userContext
   });
 
   // Step 9.5: If LLM returned fallback (all providers failed), try template fallback

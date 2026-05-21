@@ -5,8 +5,13 @@
  */
 
 const { queryRAG } = require('../services/rag');
+const { streamGenerateResponse, generateSuggestions } = require('../services/llm');
+const { generateEmbedding, cosineSimilarity } = require('../services/embedding');
+const { classifyIntent, getGreetingResponse } = require('../services/intent');
+const { getCachedResponse } = require('../services/cache');
 const Message = require('../models/Message');
 const Conversation = require('../models/Conversation');
+const QueryLog = require('../models/QueryLog');
 const { v4: uuidv4 } = require('uuid');
 
 // Follow-up detection patterns (BM + EN + Manglish)
@@ -164,6 +169,20 @@ async function sendMessage(req, res, next) {
       response.handoffContact = ragResponse.handoffContact;
     }
 
+    // Log query for popular questions tracking (non-blocking)
+    try {
+      await new QueryLog({
+        query: message,
+        normalizedQuery: message.toLowerCase().trim().replace(/\s+/g, ' '),
+        intent: ragResponse.intent || 'general',
+        language: detectedLanguage,
+        responseTime: ragResponse.metadata?.responseTime || 0,
+        provider: ragResponse.metadata?.provider || 'unknown'
+      }).save();
+    } catch (logErr) {
+      // Non-critical, don't fail the request
+    }
+
     res.json(response);
   } catch (error) {
     next(error);
@@ -296,8 +315,163 @@ function detectLanguage(text) {
   return 'mixed';
 }
 
+/**
+ * Stream a message response via Server-Sent Events
+ * POST /api/chat/stream
+ */
+async function streamMessage(req, res, next) {
+  try {
+    const { message, conversationId, language } = req.body;
+
+    if (!message || message.trim().length === 0) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    const convId = conversationId || uuidv4();
+    const detectedLanguage = language || detectLanguage(message);
+
+    // Set SSE headers
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'X-Accel-Buffering': 'no'
+    });
+
+    // Load conversation for context
+    let conversation = null;
+    let conversationHistory = [];
+    try {
+      conversation = await Conversation.findOne({ conversationId: convId });
+      if (!conversation) {
+        conversation = new Conversation({ conversationId: convId });
+      }
+      const previousMessages = await Message.find({ conversationId: convId })
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .lean();
+      conversationHistory = previousMessages
+        .reverse()
+        .slice(-5)
+        .map(m => ({ role: m.role, content: m.content }));
+    } catch (dbError) {
+      console.warn(`[${new Date().toISOString()}] Stream: Could not load conversation:`, dbError.message);
+    }
+
+    // Classify intent
+    const intentResult = classifyIntent(message);
+
+    // Handle greetings without streaming
+    if (!intentResult.needsRAG) {
+      const greetingResponse = getGreetingResponse(detectedLanguage);
+      res.write(`data: ${JSON.stringify({ type: 'chunk', content: greetingResponse })}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: 'done', conversationId: convId, sources: [], suggestions: [], confidence: 1.0, intent: intentResult.intent })}\n\n`);
+      res.end();
+      return;
+    }
+
+    // Check cache
+    try {
+      const cached = await getCachedResponse(message, detectedLanguage);
+      if (cached) {
+        res.write(`data: ${JSON.stringify({ type: 'chunk', content: cached.content })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: 'done', conversationId: convId, sources: cached.sources || [], suggestions: cached.suggestions || [], confidence: cached.confidence || 0.8, intent: cached.intent || intentResult.intent, fromCache: true })}\n\n`);
+        res.end();
+        return;
+      }
+    } catch (cacheErr) {
+      // Continue without cache
+    }
+
+    // Run RAG retrieval (embedding + search) without LLM generation
+    const { searchSimilarChunks } = require('../services/rag');
+    const queryEmbedding = await generateEmbedding(message);
+    const searchResults = await searchSimilarChunks(queryEmbedding, 8, message);
+
+    const contexts = searchResults.map((r) => {
+      return `Document: ${r.documentTitle}\nContent: ${r.chunk.content}`;
+    });
+
+    // Log query
+    const startTime = Date.now();
+
+    // Stream LLM response
+    await streamGenerateResponse(
+      message,
+      contexts,
+      { language: detectedLanguage, conversationHistory, intent: intentResult.intent },
+      (chunk) => {
+        // Send each chunk as SSE event
+        res.write(`data: ${JSON.stringify({ type: 'chunk', content: chunk })}\n\n`);
+      },
+      async (result) => {
+        const responseTime = Date.now() - startTime;
+
+        // Generate suggestions
+        let suggestions = [];
+        try {
+          suggestions = generateSuggestions(message, result.content, intentResult.intent, detectedLanguage);
+        } catch (e) {}
+
+        // Format sources
+        const sources = searchResults.map(r => ({
+          documentId: r.documentId,
+          title: r.documentTitle,
+          chunk: r.chunk.content.substring(0, 200) + '...',
+          score: r.score
+        }));
+
+        const { estimateConfidence } = require('../services/llm');
+        const confidence = estimateConfidence(searchResults.map(r => r.score));
+
+        // Send final event with metadata
+        res.write(`data: ${JSON.stringify({ type: 'done', conversationId: convId, sources, suggestions, confidence, intent: intentResult.intent, metadata: result.metadata })}\n\n`);
+        res.end();
+
+        // Save messages to DB (non-blocking)
+        try {
+          await new Message({ conversationId: convId, role: 'user', content: message, language: detectedLanguage }).save();
+          await new Message({ conversationId: convId, role: 'assistant', content: result.content, sources, language: detectedLanguage, confidence, metadata: result.metadata }).save();
+          if (conversation) {
+            conversation.lastAnswer = { content: result.content, query: message, sources, intent: intentResult.intent };
+            conversation.messageCount = (conversation.messageCount || 0) + 2;
+            conversation.language = detectedLanguage;
+            conversation.lastActiveAt = new Date();
+            await conversation.save();
+          }
+        } catch (dbErr) {
+          console.warn(`[${new Date().toISOString()}] Stream: DB save failed:`, dbErr.message);
+        }
+
+        // Log query for popular questions tracking
+        try {
+          await new QueryLog({
+            query: message,
+            normalizedQuery: message.toLowerCase().trim().replace(/\s+/g, ' '),
+            intent: intentResult.intent,
+            language: detectedLanguage,
+            responseTime,
+            provider: result.metadata?.provider || 'unknown'
+          }).save();
+        } catch (logErr) {
+          // Non-critical
+        }
+      }
+    );
+  } catch (error) {
+    // If headers already sent, end the stream
+    if (res.headersSent) {
+      res.write(`data: ${JSON.stringify({ type: 'error', message: 'An error occurred while streaming the response.' })}\n\n`);
+      res.end();
+    } else {
+      next(error);
+    }
+  }
+}
+
 module.exports = {
   sendMessage,
+  streamMessage,
   getConversation,
   listConversations,
   deleteConversation,

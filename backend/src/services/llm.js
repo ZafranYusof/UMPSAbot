@@ -46,9 +46,9 @@ const CEREBRAS_BASE_URL = 'https://api.cerebras.ai/v1/chat/completions';
  * @returns {object} Generated response with metadata
  */
 async function generateResponse(query, contexts = [], options = {}) {
-  const { language = 'mixed', conversationHistory = [], intent = 'general' } = options;
+  const { language = 'mixed', conversationHistory = [], intent = 'general', userContext = '' } = options;
 
-  const systemPrompt = buildSystemPrompt(contexts, language, intent);
+  const systemPrompt = buildSystemPrompt(contexts, language, intent, userContext);
 
   const messages = [
     { role: 'system', content: systemPrompt },
@@ -427,7 +427,7 @@ function generateSuggestions(query, response, intent = 'general', language = 'mi
 /**
  * Build system prompt with RAG context - STRICT version
  */
-function buildSystemPrompt(contexts, language, intent = 'general') {
+function buildSystemPrompt(contexts, language, intent = 'general', userContext = '') {
   let prompt = `You are UMPSABot, an AI assistant for UMPSA (Universiti Malaysia Pahang Al-Sultan Abdullah) students.
 
 RULES:
@@ -443,6 +443,11 @@ RULES:
 10. When responding in Bahasa Melayu, use natural conversational BM. Avoid overly formal or robotic phrasing. Write like a friendly senior student explaining things, not like a textbook. Use casual connectors like "so", "lepas tu", "basically" where appropriate.
 
 `;
+
+  // Inject user personalization context
+  if (userContext) {
+    prompt += `STUDENT INFO: ${userContext}Tailor your answer to this student's context when relevant.\n\n`;
+  }
 
   if (language === 'ms') {
     prompt += 'Respond in Bahasa Melayu. Guna BM yang natural dan santai, macam senior student explain kat junior. Jangan terlalu formal atau kaku.\n';
@@ -488,8 +493,111 @@ function estimateConfidence(scores) {
   return (topScore * 0.7) + (avgScore * 0.3);
 }
 
+/**
+ * Stream a response from DeepSeek using SSE (stream: true)
+ * Yields chunks as they arrive. Falls back to non-streaming if DeepSeek unavailable.
+ * @param {string} query - User's question
+ * @param {string[]} contexts - Retrieved relevant chunks
+ * @param {object} options - Additional options
+ * @param {function} onChunk - Callback called with each text chunk
+ * @param {function} onDone - Callback called when streaming is complete with metadata
+ */
+async function streamGenerateResponse(query, contexts = [], options = {}, onChunk, onDone) {
+  const { language = 'mixed', conversationHistory = [], intent = 'general' } = options;
+
+  const systemPrompt = buildSystemPrompt(contexts, language, intent);
+
+  const messages = [
+    { role: 'system', content: systemPrompt },
+    ...conversationHistory.slice(-6),
+    { role: 'user', content: query }
+  ];
+
+  const startTime = Date.now();
+
+  // Try DeepSeek streaming first
+  if (DEEPSEEK_API_KEY) {
+    try {
+      const response = await fetch(DEEPSEEK_BASE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: DEEPSEEK_MODEL,
+          messages,
+          temperature: 0.2,
+          max_tokens: 1500,
+          top_p: 0.85,
+          stream: true
+        }),
+        signal: AbortSignal.timeout(60000)
+      });
+
+      if (response.ok && response.body) {
+        let fullContent = '';
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || !trimmed.startsWith('data: ')) continue;
+            const data = trimmed.slice(6);
+            if (data === '[DONE]') continue;
+
+            try {
+              const parsed = JSON.parse(data);
+              const delta = parsed.choices?.[0]?.delta?.content;
+              if (delta) {
+                fullContent += delta;
+                onChunk(delta);
+              }
+            } catch (e) {
+              // Skip malformed JSON chunks
+            }
+          }
+        }
+
+        const responseTime = Date.now() - startTime;
+        onDone({
+          content: fullContent,
+          metadata: {
+            responseTime,
+            model: DEEPSEEK_MODEL,
+            provider: 'deepseek',
+            contextsUsed: contexts.length,
+            streamed: true
+          }
+        });
+        return;
+      }
+    } catch (error) {
+      console.error(`[${new Date().toISOString()}] DeepSeek stream error:`, (error.message || '').substring(0, 150));
+    }
+  }
+
+  // Fallback: use non-streaming generateResponse and send as single chunk
+  const result = await generateResponse(query, contexts, options);
+  onChunk(result.content);
+  onDone({
+    content: result.content,
+    metadata: { ...result.metadata, streamed: false }
+  });
+}
+
 module.exports = {
   generateResponse,
+  streamGenerateResponse,
   generateSuggestions,
   estimateConfidence,
   getFallbackResponse
