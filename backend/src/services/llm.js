@@ -467,9 +467,9 @@ RULES:
   }
 
   if (language === 'ms') {
-    prompt += 'Respond in Bahasa Melayu. Guna BM yang natural dan santai, macam senior student explain kat junior. Jangan terlalu formal atau kaku.\n';
+    prompt += 'IMPORTANT: You MUST respond ENTIRELY in Bahasa Melayu. Do not switch to English even if the student types in English. Guna BM yang natural dan santai, macam senior student explain kat junior. Jangan terlalu formal atau kaku.\n';
   } else if (language === 'en') {
-    prompt += 'Respond in English.\n';
+    prompt += 'IMPORTANT: You MUST respond ENTIRELY in English. Do not switch to Bahasa Melayu even if the student types in BM.\n';
   } else {
     prompt += 'Respond in the same language the student uses. If they mix BM and English, you can too.\n';
   }
