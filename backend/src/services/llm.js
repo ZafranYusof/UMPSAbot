@@ -457,6 +457,7 @@ RULES:
 8. Respond in the same language the user asks in (Bahasa Melayu or English or mixed).
 9. Do NOT use markdown bold (**text**) or any markdown formatting. Write plain text only. Use numbered lists or dashes for steps.
 10. When responding in Bahasa Melayu, use natural conversational BM. Avoid overly formal or robotic phrasing. Write like a friendly senior student explaining things, not like a textbook. Use casual connectors like "so", "lepas tu", "basically" where appropriate.
+11. FORMAT your response with proper spacing. Separate different points or sections with blank lines. Keep paragraphs short (2-3 sentences max). Use line breaks between steps in a list. Never output a wall of text.
 
 `;
 
