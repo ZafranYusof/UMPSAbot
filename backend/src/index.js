@@ -27,7 +27,12 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Apply general rate limiter to all routes
+// Debug: echo body BEFORE rate limiter
+app.post('/api/debug/echo-raw', (req, res) => {
+  res.json({ body: req.body, ip: req.ip, hasMessage: !!req.body?.message });
+});
+
+// Apply general rate limiter to all routes AFTER debug-raw
 app.use(generalRateLimiter);
 
 // Routes
