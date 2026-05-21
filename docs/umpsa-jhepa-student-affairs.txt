@@ -1,0 +1,12 @@
+JHEPA - Jabatan Hal Ehwal Pelajar dan Alumni UMPSA (Student Affairs and Alumni Department)
+
+Website: https://jhepa.umpsa.edu.my/
+
+ADAB Application:
+This app provides students access to the latest information on academics, student welfare, student finances, and facilities available at UMP. It also provides online application features such as zakat, e-complaints and others. It also connects students with the department's official portals at UMP, government agencies and banks, and private online payments.
+
+Download ADAB@UMPSA App:
+- iOS: https://apps.apple.com/us/app/ump-adab/id1574433441
+- Android: https://play.google.com/store/apps/details?id=my.edu.ump.adab
+
+Tags: #studentlifestyle #connecttoUMP
