@@ -6,7 +6,7 @@ import 'offline_cache.dart';
 import 'storage_service.dart';
 
 class ApiService {
-  static const String _prodBaseUrl = 'https://umpsa-chatbot-api.onrender.com/api';
+  static const String _prodBaseUrl = 'http://103.40.204.158/api';
   static const String _devBaseUrl = 'http://localhost:5005/api';
 
   late final Dio _dio;
