@@ -19,10 +19,11 @@ async function reingestDocuments(req, res) {
   }
 
   const expectedDims = getEmbeddingDimension();
+  const forceAll = req.query.force === 'true';
 
   try {
     const documents = await Document.find({ isProcessed: true });
-    console.log(`[${new Date().toISOString()}] Re-ingestion started: ${documents.length} documents`);
+    console.log(`[${new Date().toISOString()}] Re-ingestion started: ${documents.length} documents (force=${forceAll})`);
 
     let totalChunks = 0;
     let processedDocs = 0;
@@ -32,10 +33,9 @@ async function reingestDocuments(req, res) {
       if (!doc.chunks || doc.chunks.length === 0) continue;
 
       try {
-        // Check if already embedded with correct dimensions
+        // Check if already embedded with correct dimensions (skip unless forced)
         const firstChunk = doc.chunks[0];
-        if (firstChunk.embedding && firstChunk.embedding.length === expectedDims) {
-          console.log(`[${new Date().toISOString()}] Skipping "${doc.title}" - already has ${expectedDims}d embeddings`);
+        if (!forceAll && firstChunk.embedding && firstChunk.embedding.length === expectedDims) {
           processedDocs++;
           totalChunks += doc.chunks.length;
           continue;
