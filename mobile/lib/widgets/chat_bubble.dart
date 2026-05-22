@@ -12,6 +12,17 @@ class ChatBubble extends StatelessWidget {
     required this.message,
   });
 
+  /// Strip markdown formatting from text
+  String _stripMarkdown(String text) {
+    return text
+        .replaceAll(RegExp(r'\*\*(.+?)\*\*'), r'$1') // **bold**
+        .replaceAll(RegExp(r'\*(.+?)\*'), r'$1')     // *italic*
+        .replaceAll(RegExp(r'__(.+?)__'), r'$1')       // __bold__
+        .replaceAll(RegExp(r'_(.+?)_'), r'$1')         // _italic_
+        .replaceAll(RegExp(r'^#{1,6}\s+', multiLine: true), '') // headers
+        .replaceAll(RegExp(r'`(.+?)`'), r'$1');        // `code`
+  }
+
   @override
   Widget build(BuildContext context) {
     final isUser = message.isUser;
@@ -71,7 +82,7 @@ class ChatBubble extends StatelessWidget {
                       _buildStreamingCursor(theme)
                     else
                       Text(
-                        message.content,
+                        _stripMarkdown(message.content),
                         style: TextStyle(
                           color: isUser
                               ? const Color(0xFF1A1A1A)

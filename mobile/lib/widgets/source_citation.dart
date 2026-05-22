@@ -19,10 +19,14 @@ class _SourceCitationState extends State<SourceCitation> {
   Widget build(BuildContext context) {
     if (widget.sources.isEmpty) return const SizedBox.shrink();
 
+    // Deduplicate sources
+    final uniqueSources = widget.sources.toSet().toList();
+    if (uniqueSources.isEmpty) return const SizedBox.shrink();
+
     final theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.only(left: 52, right: 12, bottom: 4),
+      padding: const EdgeInsets.only(left: 50, right: 48, bottom: 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -41,7 +45,7 @@ class _SourceCitationState extends State<SourceCitation> {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '${widget.sources.length} source${widget.sources.length > 1 ? 's' : ''}',
+                    '${uniqueSources.length} source${uniqueSources.length > 1 ? 's' : ''}',
                     style: TextStyle(
                       fontSize: 12,
                       color: theme.colorScheme.onSurface.withOpacity(0.6),
@@ -74,7 +78,7 @@ class _SourceCitationState extends State<SourceCitation> {
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: widget.sources.asMap().entries.map((entry) {
+                  children: uniqueSources.asMap().entries.map((entry) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 2),
                       child: Row(

@@ -504,7 +504,7 @@ class _ChatScreenState extends State<ChatScreen> {
         left: 12,
         right: 12,
         top: 12,
-        bottom: MediaQuery.of(context).padding.bottom + 12,
+        bottom: 12,
       ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
