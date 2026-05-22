@@ -408,6 +408,11 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
     'parking': ['tempat letak kereta', 'parkir'],
     'contact': ['hubungi', 'telefon', 'phone', 'nombor', 'number'],
     'telefon': ['contact', 'phone', 'hubungi', 'nombor'],
+    'admission': ['kemasukan', 'masuk', 'syarat', 'requirements', 'entry', 'intake', 'upu'],
+    'kemasukan': ['admission', 'masuk', 'syarat', 'requirements', 'entry', 'intake', 'upu'],
+    'syarat': ['requirements', 'kemasukan', 'admission', 'kelayakan', 'entry'],
+    'masuk': ['admission', 'kemasukan', 'entry', 'intake', 'daftar'],
+    'kelayakan': ['eligibility', 'syarat', 'requirements', 'kemasukan', 'admission'],
   };
 
   // Extract keywords from query + expand with synonyms
