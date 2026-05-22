@@ -1,0 +1,95 @@
+UMPSA Website Scrape Manifest
+==============================
+Date: 2026-05-21
+Scraper: OpenClaw Subagent
+
+Total new files created: 51 (umpsa-*.txt files)
+
+URLs Scraped and Output Files:
+-------------------------------
+
+1. https://umpsa.edu.my/en/vice-chancellors-note → umpsa-vice-chancellor-note.txt
+2. https://umpsa.edu.my/en/about → umpsa-about-history.txt, umpsa-about-detailed.txt
+3. https://umpsa.edu.my/en/about/corporate-information → umpsa-corporate-info.txt, umpsa-corporate-information-detailed.txt
+4. https://umpsa.edu.my/en/clients-charter → umpsa-clients-charter.txt
+5. https://umpsa.edu.my/en/chancellor → umpsa-chancellor.txt
+6. https://umpsa.edu.my/en/student-disability → umpsa-disability-services-detailed.txt, umpsa-disability-services-full.txt
+7. https://umpsa.edu.my/en/international/outbound-mobility-programmes → umpsa-outbound-mobility.txt
+8. https://umpsa.edu.my/en/international/inbound → umpsa-inbound-exchange.txt
+9. https://umpsa.edu.my/en/international/aims-asean-international-mobility-students-programme → umpsa-aims-programme.txt
+10. https://umpsa.edu.my/en/corporate-identity → umpsa-corporate-identity.txt
+11. https://umpsa.edu.my/en/research → umpsa-research.txt
+12. https://umpsa.edu.my/en/ranking → umpsa-rankings.txt
+13. https://umpsa.edu.my/en/deans-directors → umpsa-deans-directors.txt
+14. https://umpsa.edu.my/en/senate → umpsa-senate.txt
+15. https://umpsa.edu.my/en/academic-calendar → umpsa-academic-calendar-info.txt
+16. https://umpsa.edu.my/en/pro-chancellor → (minimal content, included in senate)
+17. https://admission.umpsa.edu.my/ → umpsa-admission-portal.txt, umpsa-admission-detailed.txt
+18. https://admission.umpsa.edu.my/ug-programme → umpsa-undergraduate-programmes.txt, umpsa-undergraduate-programmes-detailed.txt
+19. https://admission.umpsa.edu.my/undergraduate/international-student-2 → umpsa-international-admission.txt, umpsa-international-student-guide.txt
+20. https://bendahari.umpsa.edu.my/ → umpsa-bursary-department.txt
+21. https://bendahari.umpsa.edu.my/index.php/en/mainmenuacademic/home-student.html → umpsa-student-finance.txt
+22. https://library.umpsa.edu.my/ → umpsa-library.txt, umpsa-library-detailed.txt
+23. https://jhepa.umpsa.edu.my/ → umpsa-jhepa-student-affairs.txt, umpsa-student-affairs-jhepa.txt
+24. https://campuspantry.umpsa.edu.my/ → umpsa-campus-pantry.txt
+25. https://ips.umpsa.edu.my/ → umpsa-postgraduate-studies.txt
+26. https://dualdegree.umpsa.edu.my/ → umpsa-dual-degree.txt
+27. https://study.umpsa.edu.my/ → umpsa-study-why-choose.txt
+28. https://open-intake.umpsa.edu.my/ → umpsa-open-intake.txt
+29. https://sukan.umpsa.edu.my/ → umpsa-sports-centre.txt
+30. https://alumni.umpsa.edu.my/ → umpsa-alumni.txt
+31. https://research.umpsa.edu.my/index.php/research → umpsa-research-grants.txt
+32. https://news.umpsa.edu.my/ → (news headlines, not saved as separate file - dynamic content)
+33. https://fk.umpsa.edu.my/ → umpsa-faculty-computing.txt
+34. https://ftkee.umpsa.edu.my/ → umpsa-faculty-electrical.txt
+35. https://ftkkp.umpsa.edu.my/ → umpsa-faculty-chemical.txt
+36. https://ftkma.umpsa.edu.my/ → umpsa-faculty-mechanical.txt
+37. https://ftkpm.umpsa.edu.my/ → umpsa-faculty-manufacturing.txt
+38. https://fist.umpsa.edu.my/ → umpsa-faculty-industrial-sciences.txt
+39. https://ftka.umpsa.edu.my/ → umpsa-faculty-civil.txt
+40. https://fim.umpsa.edu.my/ → umpsa-faculty-industrial-management.txt
+41. https://pendaftar.umpsa.edu.my/ → (minimal content, registrar info included in deans-directors)
+
+Pages that returned 404 or no useful content:
+- https://umpsa.edu.my/en/facilities (404)
+- https://umpsa.edu.my/en/sustainability (404)
+- https://umpsa.edu.my/en/college-faculty (404)
+- https://umpsa.edu.my/en/academic-centre (404)
+- https://umpsa.edu.my/en/centre-of-excellence (404)
+- https://umpsa.edu.my/en/campus-life (no extractable content)
+- https://umpsa.edu.my/en/convocation (no extractable content)
+- https://umpsa.edu.my/en/facts-figures (no extractable content)
+- https://umpsa.edu.my/en/faculties-departments (no extractable content)
+- https://fkom.umpsa.edu.my (DNS not found)
+- https://computing.umpsa.edu.my (DNS not found)
+- https://fkmp.umpsa.edu.my (DNS not found)
+- https://ftkmp.umpsa.edu.my (DNS not found)
+- https://ftkaw.umpsa.edu.my (DNS not found)
+- https://fka.umpsa.edu.my (DNS not found)
+- https://fpen.umpsa.edu.my (DNS not found)
+- https://career.umpsa.edu.my (DNS not found)
+- https://cml.umpsa.edu.my (DNS not found)
+- https://mygreen.umpsa.edu.my (JavaScript-only, no extractable content)
+
+Pre-existing files (not duplicated):
+- Various PDF files (fees, academic calendar, hostel guidelines, etc.)
+- umpsa-about-admission.txt
+- umpsa-financial-aid-programs.txt
+- umpsa-general-info.txt
+- umpsa-student-disability.txt
+- umpsa-student-faq.txt
+
+Categories of Content Scraped:
+- University Overview & Corporate Info: 6 files
+- Admission & Programmes: 5 files
+- Faculties: 8 files
+- Student Services: 6 files
+- Finance & Fees: 2 files
+- Library: 2 files
+- Research & Grants: 2 files
+- Rankings & Achievements: 1 file
+- International: 4 files
+- Leadership & Governance: 3 files
+- Sports & Activities: 1 file
+- Alumni: 1 file
+- Other: 2 files
