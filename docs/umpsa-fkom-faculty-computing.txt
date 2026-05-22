@@ -1,0 +1,143 @@
+FAKULTI KOMPUTERAN (FK) - UNIVERSITI MALAYSIA PAHANG AL-SULTAN ABDULLAH (UMPSA)
+Sumber: https://fk.umpsa.edu.my | https://www.umpsa.edu.my/en/faculties-departments
+Dikemaskini: Mei 2026
+
+================================================================================
+MAKLUMAT AM
+================================================================================
+
+Nama Penuh: Fakulti Komputeran (FK)
+Dahulu dikenali sebagai: Faculty of Computer Systems & Software Engineering (FSKKP)
+Kampus: Kampus Pekan, 26600 Pekan, Pahang, Malaysia
+Telefon: +609-431 5011 (Talian Am) | +609-431 5071 (Talian Akademik)
+Email: fk@umpsa.edu.my
+Website: https://fk.umpsa.edu.my
+
+Dekan: Boleh dirujuk di laman web FK atau portal UMPSA
+
+================================================================================
+VISI & MISI
+================================================================================
+
+Visi: Menjadi fakulti komputeran bertaraf dunia yang menerajui inovasi digital.
+
+Misi: Melahirkan graduan berkemahiran tinggi dalam bidang sains komputer, 
+kejuruteraan perisian, dan teknologi maklumat yang berdaya saing di peringkat 
+global selaras dengan Revolusi Industri 4.0 (IR 4.0).
+
+================================================================================
+PROGRAM DITAWARKAN
+================================================================================
+
+PROGRAM SARJANA MUDA (UNDERGRADUATE):
+
+1. Bachelor of Computer Science (Software Engineering) with Honours
+   - Kod: BCS (SE)
+   - Tempoh: 4 tahun (8 semester)
+   - Akreditasi: MQA, BEM
+   - Fokus: Software development, system design, project management
+
+2. Bachelor of Computer Science (Computer Systems & Networking) with Honours
+   - Kod: BCS (CSN)
+   - Tempoh: 4 tahun (8 semester)
+   - Akreditasi: MQA
+   - Fokus: Network security, cloud computing, system administration
+
+3. Bachelor of Computer Science (Graphic & Multimedia Technology) with Honours
+   - Kod: BCS (GMT)
+   - Tempoh: 4 tahun (8 semester)
+   - Akreditasi: MQA
+   - Fokus: UI/UX design, game development, multimedia applications
+
+4. Diploma in Computer Science
+   - Tempoh: 3 tahun (6 semester)
+   - Fokus: Asas pengaturcaraan, pangkalan data, rangkaian
+
+PROGRAM PASCA SISWAZAH (POSTGRADUATE):
+
+1. Master of Computer Science (by Coursework)
+   - Tempoh: 1.5 - 2 tahun
+   
+2. Master of Science (Computer Science) - by Research
+   - Tempoh: 2 - 4 tahun
+
+3. Doctor of Philosophy (PhD) in Computer Science
+   - Tempoh: 3 - 6 tahun
+
+================================================================================
+BIDANG PENYELIDIKAN
+================================================================================
+
+- Artificial Intelligence & Machine Learning
+- Cybersecurity & Network Security
+- Software Engineering & Quality Assurance
+- Data Science & Big Data Analytics
+- Internet of Things (IoT)
+- Cloud Computing & Distributed Systems
+- Computer Vision & Image Processing
+- Human-Computer Interaction (HCI)
+- Natural Language Processing (NLP)
+- Game Development & Virtual Reality
+
+================================================================================
+KEMUDAHAN & FASILITI
+================================================================================
+
+- Makmal Komputer (Computer Labs) - dilengkapi PC terkini
+- Makmal Rangkaian (Networking Lab) - Cisco equipment
+- Makmal Keselamatan Siber (Cybersecurity Lab)
+- Makmal Multimedia & Grafik
+- Makmal Penyelidikan AI
+- Bilik Seminar & Tutorial
+- Perpustakaan Mini FK
+- Ruang Pelajar (Student Lounge)
+- Makmal IoT & Embedded Systems
+
+================================================================================
+KEMASUKAN & SYARAT
+================================================================================
+
+Syarat Am Sarjana Muda:
+- SPM: Lulus BM, Sejarah, Matematik, dan Matematik Tambahan
+- Minimum 5 kredit termasuk Matematik dan satu subjek Sains
+- STPM/Matrikulasi/Diploma yang berkaitan
+- MUET Band 2 minimum
+
+Syarat Khas:
+- Matematik Tambahan (kredit/lulus bergantung program)
+- Fizik atau subjek berkaitan ICT
+
+================================================================================
+PELUANG KERJAYA
+================================================================================
+
+Graduan FK boleh bekerja sebagai:
+- Software Developer / Engineer
+- System Analyst
+- Network Engineer / Administrator
+- Cybersecurity Analyst
+- Data Scientist / Data Analyst
+- UI/UX Designer
+- Game Developer
+- Cloud Architect
+- AI/ML Engineer
+- IT Consultant
+- Database Administrator
+- Web Developer (Full Stack)
+
+================================================================================
+HUBUNGI KAMI
+================================================================================
+
+Alamat Pos:
+Fakulti Komputeran (FK)
+Universiti Malaysia Pahang Al-Sultan Abdullah
+26600 Pekan, Pahang Darul Makmur, Malaysia
+
+Telefon: +609-431 5011 (Am) | +609-431 5071 (Akademik)
+Email: fk@umpsa.edu.my
+Website: https://fk.umpsa.edu.my
+
+Waktu Operasi Pejabat:
+Ahad - Khamis: 8:00 pagi - 5:00 petang
+Jumaat - Sabtu: Tutup (kecuali ada program khas)
