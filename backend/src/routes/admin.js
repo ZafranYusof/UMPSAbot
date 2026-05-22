@@ -7,6 +7,8 @@ const { uploadDocument, deleteDocument } = require('../controllers/documentContr
 const { reingestDocuments, ingestNewDocs, debugDocs, reingestBatch } = require('../controllers/reingestController');
 const QueryLog = require('../models/QueryLog');
 const { getUnresolvedQueries, resolveQuery } = require('../services/feedbackLoop');
+const ScrapedPage = require('../models/ScrapedPage');
+const { runScrapeJob, SCRAPE_URLS } = require('../jobs/autoScrape');
 
 // Configure multer for admin uploads
 const upload = multer({
@@ -129,6 +131,49 @@ router.post('/failed-queries/resolve', async (req, res, next) => {
     if (!query) return res.status(400).json({ error: 'query is required' });
     await resolveQuery(query);
     res.json({ success: true, message: 'Query marked as resolved' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Auto-scrape: get status of all tracked pages
+router.get('/scrape-status', async (req, res, next) => {
+  try {
+    const pages = await ScrapedPage.find().sort({ lastScraped: -1 }).lean();
+
+    // Include URLs that haven't been scraped yet
+    const trackedUrls = pages.map(p => p.url);
+    const untracked = SCRAPE_URLS
+      .filter(s => !trackedUrls.includes(s.url))
+      .map(s => ({
+        url: s.url,
+        title: s.title,
+        category: s.category,
+        lastScraped: null,
+        contentHash: null,
+        status: 'pending',
+        filename: null
+      }));
+
+    res.json({
+      totalTracked: SCRAPE_URLS.length,
+      scraped: pages.length,
+      pages: [...pages, ...untracked]
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Auto-scrape: manually trigger a scrape cycle
+router.post('/scrape-now', async (req, res, next) => {
+  try {
+    // Run async so we don't block the response for too long
+    res.json({ message: 'Scrape job started', startedAt: new Date().toISOString() });
+    // Fire and forget
+    runScrapeJob().catch(err => {
+      console.error('[Admin] Manual scrape failed:', err.message);
+    });
   } catch (error) {
     next(error);
   }

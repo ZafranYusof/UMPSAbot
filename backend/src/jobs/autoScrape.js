@@ -6,10 +6,9 @@
 
 const cron = require('node-cron');
 const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
 const { ingestDocument } = require('../services/rag');
 const Document = require('../models/Document');
+const ScrapedPage = require('../models/ScrapedPage');
 
 // Key UMPSA URLs to scrape weekly
 const SCRAPE_URLS = [
@@ -34,38 +33,6 @@ const SCRAPE_URLS = [
   { url: 'https://fist.umpsa.edu.my/', title: 'Faculty of Industrial Sciences', category: 'academic' },
   { url: 'https://fim.umpsa.edu.my/', title: 'Faculty of Industrial Management', category: 'academic' },
 ];
-
-// Path to store content hashes for change detection
-const HASH_FILE = path.join(__dirname, '..', '..', 'data', 'scrape-hashes.json');
-
-/**
- * Load stored content hashes
- */
-function loadHashes() {
-  try {
-    if (fs.existsSync(HASH_FILE)) {
-      return JSON.parse(fs.readFileSync(HASH_FILE, 'utf-8'));
-    }
-  } catch (err) {
-    console.error(`[AutoScrape] Failed to load hashes:`, err.message);
-  }
-  return {};
-}
-
-/**
- * Save content hashes
- */
-function saveHashes(hashes) {
-  try {
-    const dir = path.dirname(HASH_FILE);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(HASH_FILE, JSON.stringify(hashes, null, 2));
-  } catch (err) {
-    console.error(`[AutoScrape] Failed to save hashes:`, err.message);
-  }
-}
 
 /**
  * Generate MD5 hash of content for change detection
@@ -101,30 +68,22 @@ async function fetchPageContent(url) {
 
     // Basic HTML to text extraction
     const text = html
-      // Remove script and style tags with content
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-      // Remove HTML comments
       .replace(/<!--[\s\S]*?-->/g, '')
-      // Convert headers to markdown-style
       .replace(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/gi, '\n## $1\n')
-      // Convert paragraphs and divs to newlines
       .replace(/<\/?(p|div|br|li|tr)[^>]*>/gi, '\n')
-      // Remove remaining HTML tags
       .replace(/<[^>]+>/g, '')
-      // Decode common HTML entities
       .replace(/&amp;/g, '&')
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'")
       .replace(/&nbsp;/g, ' ')
-      // Clean up whitespace
       .replace(/\n{3,}/g, '\n\n')
       .replace(/[ \t]+/g, ' ')
       .trim();
 
-    // Filter out pages with too little content
     if (text.length < 100) {
       console.warn(`[AutoScrape] Too little content from ${url} (${text.length} chars)`);
       return null;
@@ -138,13 +97,12 @@ async function fetchPageContent(url) {
 }
 
 /**
- * Run the scrape job - fetch pages, compare hashes, re-ingest if changed
+ * Run the scrape job - fetch pages, compare hashes in DB, re-ingest if changed
  */
 async function runScrapeJob() {
   const startTime = Date.now();
-  console.log(`[AutoScrape] Starting weekly scrape at ${new Date().toISOString()}`);
+  console.log(`[AutoScrape] Starting scrape at ${new Date().toISOString()}`);
 
-  const hashes = loadHashes();
   const results = {
     total: SCRAPE_URLS.length,
     scraped: 0,
@@ -157,8 +115,19 @@ async function runScrapeJob() {
   for (const { url, title, category } of SCRAPE_URLS) {
     try {
       const content = await fetchPageContent(url);
+      const filename = `autoscrape-${url.replace(/[^a-z0-9]/gi, '-')}.txt`;
+
+      // Ensure ScrapedPage record exists
+      let page = await ScrapedPage.findOne({ url });
+      if (!page) {
+        page = new ScrapedPage({ url, title, category, filename, status: 'pending' });
+      }
 
       if (!content) {
+        page.status = 'error';
+        page.errorMessage = 'Failed to fetch or content too short';
+        page.lastScraped = new Date();
+        await page.save();
         results.errors++;
         continue;
       }
@@ -167,7 +136,11 @@ async function runScrapeJob() {
       const contentHash = hashContent(content);
 
       // Check if content has changed
-      if (hashes[url] === contentHash) {
+      if (page.contentHash === contentHash) {
+        page.status = 'unchanged';
+        page.lastScraped = new Date();
+        page.errorMessage = null;
+        await page.save();
         results.skipped++;
         continue;
       }
@@ -176,9 +149,11 @@ async function runScrapeJob() {
       console.log(`[AutoScrape] Content changed for: ${title} (${url})`);
       results.changed++;
 
-      // Delete old document if exists (by title match)
+      // Delete old document if exists
       try {
-        await Document.deleteMany({ title: { $regex: new RegExp(`^${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } });
+        await Document.deleteMany({
+          title: { $regex: new RegExp(`^${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+        });
       } catch (delErr) {
         // Non-critical, continue
       }
@@ -187,7 +162,7 @@ async function runScrapeJob() {
       const buffer = Buffer.from(content, 'utf-8');
       await ingestDocument(buffer, {
         title,
-        filename: `autoscrape-${url.replace(/[^a-z0-9]/gi, '-')}.txt`,
+        filename,
         fileType: 'txt',
         fileSize: buffer.length,
         category,
@@ -195,18 +170,31 @@ async function runScrapeJob() {
       });
 
       results.ingested++;
-      hashes[url] = contentHash;
+
+      // Update DB record
+      page.contentHash = contentHash;
+      page.lastScraped = new Date();
+      page.filename = filename;
+      page.status = 'success';
+      page.errorMessage = null;
+      await page.save();
 
       // Small delay between requests to be polite
       await new Promise(resolve => setTimeout(resolve, 2000));
     } catch (err) {
       console.error(`[AutoScrape] Error processing ${url}:`, err.message);
       results.errors++;
+
+      // Try to update status in DB
+      try {
+        await ScrapedPage.findOneAndUpdate(
+          { url },
+          { status: 'error', errorMessage: err.message, lastScraped: new Date() },
+          { upsert: true }
+        );
+      } catch (_) {}
     }
   }
-
-  // Save updated hashes
-  saveHashes(hashes);
 
   const duration = ((Date.now() - startTime) / 1000).toFixed(1);
   console.log(`[AutoScrape] Complete in ${duration}s:`, JSON.stringify(results));
@@ -217,12 +205,15 @@ async function runScrapeJob() {
 /**
  * Initialize the cron job
  * Schedule: Every Sunday at 3:00 AM (Asia/Kuala_Lumpur timezone)
+ * Only runs in production environment
  */
 function initAutoScrape() {
-  // Check if node-cron is available
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('📅 Auto-scrape cron job skipped (not production)');
+    return null;
+  }
+
   try {
-    // Schedule: minute hour day-of-month month day-of-week
-    // "0 3 * * 0" = At 03:00 on Sunday
     const job = cron.schedule('0 3 * * 0', async () => {
       try {
         await runScrapeJob();
