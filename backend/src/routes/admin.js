@@ -6,6 +6,7 @@ const { getStats, getFeedback, getDocuments, clearCacheHandler } = require('../c
 const { uploadDocument, deleteDocument } = require('../controllers/documentController');
 const { reingestDocuments, ingestNewDocs, debugDocs, reingestBatch } = require('../controllers/reingestController');
 const QueryLog = require('../models/QueryLog');
+const { getUnresolvedQueries, resolveQuery } = require('../services/feedbackLoop');
 
 // Configure multer for admin uploads
 const upload = multer({
@@ -90,6 +91,44 @@ router.get('/popular-questions', async (req, res, next) => {
         lastAsked: p.lastAsked
       }))
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Failed/low-confidence queries for knowledge base expansion
+router.get('/failed-queries', async (req, res, next) => {
+  try {
+    const { limit = 50, skip = 0 } = req.query;
+    const { results, total } = await getUnresolvedQueries({
+      limit: parseInt(limit),
+      skip: parseInt(skip)
+    });
+
+    res.json({
+      total,
+      count: results.length,
+      queries: results.map(r => ({
+        query: r.query,
+        language: r.language,
+        avgConfidence: Math.round(r.avgConfidence * 1000) / 1000,
+        count: r.count,
+        lastSeen: r.lastSeen,
+        sources: r.sources
+      }))
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Resolve a failed query (mark as addressed)
+router.post('/failed-queries/resolve', async (req, res, next) => {
+  try {
+    const { query } = req.body;
+    if (!query) return res.status(400).json({ error: 'query is required' });
+    await resolveQuery(query);
+    res.json({ success: true, message: 'Query marked as resolved' });
   } catch (error) {
     next(error);
   }

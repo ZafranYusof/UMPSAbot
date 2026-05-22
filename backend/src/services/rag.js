@@ -9,6 +9,7 @@ const { generateTemplateFallback } = require('./templateFallback');
 const { chunkText, extractText } = require('./chunking');
 const { classifyIntent, getGreetingResponse } = require('./intent');
 const { getCachedResponse, cacheResponse } = require('./cache');
+const { flagLowConfidence } = require('./feedbackLoop');
 const Document = require('../models/Document');
 const UserPreference = require('../models/UserPreference');
 
@@ -340,6 +341,11 @@ async function queryRAG(query, options = {}) {
   // Step 13: Save to cache (non-blocking, don't await)
   cacheResponse(query, queryEmbedding, finalResult, language).catch(err => {
     console.error(`[${new Date().toISOString()}] Cache save failed:`, err.message);
+  });
+
+  // Step 14: Flag low-confidence queries for knowledge base expansion (non-blocking)
+  flagLowConfidence(query, language, confidence).catch(err => {
+    console.error(`[${new Date().toISOString()}] FeedbackLoop flag failed:`, err.message);
   });
 
   console.log(`[${new Date().toISOString()}] RAG total pipeline: ${Date.now() - ragStart}ms`);
