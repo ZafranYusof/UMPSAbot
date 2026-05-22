@@ -8,16 +8,17 @@ AI-powered chatbot for UMPSA students. Answers questions about fees, registratio
 
 ## What It Does
 
-Students ask questions in BM, English, or Manglish. The chatbot searches through 96 official UMPSA documents and generates answers with source citations.
+Students ask questions in BM, English, or Manglish. The chatbot searches through 141 official UMPSA documents and generates answers with source citations.
 
 Not a generic ChatGPT wrapper, trained specifically on UMPSA data.
 
 ### Key Features
 
 - **RAG Pipeline** — Retrieval-Augmented Generation for accurate, sourced answers
-- **96 Knowledge Base Documents** — fees, registration, hostel, academic calendar, clubs, facilities
-- **Web Scraping** — automated scraping of UMPSA official pages (114 documents ingested)
+- **141 Knowledge Base Documents** — fees, registration, hostel, academic calendar, clubs, facilities, admission, counselling, library
+- **Web Scraping** — automated scraping of UMPSA official pages (119 documents ingested)
 - **Jina AI Embeddings** — semantic search (768-dim vectors) with keyword boosting
+- **75-Entry BM/EN Synonym Map** — cross-language matching (Malaya NLP-generated)
 - **5-Layer LLM Failover** — DeepSeek → Groq → OpenRouter → Cerebras → Template fallback
 - **Timetable Planner** — input course codes, get non-clashing combinations
 - **Streaming Responses** — SSE-based real-time response streaming
@@ -30,6 +31,7 @@ Not a generic ChatGPT wrapper, trained specifically on UMPSA data.
 - **WhatsApp Integration** — chat via WhatsApp (Twilio)
 - **Mobile App** — Flutter Android app with SAMs-inspired premium dark theme
 - **Admin Panel** — document upload, stats, popular questions tracking
+- **Batched Re-embedding** — admin endpoint for incremental re-embedding without downtime
 
 ## Tech Stack
 
@@ -142,6 +144,9 @@ cd mobile/android
 | GET | `/api/admin/stats` | Dashboard stats |
 | GET | `/api/admin/popular-questions` | Top 20 queries |
 | GET | `/api/admin/reingest` | Re-embed all documents |
+| GET | `/api/admin/reingest-batch` | Re-embed in batches (?skip=N&limit=M) |
+| GET | `/api/admin/ingest-new` | Ingest new docs from filesystem |
+| GET | `/api/admin/debug-docs` | Check docs filesystem path |
 | POST/GET | `/api/user/preferences` | Student personalization |
 
 ## How RAG Works
@@ -156,9 +161,10 @@ cd mobile/android
 
 ## Performance
 
-- **Accuracy:** 80%+ on test queries
+- **Accuracy:** 96% (48/50 across BM, English, and Manglish queries)
 - **Response time:** < 3 seconds (streaming)
-- **Knowledge base:** 114 documents, 400+ chunks
+- **Knowledge base:** 141 documents, 500+ chunks
+- **Synonym coverage:** 75 BM/EN cross-language pairs
 - **Uptime:** 5-layer failover ensures near-zero downtime
 - **Caching:** Popular answers cached, < 500ms repeat queries
 - **Cost:** $0 (all free tiers)
