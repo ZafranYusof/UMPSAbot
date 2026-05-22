@@ -28,7 +28,11 @@ class ChatBubble extends StatelessWidget {
     result = result.replaceAll(RegExp(r'^#{1,6}\s+', multiLine: true), '');
     // Strip `code`
     result = result.replaceAllMapped(RegExp(r'`(.+?)`'), (m) => m.group(1) ?? '');
-    return result;
+    // Normalize whitespace: collapse 3+ newlines to 2
+    result = result.replaceAll(RegExp(r'\n{3,}'), '\n\n');
+    // Remove blank lines that only have spaces
+    result = result.replaceAll(RegExp(r'^\s+$', multiLine: true), '');
+    return result.trim();
   }
 
   @override
