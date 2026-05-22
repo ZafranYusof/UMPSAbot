@@ -80,23 +80,46 @@ async function autoIngestDocs(force = false) {
       // Chunk the text
       const chunks = chunkText(content);
 
-      // Generate embeddings for each chunk
+      // Generate embeddings for each chunk (batch with retry)
       const chunksWithEmbeddings = [];
-      for (let i = 0; i < chunks.length; i++) {
-        let embedding;
-        try {
-          embedding = await generateEmbedding(chunks[i]);
-        } catch (embErr) {
-          console.warn(`  ⚠️  Embedding failed for chunk ${i} of ${filename}, using fallback`);
-          const { localEmbedding } = require('./embedding');
-          embedding = localEmbedding(chunks[i]);
+      const { generateEmbeddings } = require('./embedding');
+      try {
+        const embeddings = await generateEmbeddings(chunks);
+        for (let i = 0; i < chunks.length; i++) {
+          chunksWithEmbeddings.push({
+            content: chunks[i],
+            embedding: embeddings[i],
+            index: i
+          });
         }
-        chunksWithEmbeddings.push({
-          content: chunks[i],
-          embedding,
-          index: i
-        });
+      } catch (batchErr) {
+        console.warn(`  ⚠️  Batch embedding failed for ${filename}: ${batchErr.message}`);
+        // Retry one-by-one with delay
+        for (let i = 0; i < chunks.length; i++) {
+          let embedding;
+          try {
+            await new Promise(r => setTimeout(r, 1000)); // 1s delay
+            embedding = await generateEmbedding(chunks[i]);
+          } catch (embErr) {
+            console.warn(`  ⚠️  Embedding failed for chunk ${i} of ${filename}, skipping file`);
+            break;
+          }
+          chunksWithEmbeddings.push({
+            content: chunks[i],
+            embedding,
+            index: i
+          });
+        }
       }
+
+      if (chunksWithEmbeddings.length === 0) {
+        console.warn(`  ⚠️  No embeddings generated for ${filename}, skipping`);
+        skipped++;
+        continue;
+      }
+
+      // Add delay between files to avoid rate limiting
+      await new Promise(r => setTimeout(r, 500));
 
       // Create title from filename
       const title = filename
