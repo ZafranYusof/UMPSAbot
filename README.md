@@ -178,14 +178,6 @@ cd mobile/android
 | Mixed EN+BM | 14/15 (93.3%) | Code-switching queries |
 | **Overall** | **48/50 (96%)** | All test types combined |
 
-Sample questions tested:
-- "Apa syarat kemasukan UMPSA?" ✅
-- "how to daftar subjek eh" ✅
-- "Ada gym tak kat sini" ✅
-- "nak jumpa kaunselor macam mana" ✅
-- "How much yuran semester UMPSA?" ✅
-- "bus schedule ke pekan campus" ✅
-
 ## License
 
 MIT
