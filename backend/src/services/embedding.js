@@ -69,15 +69,16 @@ function getOllamaUrl() {
  */
 async function ollamaEmbed(text) {
   const url = getOllamaUrl();
+  const isLocal = url.includes('localhost') || url.includes('127.0.0.1');
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...(process.env.OPENAI_API_KEY ? { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` } : {})
+      ...(!isLocal && process.env.OPENAI_API_KEY ? { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` } : {})
     },
     body: JSON.stringify({
       model: OLLAMA_EMBED_MODEL,
-      prompt: text
+      input: text
     })
   });
 
