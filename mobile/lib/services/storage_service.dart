@@ -11,6 +11,8 @@ class StorageService {
   static const String _sessionIdKey = 'session_id';
   static const String _bookmarksKey = 'bookmarked_messages';
   static const String _cachedConversationsKey = 'cached_conversations';
+  static const String _facultyKey = 'user_faculty';
+  static const String _yearKey = 'user_year';
 
   late SharedPreferences _prefs;
 
@@ -23,6 +25,23 @@ class StorageService {
 
   Future<void> setOnboardingComplete() async {
     await _prefs.setBool(_onboardingKey, true);
+  }
+
+  // Faculty
+  String? get faculty => _prefs.getString(_facultyKey);
+
+  Future<void> setFaculty(String faculty) async {
+    await _prefs.setString(_facultyKey, faculty);
+  }
+
+  // Year
+  int? get year {
+    final val = _prefs.getInt(_yearKey);
+    return val;
+  }
+
+  Future<void> setYear(int year) async {
+    await _prefs.setInt(_yearKey, year);
   }
 
   // Theme

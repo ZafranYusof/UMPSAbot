@@ -13,7 +13,7 @@ void main() async {
   final storageService = StorageService();
   await storageService.init();
 
-  final apiService = ApiService();
+  final apiService = ApiService(storageService: storageService);
   await apiService.initOfflineCache();
 
   runApp(

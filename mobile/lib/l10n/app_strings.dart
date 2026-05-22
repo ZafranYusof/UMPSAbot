@@ -56,6 +56,16 @@ class AppStrings {
       'skip': 'Skip',
       'next': 'Next',
       'get_started': 'Get Started',
+      'onboarding_welcome_title': 'Selamat datang ke\nUMPSABot!',
+      'onboarding_welcome_desc':
+          'Your personal AI assistant for all things UMPSA. Let\'s set up your profile for a personalized experience.',
+      'onboarding_faculty_title': 'Choose Your Faculty',
+      'onboarding_faculty_desc': 'This helps us personalize answers for your courses and faculty.',
+      'onboarding_year_title': 'What Year Are You In?',
+      'onboarding_year_desc': 'We\'ll tailor recommendations based on your study year.',
+      'onboarding_year_label': 'Year',
+      'onboarding_lang_title': 'Preferred Language',
+      'onboarding_lang_desc': 'Choose your preferred language for chatbot responses.',
 
       // Saved screen
       'saved_answers': 'Saved Answers',
@@ -167,6 +177,16 @@ class AppStrings {
       'skip': 'Langkau',
       'next': 'Seterusnya',
       'get_started': 'Mula Sekarang',
+      'onboarding_welcome_title': 'Selamat datang ke\nUMPSABot!',
+      'onboarding_welcome_desc':
+          'Pembantu AI peribadi anda untuk semua hal UMPSA. Jom setup profil untuk pengalaman yang lebih peribadi.',
+      'onboarding_faculty_title': 'Pilih Fakulti Anda',
+      'onboarding_faculty_desc': 'Ini membantu kami menyesuaikan jawapan untuk kursus dan fakulti anda.',
+      'onboarding_year_title': 'Tahun Berapa Anda?',
+      'onboarding_year_desc': 'Kami akan sesuaikan cadangan berdasarkan tahun pengajian anda.',
+      'onboarding_year_label': 'Tahun',
+      'onboarding_lang_title': 'Bahasa Pilihan',
+      'onboarding_lang_desc': 'Pilih bahasa pilihan anda untuk respons chatbot.',
 
       // Saved screen
       'saved_answers': 'Jawapan Disimpan',

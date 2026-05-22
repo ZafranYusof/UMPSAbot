@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../models/message.dart';
 import 'offline_cache.dart';
+import 'storage_service.dart';
 
 class ApiService {
   static const String _prodBaseUrl = 'https://umpsa-chatbot-api.onrender.com/api';
@@ -12,13 +13,33 @@ class ApiService {
   bool _useProduction = true;
   final OfflineCacheService _offlineCache = OfflineCacheService();
 
-  ApiService() {
+  StorageService? _storageService;
+
+  ApiService({StorageService? storageService}) {
+    _storageService = storageService;
     _dio = Dio(BaseOptions(
       baseUrl: _prodBaseUrl,
       connectTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 60),
       headers: {
         'Content-Type': 'application/json',
+      },
+    ));
+
+    // Inject user preference headers on every request
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) {
+        if (_storageService != null) {
+          final faculty = _storageService!.faculty;
+          final year = _storageService!.year;
+          if (faculty != null) {
+            options.headers['X-User-Faculty'] = faculty;
+          }
+          if (year != null) {
+            options.headers['X-User-Year'] = year.toString();
+          }
+        }
+        handler.next(options);
       },
     ));
   }
