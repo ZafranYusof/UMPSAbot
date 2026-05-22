@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../config/theme.dart';
 
 class SourceCitation extends StatefulWidget {
   final List<String> sources;
@@ -19,11 +20,8 @@ class _SourceCitationState extends State<SourceCitation> {
   Widget build(BuildContext context) {
     if (widget.sources.isEmpty) return const SizedBox.shrink();
 
-    // Deduplicate sources
     final uniqueSources = widget.sources.toSet().toList();
     if (uniqueSources.isEmpty) return const SizedBox.shrink();
-
-    final theme = Theme.of(context);
 
     return Padding(
       padding: const EdgeInsets.only(left: 50, right: 48, bottom: 4),
@@ -38,25 +36,25 @@ class _SourceCitationState extends State<SourceCitation> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.source_outlined,
                     size: 14,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: AppColors.textMuted,
                   ),
                   const SizedBox(width: 4),
                   Text(
                     '${uniqueSources.length} source${uniqueSources.length > 1 ? 's' : ''}',
-                    style: TextStyle(
+                    style: AppTheme.body(
                       fontSize: 12,
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
                       fontWeight: FontWeight.w500,
+                      color: AppColors.textMuted,
                     ),
                   ),
                   const SizedBox(width: 4),
                   Icon(
                     _expanded ? Icons.expand_less : Icons.expand_more,
                     size: 16,
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: AppColors.textMuted,
                   ),
                 ],
               ),
@@ -69,12 +67,9 @@ class _SourceCitationState extends State<SourceCitation> {
                 margin: const EdgeInsets.only(top: 4),
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest
-                      .withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: theme.colorScheme.outline.withOpacity(0.2),
-                  ),
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,19 +81,17 @@ class _SourceCitationState extends State<SourceCitation> {
                         children: [
                           Text(
                             '${entry.key + 1}. ',
-                            style: TextStyle(
+                            style: AppTheme.body(
                               fontSize: 12,
-                              color: theme.colorScheme.onSurface
-                                  .withOpacity(0.7),
+                              color: AppColors.textSecondary,
                             ),
                           ),
                           Expanded(
                             child: Text(
                               entry.value,
-                              style: TextStyle(
+                              style: AppTheme.body(
                                 fontSize: 12,
-                                color: theme.colorScheme.onSurface
-                                    .withOpacity(0.7),
+                                color: AppColors.textSecondary,
                               ),
                             ),
                           ),

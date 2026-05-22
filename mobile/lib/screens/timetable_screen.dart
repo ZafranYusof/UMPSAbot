@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../config/theme.dart';
 import '../services/api_service.dart';
 import '../providers/chat_provider.dart';
 import '../l10n/app_strings.dart';
@@ -96,7 +98,6 @@ class _TimetableScreenState extends State<TimetableScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final lang = context.watch<ChatProvider>().language;
 
     return Scaffold(
@@ -111,24 +112,25 @@ class _TimetableScreenState extends State<TimetableScreen> {
             // Semester selector
             Text(
               AppStrings.get('semester', lang),
-              style: TextStyle(
+              style: AppTheme.body(
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: theme.colorScheme.outline.withOpacity(0.3),
-                ),
-                borderRadius: BorderRadius.circular(12),
+                color: AppColors.surface,
+                border: Border.all(color: AppColors.border),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   value: _semester,
                   isExpanded: true,
+                  dropdownColor: AppColors.surface,
+                  style: AppTheme.body(color: AppColors.textPrimary),
                   items: _semesters.map((s) {
                     return DropdownMenuItem(value: s, child: Text(s));
                   }).toList(),
@@ -143,9 +145,9 @@ class _TimetableScreenState extends State<TimetableScreen> {
             // Course input
             Text(
               AppStrings.get('course_codes', lang),
-              style: TextStyle(
+              style: AppTheme.body(
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -155,10 +157,23 @@ class _TimetableScreenState extends State<TimetableScreen> {
                   child: TextField(
                     controller: _courseController,
                     textCapitalization: TextCapitalization.characters,
+                    style: AppTheme.body(color: AppColors.textPrimary),
                     decoration: InputDecoration(
                       hintText: AppStrings.get('course_hint', lang),
+                      hintStyle: AppTheme.body(color: AppColors.textMuted),
+                      filled: true,
+                      fillColor: AppColors.surface,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
@@ -169,12 +184,16 @@ class _TimetableScreenState extends State<TimetableScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                IconButton.filled(
-                  onPressed: _addCourse,
-                  icon: const Icon(Icons.add),
-                  style: IconButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4AF37),
-                    foregroundColor: const Color(0xFF003366),
+                GestureDetector(
+                  onTap: _addCourse,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.add, color: AppColors.background),
                   ),
                 ),
               ],
@@ -187,14 +206,30 @@ class _TimetableScreenState extends State<TimetableScreen> {
                 spacing: 8,
                 runSpacing: 8,
                 children: _courses.map((code) {
-                  return Chip(
-                    label: Text(code),
-                    deleteIcon: const Icon(Icons.close, size: 18),
-                    onDeleted: () => _removeCourse(code),
-                    backgroundColor:
-                        const Color(0xFF003366).withOpacity(0.1),
-                    labelStyle: const TextStyle(
-                      fontWeight: FontWeight.w500,
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      border: Border.all(color: AppColors.primary.withOpacity(0.4)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          code,
+                          style: AppTheme.body(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primaryLight,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        GestureDetector(
+                          onTap: () => _removeCourse(code),
+                          child: const Icon(Icons.close, size: 16, color: AppColors.textMuted),
+                        ),
+                      ],
                     ),
                   );
                 }).toList(),
@@ -211,16 +246,16 @@ class _TimetableScreenState extends State<TimetableScreen> {
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.background,
+                        ),
                       )
                     : const Icon(Icons.schedule),
-                label: Text(_isLoading ? AppStrings.get('planning', lang) : AppStrings.get('plan_timetable', lang)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF003366),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                label: Text(
+                  _isLoading
+                      ? AppStrings.get('planning', lang)
+                      : AppStrings.get('plan_timetable', lang),
                 ),
               ),
             ),
@@ -232,18 +267,18 @@ class _TimetableScreenState extends State<TimetableScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.red.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.red.shade200),
+                  color: AppColors.error.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.error.withOpacity(0.3)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.error_outline, color: Colors.red.shade700),
+                    const Icon(Icons.error_outline, color: AppColors.error),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         _error!,
-                        style: TextStyle(color: Colors.red.shade700),
+                        style: AppTheme.body(color: AppColors.error),
                       ),
                     ),
                   ],
@@ -254,14 +289,10 @@ class _TimetableScreenState extends State<TimetableScreen> {
             if (_results.isNotEmpty) ...[
               Text(
                 AppStrings.get('your_schedule', lang),
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onSurface,
-                ),
+                style: AppTheme.heading(fontSize: 18),
               ),
               const SizedBox(height: 12),
-              ..._results.map((item) => _buildScheduleCard(item, theme, lang)),
+              ..._results.map((item) => _buildScheduleCard(item, lang)),
             ],
 
             // Empty results
@@ -271,17 +302,15 @@ class _TimetableScreenState extends State<TimetableScreen> {
                   padding: const EdgeInsets.only(top: 40),
                   child: Column(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.calendar_today_outlined,
                         size: 48,
-                        color: theme.colorScheme.onSurface.withOpacity(0.3),
+                        color: AppColors.textMuted,
                       ),
                       const SizedBox(height: 12),
                       Text(
                         AppStrings.get('tap_plan_timetable', lang),
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurface.withOpacity(0.5),
-                        ),
+                        style: AppTheme.body(color: AppColors.textMuted),
                       ),
                     ],
                   ),
@@ -293,7 +322,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
     );
   }
 
-  Widget _buildScheduleCard(Map<String, dynamic> item, ThemeData theme, String lang) {
+  Widget _buildScheduleCard(Map<String, dynamic> item, String lang) {
     final course = item['course'] as String? ?? item['courseCode'] as String? ?? 'Unknown';
     final day = item['day'] as String? ?? '';
     final time = item['time'] as String? ?? '';
@@ -301,85 +330,92 @@ class _TimetableScreenState extends State<TimetableScreen> {
     final section = item['section'] as String? ?? '';
     final lecturer = item['lecturer'] as String? ?? '';
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF003366),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    course,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                    ),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  course,
+                  style: AppTheme.body(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.background,
                   ),
                 ),
-                if (section.isNotEmpty) ...[
-                  const SizedBox(width: 8),
-                  Text(
-                    '${AppStrings.get('section', lang)} $section',
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
-                      fontSize: 13,
-                    ),
+              ),
+              if (section.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Text(
+                  '${AppStrings.get('section', lang)} $section',
+                  style: AppTheme.body(
+                    fontSize: 13,
+                    color: AppColors.textMuted,
                   ),
-                ],
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (day.isNotEmpty || time.isNotEmpty)
+            Row(
+              children: [
+                const Icon(Icons.access_time, size: 16, color: AppColors.primary),
+                const SizedBox(width: 6),
+                Text(
+                  '$day ${time.isNotEmpty ? "• $time" : ""}'.trim(),
+                  style: AppTheme.body(fontSize: 14, color: AppColors.textPrimary),
+                ),
               ],
             ),
-            const SizedBox(height: 12),
-            if (day.isNotEmpty || time.isNotEmpty)
-              Row(
-                children: [
-                  const Icon(Icons.access_time, size: 16, color: Color(0xFFD4AF37)),
-                  const SizedBox(width: 6),
-                  Text(
-                    '$day ${time.isNotEmpty ? "• $time" : ""}'.trim(),
-                    style: const TextStyle(fontSize: 14),
+          if (venue.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.location_on_outlined, size: 16, color: AppColors.primary),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    venue,
+                    style: AppTheme.body(fontSize: 14, color: AppColors.textPrimary),
                   ),
-                ],
-              ),
-            if (venue.isNotEmpty) ...[
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  const Icon(Icons.location_on_outlined, size: 16, color: Color(0xFFD4AF37)),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(venue, style: const TextStyle(fontSize: 14)),
-                  ),
-                ],
-              ),
-            ],
-            if (lecturer.isNotEmpty) ...[
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  const Icon(Icons.person_outline, size: 16, color: Color(0xFFD4AF37)),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(lecturer, style: const TextStyle(fontSize: 14)),
-                  ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ],
-        ),
+          if (lecturer.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.person_outline, size: 16, color: AppColors.primary),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    lecturer,
+                    style: AppTheme.body(fontSize: 14, color: AppColors.textPrimary),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }

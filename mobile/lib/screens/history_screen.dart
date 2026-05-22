@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import '../config/theme.dart';
 import '../providers/chat_provider.dart';
 import '../models/conversation.dart';
 import '../app.dart';
@@ -13,8 +15,6 @@ class HistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Consumer<ChatProvider>(
@@ -29,7 +29,7 @@ class HistoryScreen extends StatelessWidget {
                 return const SizedBox.shrink();
               }
               return IconButton(
-                icon: const Icon(Icons.delete_sweep_outlined),
+                icon: const Icon(Icons.delete_sweep_outlined, color: AppColors.textSecondary),
                 tooltip: AppStrings.get('clear_all', provider.language),
                 onPressed: () => _showClearDialog(context, provider),
               );
@@ -40,11 +40,11 @@ class HistoryScreen extends StatelessWidget {
       body: Consumer<ChatProvider>(
         builder: (context, chatProvider, child) {
           if (chatProvider.isLoadingHistory) {
-            return _buildSkeletonList(theme);
+            return _buildSkeletonList();
           }
 
           if (chatProvider.conversations.isEmpty) {
-            return _buildEmptyState(context, theme);
+            return _buildEmptyState(context);
           }
 
           return RefreshIndicator(
@@ -52,8 +52,8 @@ class HistoryScreen extends StatelessWidget {
               HapticFeedback.mediumImpact();
               await chatProvider.refreshConversations();
             },
-            color: const Color(0xFFD4AF37),
-            backgroundColor: theme.colorScheme.surface,
+            color: AppColors.primary,
+            backgroundColor: AppColors.surface,
             displacement: 60,
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(
@@ -64,7 +64,7 @@ class HistoryScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final conversation = chatProvider.conversations[index];
                 return _buildConversationTile(
-                    context, conversation, chatProvider, theme, index);
+                    context, conversation, chatProvider, index);
               },
             ),
           );
@@ -73,9 +73,7 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context, ThemeData theme) {
-    final isDark = theme.brightness == Brightness.dark;
-
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),
@@ -86,17 +84,14 @@ class HistoryScreen extends StatelessWidget {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF132F4C)
-                    : const Color(0xFF003366).withOpacity(0.06),
+                color: AppColors.surface,
                 shape: BoxShape.circle,
+                border: Border.all(color: AppColors.border),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.forum_outlined,
                 size: 44,
-                color: isDark
-                    ? const Color(0xFF4A90D9).withOpacity(0.6)
-                    : const Color(0xFF003366).withOpacity(0.3),
+                color: AppColors.textMuted,
               ),
             ),
             const SizedBox(height: 24),
@@ -107,20 +102,15 @@ class HistoryScreen extends StatelessWidget {
                   children: [
                     Text(
                       AppStrings.get('no_conversations', lang),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
-                      ),
+                      style: AppTheme.heading(fontSize: 18),
                     ),
                     const SizedBox(height: 10),
                     Text(
                       AppStrings.get('no_conversations_desc', lang),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: AppTheme.body(
                         fontSize: 14,
-                        color: theme.colorScheme.onSurface.withOpacity(0.45),
-                        height: 1.5,
+                        color: AppColors.textMuted,
                       ),
                     ),
                   ],
@@ -139,32 +129,23 @@ class HistoryScreen extends StatelessWidget {
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFD4AF37), Color(0xFFC49B2C)],
-                  ),
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFD4AF37).withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.chat_bubble_outline_rounded,
-                        size: 18, color: Color(0xFF1A1A1A)),
+                        size: 18, color: AppColors.background),
                     const SizedBox(width: 8),
                     Consumer<ChatProvider>(
                       builder: (context, provider, _) {
                         return Text(
                           AppStrings.get('start_chatting', provider.language),
-                          style: const TextStyle(
-                            color: Color(0xFF1A1A1A),
+                          style: AppTheme.body(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
+                            color: AppColors.background,
                           ),
                         );
                       },
@@ -179,14 +160,10 @@ class HistoryScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSkeletonList(ThemeData theme) {
-    final isDark = theme.brightness == Brightness.dark;
-    final baseColor = isDark ? Colors.grey.shade800 : Colors.grey.shade300;
-    final highlightColor = isDark ? Colors.grey.shade700 : Colors.grey.shade100;
-
+  Widget _buildSkeletonList() {
     return Shimmer.fromColors(
-      baseColor: baseColor,
-      highlightColor: highlightColor,
+      baseColor: AppColors.surfaceLight,
+      highlightColor: AppColors.surface,
       child: ListView.builder(
         padding: const EdgeInsets.symmetric(vertical: 12),
         itemCount: 6,
@@ -196,8 +173,8 @@ class HistoryScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
                 children: [
@@ -205,8 +182,8 @@ class HistoryScreen extends StatelessWidget {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.surfaceLight,
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   const SizedBox(width: 14),
@@ -219,7 +196,7 @@ class HistoryScreen extends StatelessWidget {
                           width: double.infinity,
                           margin: const EdgeInsets.only(right: 40),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.surfaceLight,
                             borderRadius: BorderRadius.circular(6),
                           ),
                         ),
@@ -228,7 +205,7 @@ class HistoryScreen extends StatelessWidget {
                           height: 10,
                           width: 150,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.surfaceLight,
                             borderRadius: BorderRadius.circular(6),
                           ),
                         ),
@@ -245,9 +222,8 @@ class HistoryScreen extends StatelessWidget {
   }
 
   Widget _buildConversationTile(BuildContext context, Conversation conversation,
-      ChatProvider chatProvider, ThemeData theme, int index) {
+      ChatProvider chatProvider, int index) {
     final dateFormat = DateFormat('MMM d, yyyy • h:mm a');
-    final isDark = theme.brightness == Brightness.dark;
 
     return Dismissible(
       key: Key(conversation.id),
@@ -257,20 +233,20 @@ class HistoryScreen extends StatelessWidget {
         padding: const EdgeInsets.only(right: 24),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.red.shade600,
-          borderRadius: BorderRadius.circular(16),
+          color: AppColors.error,
+          borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 24),
+            const Icon(Icons.delete_outline_rounded, color: AppColors.background, size: 24),
             const SizedBox(height: 4),
             Text(
               AppStrings.get('delete', chatProvider.language),
-              style: const TextStyle(
-                color: Colors.white,
+              style: AppTheme.body(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
+                color: AppColors.background,
               ),
             ),
           ],
@@ -288,10 +264,8 @@ class HistoryScreen extends StatelessWidget {
             content: Text(AppStrings.get('conversation_deleted', lang)),
             action: SnackBarAction(
               label: AppStrings.get('undo', lang),
-              textColor: const Color(0xFFD4AF37),
-              onPressed: () {
-                // If undo is supported by provider
-              },
+              textColor: AppColors.primary,
+              onPressed: () {},
             ),
           ),
         );
@@ -299,11 +273,10 @@ class HistoryScreen extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         child: Material(
-          color: isDark ? const Color(0xFF132F4C) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          elevation: 0,
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
           child: InkWell(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(14),
             onTap: () {
               HapticFeedback.selectionClick();
               chatProvider.loadConversation(conversation);
@@ -312,10 +285,8 @@ class HistoryScreen extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: theme.colorScheme.onSurface.withOpacity(0.06),
-                ),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.border),
               ),
               child: Row(
                 children: [
@@ -323,26 +294,12 @@ class HistoryScreen extends StatelessWidget {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: isDark
-                            ? [
-                                const Color(0xFF003366).withOpacity(0.5),
-                                const Color(0xFF1A4D80).withOpacity(0.3),
-                              ]
-                            : [
-                                const Color(0xFF003366).withOpacity(0.1),
-                                const Color(0xFF003366).withOpacity(0.05),
-                              ],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.surfaceLight,
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.chat_bubble_outline_rounded,
-                      color: isDark
-                          ? const Color(0xFF4A90D9)
-                          : const Color(0xFF003366),
+                      color: AppColors.primary,
                       size: 20,
                     ),
                   ),
@@ -355,28 +312,27 @@ class HistoryScreen extends StatelessWidget {
                           conversation.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
+                          style: AppTheme.body(
                             fontSize: 14,
-                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           '${conversation.messages.length} ${AppStrings.get('messages_count', chatProvider.language)} • ${dateFormat.format(conversation.updatedAt)}',
-                          style: TextStyle(
+                          style: AppTheme.body(
                             fontSize: 12,
-                            color:
-                                theme.colorScheme.onSurface.withOpacity(0.45),
+                            color: AppColors.textMuted,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.chevron_right_rounded,
                     size: 20,
-                    color: theme.colorScheme.onSurface.withOpacity(0.3),
+                    color: AppColors.textMuted,
                   ),
                 ],
               ),
@@ -393,9 +349,11 @@ class HistoryScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(AppStrings.get('clear_all_history', lang)),
-        content: Text(AppStrings.get('clear_all_history_desc', lang)),
+        content: Text(
+          AppStrings.get('clear_all_history_desc', lang),
+          style: AppTheme.body(color: AppColors.textSecondary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -407,7 +365,7 @@ class HistoryScreen extends StatelessWidget {
               provider.clearAllHistory();
               Navigator.pop(ctx);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: Text(AppStrings.get('delete_all', lang)),
           ),
         ],

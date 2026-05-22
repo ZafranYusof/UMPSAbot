@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../config/theme.dart';
 
 class SuggestionChips extends StatefulWidget {
   final List<String> suggestions;
@@ -52,9 +53,6 @@ class _SuggestionChipsState extends State<SuggestionChips>
   Widget build(BuildContext context) {
     if (widget.suggestions.isEmpty) return const SizedBox.shrink();
 
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     return SlideTransition(
       position: _slideAnimation,
       child: FadeTransition(
@@ -68,11 +66,10 @@ class _SuggestionChipsState extends State<SuggestionChips>
                 padding: const EdgeInsets.only(left: 4, bottom: 8),
                 child: Text(
                   'Suggested questions',
-                  style: TextStyle(
+                  style: AppTheme.body(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: theme.colorScheme.onSurface.withOpacity(0.4),
-                    letterSpacing: 0.5,
+                    color: AppColors.textMuted,
                   ),
                 ),
               ),
@@ -82,7 +79,6 @@ class _SuggestionChipsState extends State<SuggestionChips>
                 children: widget.suggestions.map((suggestion) {
                   return _SuggestionChip(
                     text: suggestion,
-                    isDark: isDark,
                     onTap: () {
                       HapticFeedback.selectionClick();
                       widget.onTap(suggestion);
@@ -100,12 +96,10 @@ class _SuggestionChipsState extends State<SuggestionChips>
 
 class _SuggestionChip extends StatefulWidget {
   final String text;
-  final bool isDark;
   final VoidCallback onTap;
 
   const _SuggestionChip({
     required this.text,
-    required this.isDark,
     required this.onTap,
   });
 
@@ -129,22 +123,10 @@ class _SuggestionChipState extends State<_SuggestionChip> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: widget.isDark
-                  ? [
-                      const Color(0xFFD4AF37).withOpacity(0.15),
-                      const Color(0xFFD4AF37).withOpacity(0.08),
-                    ]
-                  : [
-                      const Color(0xFFD4AF37).withOpacity(0.08),
-                      const Color(0xFFD4AF37).withOpacity(0.04),
-                    ],
-            ),
-            borderRadius: BorderRadius.circular(18),
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: const Color(0xFFD4AF37).withOpacity(widget.isDark ? 0.4 : 0.5),
+              color: AppColors.primary.withOpacity(0.4),
               width: 1,
             ),
           ),
@@ -154,19 +136,16 @@ class _SuggestionChipState extends State<_SuggestionChip> {
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 10,
-                color: const Color(0xFFD4AF37).withOpacity(0.7),
+                color: AppColors.primary.withOpacity(0.7),
               ),
               const SizedBox(width: 6),
               Flexible(
                 child: Text(
                   widget.text,
-                  style: TextStyle(
-                    color: widget.isDark
-                        ? const Color(0xFFE8C84A)
-                        : const Color(0xFFB8941F),
+                  style: AppTheme.body(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    height: 1.2,
+                    color: AppColors.primaryLight,
                   ),
                 ),
               ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
+import '../config/theme.dart';
 import '../services/storage_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -54,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF003366),
+      backgroundColor: AppColors.background,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -68,8 +70,12 @@ class _SplashScreenState extends State<SplashScreen>
                   width: 120,
                   height: 120,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
+                    color: AppColors.surface,
                     shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.primary.withOpacity(0.3),
+                      width: 2,
+                    ),
                   ),
                   child: ClipOval(
                     child: Padding(
@@ -82,22 +88,22 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 const SizedBox(height: 32),
-                // UMPSABot text in gold
-                const Text(
+                // UMPSABot text in brass/gold
+                Text(
                   'UMPSABot',
-                  style: TextStyle(
-                    color: Color(0xFFD4AF37),
+                  style: GoogleFonts.fraunces(
+                    color: AppColors.primary,
                     fontSize: 32,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     letterSpacing: 1.5,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Your AI Campus Assistant',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                  style: AppTheme.body(
                     fontSize: 16,
+                    color: AppColors.textSecondary,
                   ),
                 ),
                 const SizedBox(height: 48),
@@ -107,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen>
                   child: CircularProgressIndicator(
                     strokeWidth: 3,
                     valueColor: AlwaysStoppedAnimation<Color>(
-                      const Color(0xFFD4AF37).withOpacity(0.8),
+                      AppColors.primary.withOpacity(0.8),
                     ),
                   ),
                 ),

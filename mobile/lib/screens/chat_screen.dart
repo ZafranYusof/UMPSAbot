@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../config/theme.dart';
 import '../providers/chat_provider.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/typing_indicator.dart';
@@ -40,13 +42,11 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _onScroll() {
-    // Lazy load: when scrolling to top, load more messages
     if (_scrollController.position.pixels <=
         _scrollController.position.minScrollExtent + 50) {
       _loadMoreMessages();
     }
 
-    // Show/hide scroll to bottom button
     final shouldShow = _scrollController.hasClients &&
         _scrollController.position.pixels <
             _scrollController.position.maxScrollExtent - 200;
@@ -80,7 +80,6 @@ class _ChatScreenState extends State<ChatScreen> {
     final provider = context.read<ChatProvider>();
     provider.sendMessage(text);
     _textController.clear();
-    // Reset display count to show all messages including new ones
     setState(() {
       _displayCount = provider.messages.length + 2;
     });
@@ -101,78 +100,49 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: Row(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF003366), Color(0xFF1A4D80)],
-                ),
-                borderRadius: BorderRadius.circular(17),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF003366).withOpacity(0.3),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.school_rounded,
-                color: Color(0xFFD4AF37),
-                size: 18,
+            Text(
+              'UMPSA Chatbot',
+              style: GoogleFonts.fraunces(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
               ),
             ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'UMPSA Chatbot',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                Consumer<ChatProvider>(
-                  builder: (context, provider, _) {
-                    if (provider.isTyping) {
-                      return Text(
-                        AppStrings.get('typing', provider.language),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w400,
-                          color: Color(0xFFD4AF37),
-                        ),
-                      );
-                    }
-                    return Text(
-                      provider.isOnline
-                          ? AppStrings.get('online', provider.language)
-                          : AppStrings.get('offline', provider.language),
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w400,
-                        color: provider.isOnline
-                            ? Colors.white70
-                            : Colors.orange.shade300,
-                      ),
-                    );
-                  },
-                ),
-              ],
+            Consumer<ChatProvider>(
+              builder: (context, provider, _) {
+                if (provider.isTyping) {
+                  return Text(
+                    AppStrings.get('typing', provider.language),
+                    style: AppTheme.body(
+                      fontSize: 12,
+                      color: AppColors.primary,
+                    ),
+                  );
+                }
+                return Text(
+                  provider.isOnline
+                      ? AppStrings.get('online', provider.language)
+                      : AppStrings.get('offline', provider.language),
+                  style: AppTheme.body(
+                    fontSize: 12,
+                    color: provider.isOnline
+                        ? AppColors.textMuted
+                        : AppColors.warning,
+                  ),
+                );
+              },
             ),
           ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_comment_outlined),
+            icon: const Icon(Icons.add_comment_outlined, color: AppColors.textSecondary),
             tooltip: AppStrings.get('new_chat', context.watch<ChatProvider>().language),
             onPressed: () {
               HapticFeedback.lightImpact();
@@ -183,10 +153,9 @@ class _ChatScreenState extends State<ChatScreen> {
         ],
       ),
       body: SafeArea(
-        bottom: false, // Parent scaffold handles bottom nav
+        bottom: false,
         child: Consumer<ChatProvider>(
           builder: (context, chatProvider, child) {
-            // Auto-scroll when new messages arrive
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (chatProvider.isTyping || chatProvider.messages.isNotEmpty) {
                 if (!_showScrollToBottom) {
@@ -199,20 +168,15 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Column(
                   children: [
-                    // Offline banner
-                    if (!chatProvider.isOnline)
-                      _buildOfflineBanner(),
-                    // Messages
+                    if (!chatProvider.isOnline) _buildOfflineBanner(),
                     Expanded(
                       child: chatProvider.messages.isEmpty
                           ? _buildEmptyState(context, chatProvider)
                           : _buildMessageList(chatProvider),
                     ),
-                    // Input area
-                    _buildInputArea(theme),
+                    _buildInputArea(),
                   ],
                 ),
-                // Scroll to bottom FAB
                 if (_showScrollToBottom && chatProvider.messages.isNotEmpty)
                   Positioned(
                     bottom: 80,
@@ -231,28 +195,15 @@ class _ChatScreenState extends State<ChatScreen> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.orange.shade800,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.shade900.withOpacity(0.3),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      color: AppColors.warning.withOpacity(0.15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.wifi_off_rounded, color: Colors.white, size: 16),
+          const Icon(Icons.wifi_off_rounded, color: AppColors.warning, size: 16),
           const SizedBox(width: 8),
           Text(
             AppStrings.get('no_internet', context.read<ChatProvider>().language),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-            ),
+            style: AppTheme.body(fontSize: 13, color: AppColors.warning),
           ),
           const Spacer(),
           GestureDetector(
@@ -262,12 +213,10 @@ class _ChatScreenState extends State<ChatScreen> {
             },
             child: Text(
               AppStrings.get('retry', context.read<ChatProvider>().language),
-              style: const TextStyle(
-                color: Colors.white,
+              style: AppTheme.body(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                decoration: TextDecoration.underline,
-                decorationColor: Colors.white,
+                color: AppColors.primary,
               ),
             ),
           ),
@@ -286,11 +235,12 @@ class _ChatScreenState extends State<ChatScreen> {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: const Color(0xFF003366),
+          color: AppColors.surface,
           shape: BoxShape.circle,
+          border: Border.all(color: AppColors.border),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF003366).withOpacity(0.4),
+              color: Colors.black.withOpacity(0.3),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -298,7 +248,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         child: const Icon(
           Icons.keyboard_arrow_down_rounded,
-          color: Colors.white,
+          color: AppColors.primary,
           size: 24,
         ),
       ),
@@ -306,9 +256,6 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildEmptyState(BuildContext context, ChatProvider chatProvider) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     final starterQuestions = [
       'Macam mana nak daftar kursus?',
       'Berapa yuran semester?',
@@ -324,69 +271,43 @@ class _ChatScreenState extends State<ChatScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Animated logo
             Container(
-              width: 100,
-              height: 100,
+              width: 80,
+              height: 80,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isDark
-                      ? [
-                          const Color(0xFF003366).withOpacity(0.4),
-                          const Color(0xFF1A4D80).withOpacity(0.3),
-                        ]
-                      : [
-                          const Color(0xFF003366).withOpacity(0.1),
-                          const Color(0xFF003366).withOpacity(0.05),
-                        ],
-                ),
+                color: AppColors.surface,
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF003366).withOpacity(0.1),
-                    blurRadius: 20,
-                    spreadRadius: 5,
-                  ),
-                ],
+                border: Border.all(color: AppColors.border),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.school_rounded,
-                size: 48,
-                color: isDark ? const Color(0xFF4A90D9) : const Color(0xFF003366),
+                size: 40,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 28),
             Text(
               AppStrings.get('greeting', chatProvider.language),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
-              ),
+              style: AppTheme.heading(fontSize: 26),
             ),
             const SizedBox(height: 10),
             Text(
               AppStrings.get('greeting_subtitle', chatProvider.language),
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: AppTheme.body(
                 fontSize: 15,
-                color: theme.colorScheme.onSurface.withOpacity(0.55),
-                height: 1.5,
+                color: AppColors.textSecondary,
               ),
             ),
             const SizedBox(height: 36),
-            // Section label
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Text(
                 AppStrings.get('popular_questions', chatProvider.language),
-                style: TextStyle(
+                style: AppTheme.body(
                   fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onSurface.withOpacity(0.35),
-                  letterSpacing: 1.2,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textMuted,
                 ),
               ),
             ),
@@ -402,24 +323,21 @@ class _ChatScreenState extends State<ChatScreen> {
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
+                      horizontal: 14,
+                      vertical: 9,
                     ),
                     decoration: BoxDecoration(
+                      color: AppColors.surface,
                       border: Border.all(
-                        color: const Color(0xFFD4AF37).withOpacity(isDark ? 0.4 : 0.5),
+                        color: AppColors.primary.withOpacity(0.4),
                       ),
-                      borderRadius: BorderRadius.circular(20),
-                      color: const Color(0xFFD4AF37).withOpacity(isDark ? 0.1 : 0.05),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       q,
-                      style: TextStyle(
-                        color: isDark
-                            ? const Color(0xFFE8C84A)
-                            : const Color(0xFFB8941F),
+                      style: AppTheme.body(
                         fontSize: 13,
-                        fontWeight: FontWeight.w500,
+                        color: AppColors.primaryLight,
                       ),
                     ),
                   ),
@@ -449,7 +367,6 @@ class _ChatScreenState extends State<ChatScreen> {
           final message = visibleMessages[index];
           final widgets = <Widget>[ChatBubble(message: message)];
 
-          // Show sources after bot messages
           if (!message.isUser &&
               message.sources != null &&
               message.sources!.isNotEmpty &&
@@ -457,7 +374,6 @@ class _ChatScreenState extends State<ChatScreen> {
             widgets.add(SourceCitation(sources: message.sources!));
           }
 
-          // Show suggestions after the last bot message
           if (!message.isUser &&
               index == visibleMessages.length - 1 &&
               message.suggestions != null &&
@@ -475,7 +391,6 @@ class _ChatScreenState extends State<ChatScreen> {
           );
         }
 
-        // Typing indicator
         if (chatProvider.isTyping) {
           return const TypingIndicator();
         }
@@ -485,55 +400,49 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildInputArea(ThemeData theme) {
+  Widget _buildInputArea() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+      decoration: const BoxDecoration(
+        color: AppColors.background,
         border: Border(
-          top: BorderSide(
-            color: theme.colorScheme.onSurface.withOpacity(0.08),
-            width: 0.5,
-          ),
+          top: BorderSide(color: AppColors.border, width: 1),
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: theme.colorScheme.onSurface.withOpacity(0.06),
+            child: TextField(
+              controller: _textController,
+              focusNode: _focusNode,
+              textCapitalization: TextCapitalization.sentences,
+              maxLines: 4,
+              minLines: 1,
+              style: AppTheme.body(fontSize: 15, color: AppColors.textPrimary),
+              decoration: InputDecoration(
+                hintText: AppStrings.get('type_your_question', context.watch<ChatProvider>().language),
+                hintStyle: AppTheme.body(fontSize: 15, color: AppColors.textMuted),
+                filled: true,
+                fillColor: AppColors.surface,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
                 ),
               ),
-              child: TextField(
-                controller: _textController,
-                focusNode: _focusNode,
-                textCapitalization: TextCapitalization.sentences,
-                maxLines: 4,
-                minLines: 1,
-                style: TextStyle(
-                  fontSize: 15,
-                  color: theme.colorScheme.onSurface,
-                  height: 1.4,
-                ),
-                decoration: InputDecoration(
-                  hintText: AppStrings.get('type_your_question', context.watch<ChatProvider>().language),
-                  hintStyle: TextStyle(
-                    color: theme.colorScheme.onSurface.withOpacity(0.35),
-                    fontSize: 15,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                ),
-                onSubmitted: _sendMessage,
-              ),
+              onSubmitted: _sendMessage,
             ),
           ),
           const SizedBox(width: 8),
@@ -591,23 +500,12 @@ class _SendButtonState extends State<_SendButton>
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFD4AF37), Color(0xFFC49B2C)],
-            ),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFFD4AF37).withOpacity(0.4),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(10),
           ),
           child: const Icon(
             Icons.send_rounded,
-            color: Color(0xFF1A1A1A),
+            color: AppColors.background,
             size: 20,
           ),
         ),

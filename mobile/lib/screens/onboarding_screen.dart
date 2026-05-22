@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../config/theme.dart';
 import '../services/storage_service.dart';
 import '../providers/chat_provider.dart';
 import '../l10n/app_strings.dart';
@@ -63,7 +65,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final pages = _getPages(lang);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF003366),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -74,9 +76,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPressed: _completeOnboarding,
                 child: Text(
                   AppStrings.get('skip', lang),
-                  style: const TextStyle(
-                    color: Color(0xFFD4AF37),
+                  style: AppTheme.body(
                     fontSize: 16,
+                    color: AppColors.primary,
                   ),
                 ),
               ),
@@ -100,33 +102,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFD4AF37).withOpacity(0.15),
+                            color: AppColors.surface,
                             shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.primary.withOpacity(0.3)),
                           ),
                           child: Icon(
                             page.icon,
                             size: 56,
-                            color: const Color(0xFFD4AF37),
+                            color: AppColors.primary,
                           ),
                         ),
                         const SizedBox(height: 48),
                         Text(
                           page.title,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: AppTheme.heading(
                             fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 16),
                         Text(
                           page.description,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
+                          style: AppTheme.body(
                             fontSize: 16,
-                            height: 1.5,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ],
@@ -146,8 +147,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   height: 8,
                   decoration: BoxDecoration(
                     color: _currentPage == index
-                        ? const Color(0xFFD4AF37)
-                        : Colors.white.withOpacity(0.3),
+                        ? AppColors.primary
+                        : AppColors.textMuted.withOpacity(0.3),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 );
@@ -163,20 +164,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: ElevatedButton(
                   onPressed: _onNext,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD4AF37),
-                    foregroundColor: const Color(0xFF003366),
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.background,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(26),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    elevation: 4,
+                    elevation: 0,
                   ),
                   child: Text(
                     _currentPage == pages.length - 1
                         ? AppStrings.get('get_started', lang)
                         : AppStrings.get('next', lang),
-                    style: const TextStyle(
+                    style: AppTheme.body(
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.background,
                     ),
                   ),
                 ),

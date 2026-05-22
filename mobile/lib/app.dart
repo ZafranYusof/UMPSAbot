@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'config/theme.dart';
 import 'providers/settings_provider.dart';
 import 'providers/chat_provider.dart';
 import 'screens/splash_screen.dart';
@@ -21,9 +22,9 @@ class UmpsaChatbotApp extends StatelessWidget {
         return MaterialApp(
           title: 'UMPSA Chatbot',
           debugShowCheckedModeBanner: false,
-          themeMode: settings.themeMode,
-          theme: _buildLightTheme(),
-          darkTheme: _buildDarkTheme(),
+          themeMode: ThemeMode.dark,
+          theme: AppTheme.darkTheme,
+          darkTheme: AppTheme.darkTheme,
           initialRoute: '/splash',
           routes: {
             '/splash': (context) => const SplashScreen(),
@@ -32,110 +33,6 @@ class UmpsaChatbotApp extends StatelessWidget {
           },
         );
       },
-    );
-  }
-
-  ThemeData _buildLightTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF003366),
-        brightness: Brightness.light,
-        primary: const Color(0xFF003366),
-        secondary: const Color(0xFFD4AF37),
-        tertiary: const Color(0xFF1A4D80),
-      ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF003366),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: false,
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      scaffoldBackgroundColor: const Color(0xFFF8F9FA),
-      cardTheme: CardThemeData(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        color: Colors.white,
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: const Color(0xFFF0F2F5),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 12,
-        ),
-      ),
-      snackBarTheme: SnackBarThemeData(
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-    );
-  }
-
-  ThemeData _buildDarkTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF003366),
-        brightness: Brightness.dark,
-        primary: const Color(0xFF4A90D9),
-        secondary: const Color(0xFFD4AF37),
-        tertiary: const Color(0xFF6AB0FF),
-        surface: const Color(0xFF0A1929),
-        surfaceContainerHighest: const Color(0xFF132F4C),
-      ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF0A1929),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: false,
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      scaffoldBackgroundColor: const Color(0xFF0A1929),
-      cardTheme: CardThemeData(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        color: const Color(0xFF132F4C),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: const Color(0xFF132F4C),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(24),
-          borderSide: BorderSide.none,
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 12,
-        ),
-      ),
-      snackBarTheme: SnackBarThemeData(
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
     );
   }
 }
@@ -171,8 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Consumer<ChatProvider>(
       builder: (context, chatProvider, _) {
         final lang = chatProvider.language;
@@ -181,40 +76,56 @@ class _HomeScreenState extends State<HomeScreen> {
             index: _currentIndex,
             children: _screens,
           ),
-          bottomNavigationBar: NavigationBar(
-            selectedIndex: _currentIndex,
-            onDestinationSelected: (index) {
-              setState(() => _currentIndex = index);
-            },
-            backgroundColor: theme.colorScheme.surface,
-            indicatorColor: const Color(0xFFD4AF37).withOpacity(0.2),
-            destinations: [
-              NavigationDestination(
-                icon: const Icon(Icons.chat_bubble_outline),
-                selectedIcon: const Icon(Icons.chat_bubble, color: Color(0xFFD4AF37)),
-                label: AppStrings.get('nav_chat', lang),
+          bottomNavigationBar: Container(
+            decoration: const BoxDecoration(
+              color: AppColors.surface,
+              border: Border(
+                top: BorderSide(
+                  color: AppColors.border,
+                  width: 1,
+                ),
               ),
-              NavigationDestination(
-                icon: const Icon(Icons.calendar_today_outlined),
-                selectedIcon: const Icon(Icons.calendar_today, color: Color(0xFFD4AF37)),
-                label: AppStrings.get('nav_timetable', lang),
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.history_outlined),
-                selectedIcon: const Icon(Icons.history, color: Color(0xFFD4AF37)),
-                label: AppStrings.get('nav_history', lang),
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.bookmark_outline),
-                selectedIcon: const Icon(Icons.bookmark, color: Color(0xFFD4AF37)),
-                label: AppStrings.get('nav_saved', lang),
-              ),
-              NavigationDestination(
-                icon: const Icon(Icons.settings_outlined),
-                selectedIcon: const Icon(Icons.settings, color: Color(0xFFD4AF37)),
-                label: AppStrings.get('nav_settings', lang),
-              ),
-            ],
+            ),
+            child: BottomNavigationBar(
+              currentIndex: _currentIndex,
+              onTap: (index) {
+                setState(() => _currentIndex = index);
+              },
+              backgroundColor: AppColors.surface,
+              selectedItemColor: AppColors.primary,
+              unselectedItemColor: AppColors.textMuted,
+              type: BottomNavigationBarType.fixed,
+              elevation: 0,
+              selectedFontSize: 12,
+              unselectedFontSize: 12,
+              items: [
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.chat_bubble_outline),
+                  activeIcon: const Icon(Icons.chat_bubble),
+                  label: AppStrings.get('nav_chat', lang),
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.calendar_today_outlined),
+                  activeIcon: const Icon(Icons.calendar_today),
+                  label: AppStrings.get('nav_timetable', lang),
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.history_outlined),
+                  activeIcon: const Icon(Icons.history),
+                  label: AppStrings.get('nav_history', lang),
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.bookmark_outline),
+                  activeIcon: const Icon(Icons.bookmark),
+                  label: AppStrings.get('nav_saved', lang),
+                ),
+                BottomNavigationBarItem(
+                  icon: const Icon(Icons.settings_outlined),
+                  activeIcon: const Icon(Icons.settings),
+                  label: AppStrings.get('nav_settings', lang),
+                ),
+              ],
+            ),
           ),
         );
       },

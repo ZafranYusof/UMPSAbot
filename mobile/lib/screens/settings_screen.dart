@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../config/theme.dart';
 import '../providers/chat_provider.dart';
 import '../providers/settings_provider.dart';
 import '../app.dart';
@@ -10,8 +12,6 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Consumer<ChatProvider>(
@@ -27,92 +27,141 @@ class SettingsScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 8),
             children: [
               // Appearance section
-              _buildSectionHeader(theme, AppStrings.get('appearance', lang)),
-              SwitchListTile(
-                title: Text(AppStrings.get('dark_mode', lang)),
-                subtitle: Text(
-                  settings.isDarkMode
-                      ? AppStrings.get('dark_theme_active', lang)
-                      : AppStrings.get('light_theme_active', lang),
-                ),
-                value: settings.isDarkMode,
-                onChanged: (_) => settings.toggleTheme(),
-                secondary: Icon(
-                  settings.isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                  color: const Color(0xFFD4AF37),
-                ),
+              _buildSectionHeader(AppStrings.get('appearance', lang)),
+              _buildSettingsCard(
+                children: [
+                  SwitchListTile(
+                    title: Text(
+                      AppStrings.get('dark_mode', lang),
+                      style: AppTheme.body(color: AppColors.textPrimary),
+                    ),
+                    subtitle: Text(
+                      settings.isDarkMode
+                          ? AppStrings.get('dark_theme_active', lang)
+                          : AppStrings.get('light_theme_active', lang),
+                      style: AppTheme.body(fontSize: 13, color: AppColors.textMuted),
+                    ),
+                    value: settings.isDarkMode,
+                    onChanged: (_) => settings.toggleTheme(),
+                    secondary: const Icon(
+                      Icons.dark_mode,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
               ),
-              const Divider(height: 1),
 
               // Language section
-              _buildSectionHeader(theme, AppStrings.get('language', lang)),
-              RadioListTile<String>(
-                title: Text(AppStrings.get('english', lang)),
-                value: 'en',
-                groupValue: settings.language,
-                onChanged: (val) {
-                  if (val != null) {
-                    settings.setLanguage(val);
-                    chat.setLanguage(val);
-                  }
-                },
-                secondary: const Icon(Icons.language),
+              _buildSectionHeader(AppStrings.get('language', lang)),
+              _buildSettingsCard(
+                children: [
+                  RadioListTile<String>(
+                    title: Text(
+                      AppStrings.get('english', lang),
+                      style: AppTheme.body(color: AppColors.textPrimary),
+                    ),
+                    value: 'en',
+                    groupValue: settings.language,
+                    activeColor: AppColors.primary,
+                    onChanged: (val) {
+                      if (val != null) {
+                        settings.setLanguage(val);
+                        chat.setLanguage(val);
+                      }
+                    },
+                    secondary: const Icon(Icons.language, color: AppColors.textSecondary),
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  RadioListTile<String>(
+                    title: Text(
+                      AppStrings.get('bahasa_melayu', lang),
+                      style: AppTheme.body(color: AppColors.textPrimary),
+                    ),
+                    value: 'ms',
+                    groupValue: settings.language,
+                    activeColor: AppColors.primary,
+                    onChanged: (val) {
+                      if (val != null) {
+                        settings.setLanguage(val);
+                        chat.setLanguage(val);
+                      }
+                    },
+                    secondary: const Icon(Icons.language, color: AppColors.textSecondary),
+                  ),
+                ],
               ),
-              RadioListTile<String>(
-                title: Text(AppStrings.get('bahasa_melayu', lang)),
-                value: 'ms',
-                groupValue: settings.language,
-                onChanged: (val) {
-                  if (val != null) {
-                    settings.setLanguage(val);
-                    chat.setLanguage(val);
-                  }
-                },
-                secondary: const Icon(Icons.language),
-              ),
-              const Divider(height: 1),
 
               // Data section
-              _buildSectionHeader(theme, AppStrings.get('data', lang)),
-              ListTile(
-                leading: const Icon(Icons.bookmark_outline,
-                    color: Color(0xFFD4AF37)),
-                title: Text(AppStrings.get('saved_answers', lang)),
-                subtitle: Text('${chat.bookmarks.length} ${AppStrings.get('saved_messages_count', lang)}'),
-                trailing: const Icon(Icons.chevron_right, size: 20),
-                onTap: () {
-                  HomeScreen.homeKey.currentState?.switchToTab(3);
-                },
+              _buildSectionHeader(AppStrings.get('data', lang)),
+              _buildSettingsCard(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.bookmark_outline, color: AppColors.primary),
+                    title: Text(
+                      AppStrings.get('saved_answers', lang),
+                      style: AppTheme.body(color: AppColors.textPrimary),
+                    ),
+                    subtitle: Text(
+                      '${chat.bookmarks.length} ${AppStrings.get('saved_messages_count', lang)}',
+                      style: AppTheme.body(fontSize: 13, color: AppColors.textMuted),
+                    ),
+                    trailing: const Icon(Icons.chevron_right, size: 20, color: AppColors.textMuted),
+                    onTap: () {
+                      HomeScreen.homeKey.currentState?.switchToTab(3);
+                    },
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  ListTile(
+                    leading: const Icon(Icons.delete_outline, color: AppColors.error),
+                    title: Text(
+                      AppStrings.get('clear_chat_history', lang),
+                      style: AppTheme.body(color: AppColors.textPrimary),
+                    ),
+                    subtitle: Text(
+                      AppStrings.get('delete_all_conversations', lang),
+                      style: AppTheme.body(fontSize: 13, color: AppColors.textMuted),
+                    ),
+                    onTap: () => _showClearHistoryDialog(context, chat),
+                  ),
+                ],
               ),
-              ListTile(
-                leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: Text(AppStrings.get('clear_chat_history', lang)),
-                subtitle: Text(AppStrings.get('delete_all_conversations', lang)),
-                onTap: () => _showClearHistoryDialog(context, chat),
-              ),
-              const Divider(height: 1),
 
               // About section
-              _buildSectionHeader(theme, AppStrings.get('about', lang)),
-              ListTile(
-                leading: const Icon(Icons.info_outline,
-                    color: Color(0xFFD4AF37)),
-                title: const Text('UMPSA Chatbot'),
-                subtitle: Text(AppStrings.get('version', lang)),
-              ),
-              ListTile(
-                leading: const Icon(Icons.school_outlined,
-                    color: Color(0xFF003366)),
-                title: Text(AppStrings.get('umpsa_full_name', lang)),
-                subtitle: Text(AppStrings.get('ai_campus_assistant', lang)),
+              _buildSectionHeader(AppStrings.get('about', lang)),
+              _buildSettingsCard(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.info_outline, color: AppColors.primary),
+                    title: Text(
+                      'UMPSA Chatbot',
+                      style: AppTheme.body(color: AppColors.textPrimary),
+                    ),
+                    subtitle: Text(
+                      AppStrings.get('version', lang),
+                      style: AppTheme.body(fontSize: 13, color: AppColors.textMuted),
+                    ),
+                  ),
+                  const Divider(height: 1, indent: 16, endIndent: 16),
+                  ListTile(
+                    leading: const Icon(Icons.school_outlined, color: AppColors.primary),
+                    title: Text(
+                      AppStrings.get('umpsa_full_name', lang),
+                      style: AppTheme.body(color: AppColors.textPrimary),
+                    ),
+                    subtitle: Text(
+                      AppStrings.get('ai_campus_assistant', lang),
+                      style: AppTheme.body(fontSize: 13, color: AppColors.textMuted),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 32),
               Center(
                 child: Text(
                   AppStrings.get('made_with_love', lang),
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface.withOpacity(0.4),
+                  style: AppTheme.body(
                     fontSize: 13,
+                    color: AppColors.textMuted,
                   ),
                 ),
               ),
@@ -124,18 +173,29 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(ThemeData theme, String title) {
+  Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       child: Text(
         title,
-        style: TextStyle(
-          fontSize: 13,
+        style: GoogleFonts.fraunces(
+          fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: theme.colorScheme.primary,
-          letterSpacing: 0.5,
+          color: AppColors.primary,
         ),
       ),
+    );
+  }
+
+  Widget _buildSettingsCard({required List<Widget> children}) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(children: children),
     );
   }
 
@@ -145,7 +205,10 @@ class SettingsScreen extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(AppStrings.get('clear_history_title', lang)),
-        content: Text(AppStrings.get('clear_history_desc', lang)),
+        content: Text(
+          AppStrings.get('clear_history_desc', lang),
+          style: AppTheme.body(color: AppColors.textSecondary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -159,7 +222,7 @@ class SettingsScreen extends StatelessWidget {
                 SnackBar(content: Text(AppStrings.get('history_cleared', lang))),
               );
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: Text(AppStrings.get('clear', lang)),
           ),
         ],

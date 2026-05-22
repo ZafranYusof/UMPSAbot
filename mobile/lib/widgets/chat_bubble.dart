@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../config/theme.dart';
 import '../models/message.dart';
 import '../providers/chat_provider.dart';
 import '../l10n/app_strings.dart';
@@ -13,15 +14,14 @@ class ChatBubble extends StatelessWidget {
     required this.message,
   });
 
-  /// Strip markdown formatting from text
   String _stripMarkdown(String text) {
     return text
-        .replaceAll(RegExp(r'\*\*(.+?)\*\*'), r'$1') // **bold**
-        .replaceAll(RegExp(r'\*(.+?)\*'), r'$1')     // *italic*
-        .replaceAll(RegExp(r'__(.+?)__'), r'$1')       // __bold__
-        .replaceAll(RegExp(r'_(.+?)_'), r'$1')         // _italic_
-        .replaceAll(RegExp(r'^#{1,6}\s+', multiLine: true), '') // headers
-        .replaceAll(RegExp(r'`(.+?)`'), r'$1');        // `code`
+        .replaceAll(RegExp(r'\*\*(.+?)\*\*'), r'$1')
+        .replaceAll(RegExp(r'\*(.+?)\*'), r'$1')
+        .replaceAll(RegExp(r'__(.+?)__'), r'$1')
+        .replaceAll(RegExp(r'_(.+?)_'), r'$1')
+        .replaceAll(RegExp(r'^#{1,6}\s+', multiLine: true), '')
+        .replaceAll(RegExp(r'`(.+?)`'), r'$1');
   }
 
   @override
@@ -56,45 +56,29 @@ class ChatBubble extends StatelessWidget {
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
-                  color: isUser
-                      ? const Color(0xFFD4AF37)
-                      : theme.colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(20),
-                    topRight: const Radius.circular(20),
-                    bottomLeft: Radius.circular(isUser ? 20 : 6),
-                    bottomRight: Radius.circular(isUser ? 6 : 20),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: isUser
-                          ? const Color(0xFFD4AF37).withOpacity(0.25)
-                          : Colors.black.withOpacity(0.06),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                      spreadRadius: 0,
-                    ),
-                  ],
+                  color: isUser ? AppColors.primary : AppColors.surface,
+                  borderRadius: BorderRadius.circular(14),
+                  border: isUser
+                      ? null
+                      : Border.all(color: AppColors.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (message.isStreaming && message.content.isEmpty)
-                      _buildStreamingCursor(theme)
+                      _buildStreamingCursor()
                     else
                       Text(
                         _stripMarkdown(message.content),
-                        style: TextStyle(
-                          color: isUser
-                              ? const Color(0xFF1A1A1A)
-                              : theme.colorScheme.onSurface,
+                        style: AppTheme.body(
                           fontSize: 15,
-                          height: 1.45,
-                          letterSpacing: 0.1,
+                          color: isUser
+                              ? AppColors.background
+                              : AppColors.textPrimary,
                         ),
                       ),
                     if (message.isStreaming && message.content.isNotEmpty)
-                      _buildStreamingCursor(theme),
+                      _buildStreamingCursor(),
                     if (message.confidence != null &&
                         !isUser &&
                         !message.isStreaming) ...[
@@ -105,16 +89,14 @@ class ChatBubble extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.onSurface.withOpacity(0.05),
+                          color: AppColors.surfaceLight,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
                           '${AppStrings.get('confidence', context.read<ChatProvider>().language)}: ${(message.confidence! * 100).toStringAsFixed(0)}%',
-                          style: TextStyle(
-                            color:
-                                theme.colorScheme.onSurface.withOpacity(0.45),
+                          style: AppTheme.body(
                             fontSize: 11,
-                            fontWeight: FontWeight.w500,
+                            color: AppColors.textMuted,
                           ),
                         ),
                       ),
@@ -129,18 +111,15 @@ class ChatBubble extends StatelessWidget {
     );
   }
 
-  Widget _buildStreamingCursor(ThemeData theme) {
+  Widget _buildStreamingCursor() {
     return SizedBox(
       width: 8,
       height: 16,
-      child:
-          _BlinkingCursor(color: theme.colorScheme.onSurface.withOpacity(0.6)),
+      child: _BlinkingCursor(color: AppColors.textMuted),
     );
   }
 
   Widget _buildErrorBubble(BuildContext context, ThemeData theme) {
-    final isDark = theme.brightness == Brightness.dark;
-
     return Padding(
       padding: const EdgeInsets.only(left: 12, right: 48, top: 3, bottom: 3),
       child: Row(
@@ -153,19 +132,10 @@ class ChatBubble extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: isDark
-                    ? Colors.red.shade900.withOpacity(0.3)
-                    : Colors.red.shade50,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                  bottomLeft: Radius.circular(6),
-                  bottomRight: Radius.circular(20),
-                ),
+                color: AppColors.error.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: isDark
-                      ? Colors.red.shade700.withOpacity(0.5)
-                      : Colors.red.shade200,
+                  color: AppColors.error.withOpacity(0.3),
                   width: 1,
                 ),
               ),
@@ -174,21 +144,15 @@ class ChatBubble extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.error_outline,
-                          size: 16,
-                          color: isDark
-                              ? Colors.red.shade300
-                              : Colors.red.shade700),
+                      const Icon(Icons.error_outline,
+                          size: 16, color: AppColors.error),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           message.content,
-                          style: TextStyle(
-                            color: isDark
-                                ? Colors.red.shade200
-                                : Colors.red.shade700,
+                          style: AppTheme.body(
                             fontSize: 14,
-                            height: 1.4,
+                            color: AppColors.error,
                           ),
                         ),
                       ),
@@ -206,28 +170,21 @@ class ChatBubble extends StatelessWidget {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.red.shade800.withOpacity(0.4)
-                            : Colors.red.shade100,
-                        borderRadius: BorderRadius.circular(14),
+                        color: AppColors.error.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.refresh_rounded,
-                              size: 15,
-                              color: isDark
-                                  ? Colors.red.shade200
-                                  : Colors.red.shade700),
+                          const Icon(Icons.refresh_rounded,
+                              size: 15, color: AppColors.error),
                           const SizedBox(width: 6),
                           Text(
                             AppStrings.get('tap_to_retry', context.read<ChatProvider>().language),
-                            style: TextStyle(
-                              color: isDark
-                                  ? Colors.red.shade200
-                                  : Colors.red.shade700,
+                            style: AppTheme.body(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
+                              color: AppColors.error,
                             ),
                           ),
                         ],
@@ -248,13 +205,12 @@ class ChatBubble extends StatelessWidget {
     final chatProvider = context.read<ChatProvider>();
     final lang = chatProvider.language;
     final isBookmarked = chatProvider.isMessageBookmarked(message.id);
-    final theme = Theme.of(context);
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
       ),
       builder: (ctx) => SafeArea(
         child: Padding(
@@ -267,11 +223,10 @@ class ChatBubble extends StatelessWidget {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 16),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withOpacity(0.2),
+                  color: AppColors.textMuted,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              // Preview of message
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
@@ -279,18 +234,16 @@ class ChatBubble extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest
-                        .withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(12),
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     message.content.length > 100
                         ? '${message.content.substring(0, 100)}...'
                         : message.content,
-                    style: TextStyle(
+                    style: AppTheme.body(
                       fontSize: 13,
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
-                      fontStyle: FontStyle.italic,
+                      color: AppColors.textSecondary,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -299,8 +252,9 @@ class ChatBubble extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               ListTile(
-                leading: const Icon(Icons.copy_rounded, color: Color(0xFF003366)),
-                title: Text(AppStrings.get('copy_text', lang)),
+                leading: const Icon(Icons.copy_rounded, color: AppColors.primary),
+                title: Text(AppStrings.get('copy_text', lang),
+                    style: AppTheme.body(color: AppColors.textPrimary)),
                 onTap: () {
                   HapticFeedback.lightImpact();
                   Clipboard.setData(ClipboardData(text: message.content));
@@ -319,11 +273,14 @@ class ChatBubble extends StatelessWidget {
                     isBookmarked
                         ? Icons.bookmark_rounded
                         : Icons.bookmark_outline_rounded,
-                    color: const Color(0xFFD4AF37),
+                    color: AppColors.primary,
                   ),
-                  title: Text(isBookmarked
-                      ? AppStrings.get('remove_from_saved', lang)
-                      : AppStrings.get('save_answer', lang)),
+                  title: Text(
+                    isBookmarked
+                        ? AppStrings.get('remove_from_saved', lang)
+                        : AppStrings.get('save_answer', lang),
+                    style: AppTheme.body(color: AppColors.textPrimary),
+                  ),
                   onTap: () {
                     HapticFeedback.lightImpact();
                     chatProvider.toggleBookmark(message);
@@ -342,9 +299,9 @@ class ChatBubble extends StatelessWidget {
                 ),
               if (!message.isUser)
                 ListTile(
-                  leading:
-                      const Icon(Icons.share_outlined, color: Color(0xFF003366)),
-                  title: Text(AppStrings.get('share', lang)),
+                  leading: const Icon(Icons.share_outlined, color: AppColors.textSecondary),
+                  title: Text(AppStrings.get('share', lang),
+                      style: AppTheme.body(color: AppColors.textPrimary)),
                   onTap: () {
                     HapticFeedback.lightImpact();
                     Clipboard.setData(ClipboardData(text: message.content));
@@ -369,23 +326,13 @@ class ChatBubble extends StatelessWidget {
       width: 30,
       height: 30,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF003366), Color(0xFF1A4D80)],
-        ),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF003366).withOpacity(0.3),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        border: Border.all(color: AppColors.border),
       ),
       child: const Icon(
         Icons.school_rounded,
-        color: Color(0xFFD4AF37),
+        color: AppColors.primary,
         size: 16,
       ),
     );
