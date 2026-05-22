@@ -83,11 +83,10 @@ async function sendMessage(req, res, next) {
       console.warn(`[${new Date().toISOString()}] Could not fetch conversation history:`, dbError.message);
     }
 
-    // Detect language from message content first, use frontend hint as fallback
-    const messageLanguage = detectLanguage(message);
-    // If message detection is clear (not 'mixed'), use it. Otherwise fall back to frontend hint
-    const rawLanguage = (messageLanguage !== 'mixed') ? messageLanguage : (language || 'mixed');
-    const detectedLanguage = rawLanguage === 'bm' ? 'ms' : rawLanguage;
+    // If frontend explicitly sends a language preference, respect it.
+    // Only auto-detect if no preference sent.
+    const rawLanguage = language ? language : detectLanguage(message);
+    const detectedLanguage = (rawLanguage === 'bm') ? 'ms' : rawLanguage;
 
     // Check if this is a follow-up query
     const isFollowUp = isFollowUpQuery(message);
@@ -331,10 +330,10 @@ async function streamMessage(req, res, next) {
     }
 
     const convId = conversationId || uuidv4();
-    // Detect language from message content first, use frontend hint as fallback
-    const msgLang = detectLanguage(message);
-    const rawLang = (msgLang !== 'mixed') ? msgLang : (language || 'mixed');
-    const detectedLanguage = rawLang === 'bm' ? 'ms' : rawLang;
+    // If frontend explicitly sends a language preference, respect it.
+    // Only auto-detect if no preference sent.
+    const rawLang = language ? language : detectLanguage(message);
+    const detectedLanguage = (rawLang === 'bm') ? 'ms' : rawLang;
 
     // Set SSE headers
     res.writeHead(200, {
