@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/chat_provider.dart';
 import '../providers/settings_provider.dart';
 import '../app.dart';
+import '../l10n/app_strings.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -13,19 +14,26 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Consumer<ChatProvider>(
+          builder: (context, chat, _) {
+            return Text(AppStrings.get('settings', chat.language));
+          },
+        ),
       ),
       body: Consumer2<SettingsProvider, ChatProvider>(
         builder: (context, settings, chat, _) {
+          final lang = chat.language;
           return ListView(
             padding: const EdgeInsets.symmetric(vertical: 8),
             children: [
               // Appearance section
-              _buildSectionHeader(theme, 'Appearance'),
+              _buildSectionHeader(theme, AppStrings.get('appearance', lang)),
               SwitchListTile(
-                title: const Text('Dark Mode'),
+                title: Text(AppStrings.get('dark_mode', lang)),
                 subtitle: Text(
-                  settings.isDarkMode ? 'Dark theme active' : 'Light theme active',
+                  settings.isDarkMode
+                      ? AppStrings.get('dark_theme_active', lang)
+                      : AppStrings.get('light_theme_active', lang),
                 ),
                 value: settings.isDarkMode,
                 onChanged: (_) => settings.toggleTheme(),
@@ -37,9 +45,9 @@ class SettingsScreen extends StatelessWidget {
               const Divider(height: 1),
 
               // Language section
-              _buildSectionHeader(theme, 'Language'),
+              _buildSectionHeader(theme, AppStrings.get('language', lang)),
               RadioListTile<String>(
-                title: const Text('English'),
+                title: Text(AppStrings.get('english', lang)),
                 value: 'en',
                 groupValue: settings.language,
                 onChanged: (val) {
@@ -51,7 +59,7 @@ class SettingsScreen extends StatelessWidget {
                 secondary: const Icon(Icons.language),
               ),
               RadioListTile<String>(
-                title: const Text('Bahasa Melayu'),
+                title: Text(AppStrings.get('bahasa_melayu', lang)),
                 value: 'ms',
                 groupValue: settings.language,
                 onChanged: (val) {
@@ -65,12 +73,12 @@ class SettingsScreen extends StatelessWidget {
               const Divider(height: 1),
 
               // Data section
-              _buildSectionHeader(theme, 'Data'),
+              _buildSectionHeader(theme, AppStrings.get('data', lang)),
               ListTile(
                 leading: const Icon(Icons.bookmark_outline,
                     color: Color(0xFFD4AF37)),
-                title: const Text('Saved Answers'),
-                subtitle: Text('${chat.bookmarks.length} saved messages'),
+                title: Text(AppStrings.get('saved_answers', lang)),
+                subtitle: Text('${chat.bookmarks.length} ${AppStrings.get('saved_messages_count', lang)}'),
                 trailing: const Icon(Icons.chevron_right, size: 20),
                 onTap: () {
                   HomeScreen.homeKey.currentState?.switchToTab(3);
@@ -78,30 +86,30 @@ class SettingsScreen extends StatelessWidget {
               ),
               ListTile(
                 leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: const Text('Clear Chat History'),
-                subtitle: const Text('Delete all saved conversations'),
+                title: Text(AppStrings.get('clear_chat_history', lang)),
+                subtitle: Text(AppStrings.get('delete_all_conversations', lang)),
                 onTap: () => _showClearHistoryDialog(context, chat),
               ),
               const Divider(height: 1),
 
               // About section
-              _buildSectionHeader(theme, 'About'),
+              _buildSectionHeader(theme, AppStrings.get('about', lang)),
               ListTile(
                 leading: const Icon(Icons.info_outline,
                     color: Color(0xFFD4AF37)),
                 title: const Text('UMPSA Chatbot'),
-                subtitle: const Text('Version 1.0.0'),
+                subtitle: Text(AppStrings.get('version', lang)),
               ),
               ListTile(
                 leading: const Icon(Icons.school_outlined,
                     color: Color(0xFF003366)),
-                title: const Text('Universiti Malaysia Pahang Al-Sultan Abdullah'),
-                subtitle: const Text('AI-powered campus assistant'),
+                title: Text(AppStrings.get('umpsa_full_name', lang)),
+                subtitle: Text(AppStrings.get('ai_campus_assistant', lang)),
               ),
               const SizedBox(height: 32),
               Center(
                 child: Text(
-                  'Made with ❤️ for UMPSA students',
+                  AppStrings.get('made_with_love', lang),
                   style: TextStyle(
                     color: theme.colorScheme.onSurface.withOpacity(0.4),
                     fontSize: 13,
@@ -132,27 +140,27 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _showClearHistoryDialog(BuildContext context, ChatProvider chat) {
+    final lang = chat.language;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Clear History'),
-        content: const Text(
-            'This will delete all your saved conversations. This action cannot be undone.'),
+        title: Text(AppStrings.get('clear_history_title', lang)),
+        content: Text(AppStrings.get('clear_history_desc', lang)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(AppStrings.get('cancel', lang)),
           ),
           TextButton(
             onPressed: () {
               chat.clearAllHistory();
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('History cleared')),
+                SnackBar(content: Text(AppStrings.get('history_cleared', lang))),
               );
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Clear'),
+            child: Text(AppStrings.get('clear', lang)),
           ),
         ],
       ),

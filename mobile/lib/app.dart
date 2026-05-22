@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/settings_provider.dart';
+import 'providers/chat_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/chat_screen.dart';
@@ -8,6 +9,7 @@ import 'screens/history_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/timetable_screen.dart';
 import 'screens/saved_screen.dart';
+import 'l10n/app_strings.dart';
 
 class UmpsaChatbotApp extends StatelessWidget {
   const UmpsaChatbotApp({super.key});
@@ -171,46 +173,51 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
-          setState(() => _currentIndex = index);
-        },
-        backgroundColor: theme.colorScheme.surface,
-        indicatorColor: const Color(0xFFD4AF37).withOpacity(0.2),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.chat_bubble_outline),
-            selectedIcon: Icon(Icons.chat_bubble, color: Color(0xFFD4AF37)),
-            label: 'Chat',
+    return Consumer<ChatProvider>(
+      builder: (context, chatProvider, _) {
+        final lang = chatProvider.language;
+        return Scaffold(
+          body: IndexedStack(
+            index: _currentIndex,
+            children: _screens,
           ),
-          NavigationDestination(
-            icon: Icon(Icons.calendar_today_outlined),
-            selectedIcon: Icon(Icons.calendar_today, color: Color(0xFFD4AF37)),
-            label: 'Timetable',
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: _currentIndex,
+            onDestinationSelected: (index) {
+              setState(() => _currentIndex = index);
+            },
+            backgroundColor: theme.colorScheme.surface,
+            indicatorColor: const Color(0xFFD4AF37).withOpacity(0.2),
+            destinations: [
+              NavigationDestination(
+                icon: const Icon(Icons.chat_bubble_outline),
+                selectedIcon: const Icon(Icons.chat_bubble, color: Color(0xFFD4AF37)),
+                label: AppStrings.get('nav_chat', lang),
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.calendar_today_outlined),
+                selectedIcon: const Icon(Icons.calendar_today, color: Color(0xFFD4AF37)),
+                label: AppStrings.get('nav_timetable', lang),
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.history_outlined),
+                selectedIcon: const Icon(Icons.history, color: Color(0xFFD4AF37)),
+                label: AppStrings.get('nav_history', lang),
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.bookmark_outline),
+                selectedIcon: const Icon(Icons.bookmark, color: Color(0xFFD4AF37)),
+                label: AppStrings.get('nav_saved', lang),
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.settings_outlined),
+                selectedIcon: const Icon(Icons.settings, color: Color(0xFFD4AF37)),
+                label: AppStrings.get('nav_settings', lang),
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: Icon(Icons.history_outlined),
-            selectedIcon: Icon(Icons.history, color: Color(0xFFD4AF37)),
-            label: 'History',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.bookmark_outline),
-            selectedIcon: Icon(Icons.bookmark, color: Color(0xFFD4AF37)),
-            label: 'Saved',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings, color: Color(0xFFD4AF37)),
-            label: 'Settings',
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

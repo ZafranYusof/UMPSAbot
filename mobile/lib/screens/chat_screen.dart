@@ -6,6 +6,7 @@ import '../widgets/chat_bubble.dart';
 import '../widgets/typing_indicator.dart';
 import '../widgets/suggestion_chips.dart';
 import '../widgets/source_citation.dart';
+import '../l10n/app_strings.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -142,9 +143,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 Consumer<ChatProvider>(
                   builder: (context, provider, _) {
                     if (provider.isTyping) {
-                      return const Text(
-                        'typing...',
-                        style: TextStyle(
+                      return Text(
+                        AppStrings.get('typing', provider.language),
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w400,
                           color: Color(0xFFD4AF37),
@@ -152,7 +153,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       );
                     }
                     return Text(
-                      provider.isOnline ? 'Online' : 'Offline',
+                      provider.isOnline
+                          ? AppStrings.get('online', provider.language)
+                          : AppStrings.get('offline', provider.language),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w400,
@@ -170,7 +173,7 @@ class _ChatScreenState extends State<ChatScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add_comment_outlined),
-            tooltip: 'New Chat',
+            tooltip: AppStrings.get('new_chat', context.watch<ChatProvider>().language),
             onPressed: () {
               HapticFeedback.lightImpact();
               context.read<ChatProvider>().startNewChat();
@@ -243,9 +246,9 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           const Icon(Icons.wifi_off_rounded, color: Colors.white, size: 16),
           const SizedBox(width: 8),
-          const Text(
-            'No internet connection',
-            style: TextStyle(
+          Text(
+            AppStrings.get('no_internet', context.read<ChatProvider>().language),
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 13,
               fontWeight: FontWeight.w500,
@@ -257,9 +260,9 @@ class _ChatScreenState extends State<ChatScreen> {
               HapticFeedback.lightImpact();
               context.read<ChatProvider>().retryLastMessage();
             },
-            child: const Text(
-              'Retry',
-              style: TextStyle(
+            child: Text(
+              AppStrings.get('retry', context.read<ChatProvider>().language),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -356,7 +359,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             const SizedBox(height: 28),
             Text(
-              'Assalamualaikum! 👋',
+              AppStrings.get('greeting', chatProvider.language),
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -365,7 +368,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              'Saya UMPSABot, pembantu AI anda.\nTanya apa-apa tentang UMPSA!',
+              AppStrings.get('greeting_subtitle', chatProvider.language),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15,
@@ -378,7 +381,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Text(
-                'SOALAN POPULAR',
+                AppStrings.get('popular_questions', chatProvider.language),
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
@@ -518,7 +521,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   height: 1.4,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Type your question...',
+                  hintText: AppStrings.get('type_your_question', context.watch<ChatProvider>().language),
                   hintStyle: TextStyle(
                     color: theme.colorScheme.onSurface.withOpacity(0.35),
                     fontSize: 15,

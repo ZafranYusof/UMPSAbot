@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/api_service.dart';
+import '../providers/chat_provider.dart';
+import '../l10n/app_strings.dart';
 
 class TimetableScreen extends StatefulWidget {
   const TimetableScreen({super.key});
@@ -27,8 +29,9 @@ class _TimetableScreenState extends State<TimetableScreen> {
     final code = _courseController.text.trim().toUpperCase();
     if (code.isEmpty) return;
     if (_courses.contains(code)) {
+      final lang = context.read<ChatProvider>().language;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Course already added')),
+        SnackBar(content: Text(AppStrings.get('course_already_added', lang))),
       );
       return;
     }
@@ -43,9 +46,10 @@ class _TimetableScreenState extends State<TimetableScreen> {
   }
 
   Future<void> _planTimetable() async {
+    final lang = context.read<ChatProvider>().language;
     if (_courses.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Add at least one course code')),
+        SnackBar(content: Text(AppStrings.get('add_at_least_one', lang))),
       );
       return;
     }
@@ -78,7 +82,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
       });
     } catch (e) {
       setState(() {
-        _error = 'Failed to plan timetable. Please try again.';
+        _error = AppStrings.get('failed_plan_timetable', context.read<ChatProvider>().language);
         _isLoading = false;
       });
     }
@@ -93,10 +97,11 @@ class _TimetableScreenState extends State<TimetableScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final lang = context.watch<ChatProvider>().language;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Timetable Planner'),
+        title: Text(AppStrings.get('timetable_planner', lang)),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -105,7 +110,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
           children: [
             // Semester selector
             Text(
-              'Semester',
+              AppStrings.get('semester', lang),
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.onSurface,
@@ -137,7 +142,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
 
             // Course input
             Text(
-              'Course Codes',
+              AppStrings.get('course_codes', lang),
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.onSurface,
@@ -151,7 +156,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                     controller: _courseController,
                     textCapitalization: TextCapitalization.characters,
                     decoration: InputDecoration(
-                      hintText: 'e.g. BCS1023',
+                      hintText: AppStrings.get('course_hint', lang),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -209,7 +214,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.schedule),
-                label: Text(_isLoading ? 'Planning...' : 'Plan Timetable'),
+                label: Text(_isLoading ? AppStrings.get('planning', lang) : AppStrings.get('plan_timetable', lang)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF003366),
                   foregroundColor: Colors.white,
@@ -248,7 +253,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
             // Results
             if (_results.isNotEmpty) ...[
               Text(
-                'Your Schedule',
+                AppStrings.get('your_schedule', lang),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -256,7 +261,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              ..._results.map((item) => _buildScheduleCard(item, theme)),
+              ..._results.map((item) => _buildScheduleCard(item, theme, lang)),
             ],
 
             // Empty results
@@ -273,7 +278,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Tap "Plan Timetable" to generate your schedule',
+                        AppStrings.get('tap_plan_timetable', lang),
                         style: TextStyle(
                           color: theme.colorScheme.onSurface.withOpacity(0.5),
                         ),
@@ -288,7 +293,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
     );
   }
 
-  Widget _buildScheduleCard(Map<String, dynamic> item, ThemeData theme) {
+  Widget _buildScheduleCard(Map<String, dynamic> item, ThemeData theme, String lang) {
     final course = item['course'] as String? ?? item['courseCode'] as String? ?? 'Unknown';
     final day = item['day'] as String? ?? '';
     final time = item['time'] as String? ?? '';
@@ -328,7 +333,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                 if (section.isNotEmpty) ...[
                   const SizedBox(width: 8),
                   Text(
-                    'Section $section',
+                    '${AppStrings.get('section', lang)} $section',
                     style: TextStyle(
                       color: theme.colorScheme.onSurface.withOpacity(0.6),
                       fontSize: 13,

@@ -5,6 +5,7 @@ import 'package:shimmer/shimmer.dart';
 import '../providers/chat_provider.dart';
 import '../models/conversation.dart';
 import '../app.dart';
+import '../l10n/app_strings.dart';
 import 'package:intl/intl.dart';
 
 class HistoryScreen extends StatelessWidget {
@@ -16,7 +17,11 @@ class HistoryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chat History'),
+        title: Consumer<ChatProvider>(
+          builder: (context, provider, _) {
+            return Text(AppStrings.get('chat_history', provider.language));
+          },
+        ),
         actions: [
           Consumer<ChatProvider>(
             builder: (context, provider, _) {
@@ -25,7 +30,7 @@ class HistoryScreen extends StatelessWidget {
               }
               return IconButton(
                 icon: const Icon(Icons.delete_sweep_outlined),
-                tooltip: 'Clear All',
+                tooltip: AppStrings.get('clear_all', provider.language),
                 onPressed: () => _showClearDialog(context, provider),
               );
             },
@@ -95,23 +100,32 @@ class HistoryScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            Text(
-              'No conversations yet',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Your chat history will appear here.\nStart a conversation to get going!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 14,
-                color: theme.colorScheme.onSurface.withOpacity(0.45),
-                height: 1.5,
-              ),
+            Consumer<ChatProvider>(
+              builder: (context, provider, _) {
+                final lang = provider.language;
+                return Column(
+                  children: [
+                    Text(
+                      AppStrings.get('no_conversations', lang),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      AppStrings.get('no_conversations_desc', lang),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: theme.colorScheme.onSurface.withOpacity(0.45),
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 32),
             GestureDetector(
@@ -137,19 +151,23 @@ class HistoryScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.chat_bubble_outline_rounded,
+                    const Icon(Icons.chat_bubble_outline_rounded,
                         size: 18, color: Color(0xFF1A1A1A)),
-                    SizedBox(width: 8),
-                    Text(
-                      'Start chatting',
-                      style: TextStyle(
-                        color: Color(0xFF1A1A1A),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    const SizedBox(width: 8),
+                    Consumer<ChatProvider>(
+                      builder: (context, provider, _) {
+                        return Text(
+                          AppStrings.get('start_chatting', provider.language),
+                          style: const TextStyle(
+                            color: Color(0xFF1A1A1A),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -242,14 +260,14 @@ class HistoryScreen extends StatelessWidget {
           color: Colors.red.shade600,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.delete_outline_rounded, color: Colors.white, size: 24),
-            SizedBox(height: 4),
+            const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 24),
+            const SizedBox(height: 4),
             Text(
-              'Delete',
-              style: TextStyle(
+              AppStrings.get('delete', chatProvider.language),
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
@@ -264,11 +282,12 @@ class HistoryScreen extends StatelessWidget {
       },
       onDismissed: (_) {
         chatProvider.deleteConversation(conversation.id);
+        final lang = chatProvider.language;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Conversation deleted'),
+            content: Text(AppStrings.get('conversation_deleted', lang)),
             action: SnackBarAction(
-              label: 'Undo',
+              label: AppStrings.get('undo', lang),
               textColor: const Color(0xFFD4AF37),
               onPressed: () {
                 // If undo is supported by provider
@@ -344,7 +363,7 @@ class HistoryScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${conversation.messages.length} messages • ${dateFormat.format(conversation.updatedAt)}',
+                          '${conversation.messages.length} ${AppStrings.get('messages_count', chatProvider.language)} • ${dateFormat.format(conversation.updatedAt)}',
                           style: TextStyle(
                             fontSize: 12,
                             color:
@@ -370,17 +389,17 @@ class HistoryScreen extends StatelessWidget {
 
   void _showClearDialog(BuildContext context, ChatProvider provider) {
     HapticFeedback.mediumImpact();
+    final lang = provider.language;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Clear All History'),
-        content: const Text(
-            'Are you sure you want to delete all conversations? This cannot be undone.'),
+        title: Text(AppStrings.get('clear_all_history', lang)),
+        content: Text(AppStrings.get('clear_all_history_desc', lang)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text(AppStrings.get('cancel', lang)),
           ),
           TextButton(
             onPressed: () {
@@ -389,7 +408,7 @@ class HistoryScreen extends StatelessWidget {
               Navigator.pop(ctx);
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete All'),
+            child: Text(AppStrings.get('delete_all', lang)),
           ),
         ],
       ),

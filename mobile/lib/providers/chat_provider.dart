@@ -34,6 +34,7 @@ class ChatProvider extends ChangeNotifier {
   bool get isOnline => _isOnline;
   bool get isLoadingHistory => _isLoadingHistory;
   String get sessionId => _sessionId;
+  String get language => _language;
 
   void _initSession() {
     final stored = _storage.sessionId;

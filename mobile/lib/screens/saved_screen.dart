@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/chat_provider.dart';
 import '../models/message.dart';
+import '../l10n/app_strings.dart';
 
 class SavedScreen extends StatelessWidget {
   const SavedScreen({super.key});
@@ -13,13 +14,18 @@ class SavedScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Saved Answers'),
+        title: Consumer<ChatProvider>(
+          builder: (context, provider, _) {
+            return Text(AppStrings.get('saved_answers', provider.language));
+          },
+        ),
       ),
       body: Consumer<ChatProvider>(
         builder: (context, chatProvider, child) {
           final bookmarks = chatProvider.bookmarks;
 
           if (bookmarks.isEmpty) {
+            final lang = chatProvider.language;
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -31,7 +37,7 @@ class SavedScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No saved answers yet',
+                    AppStrings.get('no_saved_answers', lang),
                     style: TextStyle(
                       fontSize: 16,
                       color: theme.colorScheme.onSurface.withOpacity(0.5),
@@ -39,7 +45,7 @@ class SavedScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Long press on any bot message to save it',
+                    AppStrings.get('long_press_to_save', lang),
                     style: TextStyle(
                       fontSize: 14,
                       color: theme.colorScheme.onSurface.withOpacity(0.4),
@@ -81,7 +87,7 @@ class SavedScreen extends StatelessWidget {
       onDismissed: (_) {
         chatProvider.toggleBookmark(message);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Removed from saved')),
+          SnackBar(content: Text(AppStrings.get('removed_from_saved', chatProvider.language))),
         );
       },
       child: Card(
@@ -102,7 +108,7 @@ class SavedScreen extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      _formatDate(message.timestamp),
+                      _formatDate(message.timestamp, chatProvider.language),
                       style: TextStyle(
                         fontSize: 12,
                         color: theme.colorScheme.onSurface.withOpacity(0.5),
@@ -114,7 +120,7 @@ class SavedScreen extends StatelessWidget {
                     onPressed: () {
                       Clipboard.setData(ClipboardData(text: message.content));
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Copied to clipboard')),
+                        SnackBar(content: Text(AppStrings.get('copied_to_clipboard', chatProvider.language))),
                       );
                     },
                     padding: EdgeInsets.zero,
@@ -136,7 +142,7 @@ class SavedScreen extends StatelessWidget {
               if (message.sources != null && message.sources!.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Text(
-                  '${message.sources!.length} source(s)',
+                  '${message.sources!.length} ${AppStrings.get('sources', chatProvider.language)}',
                   style: TextStyle(
                     fontSize: 12,
                     color: theme.colorScheme.onSurface.withOpacity(0.4),
@@ -150,12 +156,12 @@ class SavedScreen extends StatelessWidget {
     );
   }
 
-  String _formatDate(DateTime date) {
+  String _formatDate(DateTime date, String lang) {
     final now = DateTime.now();
     final diff = now.difference(date);
-    if (diff.inDays == 0) return 'Today';
-    if (diff.inDays == 1) return 'Yesterday';
-    if (diff.inDays < 7) return '${diff.inDays} days ago';
+    if (diff.inDays == 0) return AppStrings.get('today', lang);
+    if (diff.inDays == 1) return AppStrings.get('yesterday', lang);
+    if (diff.inDays < 7) return '${diff.inDays} ${AppStrings.get('days_ago', lang)}';
     return '${date.day}/${date.month}/${date.year}';
   }
 }

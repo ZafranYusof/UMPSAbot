@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../models/message.dart';
 import '../providers/chat_provider.dart';
+import '../l10n/app_strings.dart';
 
 class ChatBubble extends StatelessWidget {
   final Message message;
@@ -108,7 +109,7 @@ class ChatBubble extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          'Confidence: ${(message.confidence! * 100).toStringAsFixed(0)}%',
+                          '${AppStrings.get('confidence', context.read<ChatProvider>().language)}: ${(message.confidence! * 100).toStringAsFixed(0)}%',
                           style: TextStyle(
                             color:
                                 theme.colorScheme.onSurface.withOpacity(0.45),
@@ -220,7 +221,7 @@ class ChatBubble extends StatelessWidget {
                                   : Colors.red.shade700),
                           const SizedBox(width: 6),
                           Text(
-                            'Tap to retry',
+                            AppStrings.get('tap_to_retry', context.read<ChatProvider>().language),
                             style: TextStyle(
                               color: isDark
                                   ? Colors.red.shade200
@@ -245,6 +246,7 @@ class ChatBubble extends StatelessWidget {
   void _showMessageOptions(BuildContext context) {
     HapticFeedback.mediumImpact();
     final chatProvider = context.read<ChatProvider>();
+    final lang = chatProvider.language;
     final isBookmarked = chatProvider.isMessageBookmarked(message.id);
     final theme = Theme.of(context);
 
@@ -298,15 +300,15 @@ class ChatBubble extends StatelessWidget {
               const SizedBox(height: 8),
               ListTile(
                 leading: const Icon(Icons.copy_rounded, color: Color(0xFF003366)),
-                title: const Text('Copy text'),
+                title: Text(AppStrings.get('copy_text', lang)),
                 onTap: () {
                   HapticFeedback.lightImpact();
                   Clipboard.setData(ClipboardData(text: message.content));
                   Navigator.pop(ctx);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Copied to clipboard'),
-                      duration: Duration(seconds: 2),
+                    SnackBar(
+                      content: Text(AppStrings.get('copied_to_clipboard', lang)),
+                      duration: const Duration(seconds: 2),
                     ),
                   );
                 },
@@ -319,8 +321,9 @@ class ChatBubble extends StatelessWidget {
                         : Icons.bookmark_outline_rounded,
                     color: const Color(0xFFD4AF37),
                   ),
-                  title:
-                      Text(isBookmarked ? 'Remove from Saved' : 'Save answer'),
+                  title: Text(isBookmarked
+                      ? AppStrings.get('remove_from_saved', lang)
+                      : AppStrings.get('save_answer', lang)),
                   onTap: () {
                     HapticFeedback.lightImpact();
                     chatProvider.toggleBookmark(message);
@@ -328,7 +331,9 @@ class ChatBubble extends StatelessWidget {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          isBookmarked ? 'Removed from saved' : 'Answer saved!',
+                          isBookmarked
+                              ? AppStrings.get('removed_from_saved', lang)
+                              : AppStrings.get('answer_saved', lang),
                         ),
                         duration: const Duration(seconds: 2),
                       ),
@@ -339,15 +344,15 @@ class ChatBubble extends StatelessWidget {
                 ListTile(
                   leading:
                       const Icon(Icons.share_outlined, color: Color(0xFF003366)),
-                  title: const Text('Share'),
+                  title: Text(AppStrings.get('share', lang)),
                   onTap: () {
                     HapticFeedback.lightImpact();
                     Clipboard.setData(ClipboardData(text: message.content));
                     Navigator.pop(ctx);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Copied to clipboard for sharing'),
-                        duration: Duration(seconds: 2),
+                      SnackBar(
+                        content: Text(AppStrings.get('copied_for_sharing', lang)),
+                        duration: const Duration(seconds: 2),
                       ),
                     );
                   },

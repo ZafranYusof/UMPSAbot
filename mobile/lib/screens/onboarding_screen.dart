@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/storage_service.dart';
+import '../providers/chat_provider.dart';
+import '../l10n/app_strings.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -13,26 +15,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<_OnboardingPage> _pages = [
-    _OnboardingPage(
-      icon: Icons.school,
-      title: 'Welcome to UMPSA Chatbot',
-      description:
-          'Your AI-powered assistant for everything about Universiti Malaysia Pahang Al-Sultan Abdullah.',
-    ),
-    _OnboardingPage(
-      icon: Icons.chat_bubble_outline,
-      title: 'Ask Anything',
-      description:
-          'Get instant answers about courses, facilities, events, admissions, and more. Available in Bahasa Melayu and English.',
-    ),
-    _OnboardingPage(
-      icon: Icons.rocket_launch,
-      title: 'Get Started',
-      description:
-          'No login required. Start chatting right away and explore what UMPSA has to offer!',
-    ),
-  ];
+  List<_OnboardingPage> _getPages(String lang) {
+    return [
+      _OnboardingPage(
+        icon: Icons.school,
+        title: AppStrings.get('welcome_title', lang),
+        description: AppStrings.get('welcome_desc', lang),
+      ),
+      _OnboardingPage(
+        icon: Icons.chat_bubble_outline,
+        title: AppStrings.get('ask_anything_title', lang),
+        description: AppStrings.get('ask_anything_desc', lang),
+      ),
+      _OnboardingPage(
+        icon: Icons.rocket_launch,
+        title: AppStrings.get('get_started_title', lang),
+        description: AppStrings.get('get_started_desc', lang),
+      ),
+    ];
+  }
 
   @override
   void dispose() {
@@ -41,7 +42,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _onNext() {
-    if (_currentPage < _pages.length - 1) {
+    if (_currentPage < 2) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -58,6 +59,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.watch<ChatProvider>().language;
+    final pages = _getPages(lang);
+
     return Scaffold(
       backgroundColor: const Color(0xFF003366),
       body: SafeArea(
@@ -68,9 +72,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               alignment: Alignment.topRight,
               child: TextButton(
                 onPressed: _completeOnboarding,
-                child: const Text(
-                  'Skip',
-                  style: TextStyle(
+                child: Text(
+                  AppStrings.get('skip', lang),
+                  style: const TextStyle(
                     color: Color(0xFFD4AF37),
                     fontSize: 16,
                   ),
@@ -84,9 +88,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 onPageChanged: (index) {
                   setState(() => _currentPage = index);
                 },
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 itemBuilder: (context, index) {
-                  final page = _pages[index];
+                  final page = pages[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Column(
@@ -134,7 +138,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             // Dots indicator
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_pages.length, (index) {
+              children: List.generate(pages.length, (index) {
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -167,9 +171,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     elevation: 4,
                   ),
                   child: Text(
-                    _currentPage == _pages.length - 1
-                        ? 'Get Started'
-                        : 'Next',
+                    _currentPage == pages.length - 1
+                        ? AppStrings.get('get_started', lang)
+                        : AppStrings.get('next', lang),
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
