@@ -1,6 +1,6 @@
 # UMPSABot
 
-AI-powered chatbot for UMPSA students. Answers questions about fees, registration, hostel, academic calendar, and more using official UMPSA documents.
+Answers questions about fees, registration, hostel, academic calendar, and more using official UMPSA documents.
 
 ## Live Demo
 - **API (Primary):** [http://103.40.204.158](http://103.40.204.158) (IPServerOne VPS, Malaysia)
