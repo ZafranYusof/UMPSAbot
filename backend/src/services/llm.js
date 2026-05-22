@@ -412,8 +412,8 @@ function generateSuggestions(query, response, intent = 'general', language = 'mi
     }
   };
 
-  // Determine language bucket
-  const lang = (language === 'ms') ? 'ms' : 'en';
+  // Determine language bucket (frontend sends 'bm', backend uses 'ms')
+  const lang = (language === 'ms' || language === 'bm') ? 'ms' : 'en';
   const bucket = topicSuggestions[lang];
 
   // Map intent to suggestion category

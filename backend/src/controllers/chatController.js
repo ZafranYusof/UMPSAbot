@@ -83,8 +83,9 @@ async function sendMessage(req, res, next) {
       console.warn(`[${new Date().toISOString()}] Could not fetch conversation history:`, dbError.message);
     }
 
-    // Detect language from message
-    const detectedLanguage = language || detectLanguage(message);
+    // Detect language from message (normalize 'bm' from frontend to 'ms' for backend)
+    const rawLanguage = language || detectLanguage(message);
+    const detectedLanguage = rawLanguage === 'bm' ? 'ms' : rawLanguage;
 
     // Check if this is a follow-up query
     const isFollowUp = isFollowUpQuery(message);
@@ -328,7 +329,8 @@ async function streamMessage(req, res, next) {
     }
 
     const convId = conversationId || uuidv4();
-    const detectedLanguage = language || detectLanguage(message);
+    const rawLang = language || detectLanguage(message);
+    const detectedLanguage = rawLang === 'bm' ? 'ms' : rawLang;
 
     // Set SSE headers
     res.writeHead(200, {
