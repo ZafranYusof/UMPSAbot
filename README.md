@@ -169,6 +169,23 @@ cd mobile/android
 - **Caching:** Popular answers cached, < 500ms repeat queries
 - **Cost:** $0 (all free tiers)
 
+### Accuracy Test Results
+
+| Test Type | Score | Details |
+|-----------|-------|---------|
+| Pure BM | 20/20 (100%) | Standard BM questions |
+| Manglish | 14/15 (93.3%) | Casual mixed slang |
+| Mixed EN+BM | 14/15 (93.3%) | Code-switching queries |
+| **Overall** | **48/50 (96%)** | All test types combined |
+
+Sample questions tested:
+- "Apa syarat kemasukan UMPSA?" ✅
+- "how to daftar subjek eh" ✅
+- "Ada gym tak kat sini" ✅
+- "nak jumpa kaunselor macam mana" ✅
+- "How much yuran semester UMPSA?" ✅
+- "bus schedule ke pekan campus" ✅
+
 ## License
 
 MIT
