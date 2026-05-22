@@ -103,6 +103,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Row(
           children: [
@@ -178,44 +179,47 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
-      body: Consumer<ChatProvider>(
-        builder: (context, chatProvider, child) {
-          // Auto-scroll when new messages arrive
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (chatProvider.isTyping || chatProvider.messages.isNotEmpty) {
-              if (!_showScrollToBottom) {
-                _scrollToBottom(immediate: true);
+      body: SafeArea(
+        bottom: false, // Parent scaffold handles bottom nav
+        child: Consumer<ChatProvider>(
+          builder: (context, chatProvider, child) {
+            // Auto-scroll when new messages arrive
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (chatProvider.isTyping || chatProvider.messages.isNotEmpty) {
+                if (!_showScrollToBottom) {
+                  _scrollToBottom(immediate: true);
+                }
               }
-            }
-          });
+            });
 
-          return Stack(
-            children: [
-              Column(
-                children: [
-                  // Offline banner
-                  if (!chatProvider.isOnline)
-                    _buildOfflineBanner(),
-                  // Messages
-                  Expanded(
-                    child: chatProvider.messages.isEmpty
-                        ? _buildEmptyState(context, chatProvider)
-                        : _buildMessageList(chatProvider),
-                  ),
-                  // Input area
-                  _buildInputArea(theme),
-                ],
-              ),
-              // Scroll to bottom FAB
-              if (_showScrollToBottom && chatProvider.messages.isNotEmpty)
-                Positioned(
-                  bottom: 90,
-                  right: 16,
-                  child: _buildScrollToBottomButton(),
+            return Stack(
+              children: [
+                Column(
+                  children: [
+                    // Offline banner
+                    if (!chatProvider.isOnline)
+                      _buildOfflineBanner(),
+                    // Messages
+                    Expanded(
+                      child: chatProvider.messages.isEmpty
+                          ? _buildEmptyState(context, chatProvider)
+                          : _buildMessageList(chatProvider),
+                    ),
+                    // Input area
+                    _buildInputArea(theme),
+                  ],
                 ),
-            ],
-          );
-        },
+                // Scroll to bottom FAB
+                if (_showScrollToBottom && chatProvider.messages.isNotEmpty)
+                  Positioned(
+                    bottom: 80,
+                    right: 16,
+                    child: _buildScrollToBottomButton(),
+                  ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -500,21 +504,15 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Widget _buildInputArea(ThemeData theme) {
     return Container(
-      padding: EdgeInsets.only(
-        left: 12,
-        right: 12,
-        top: 12,
-        bottom: 12,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, -3),
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.onSurface.withOpacity(0.08),
+            width: 0.5,
           ),
-        ],
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
