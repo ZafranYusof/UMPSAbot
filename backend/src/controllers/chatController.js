@@ -48,6 +48,7 @@ function isFollowUpQuery(query) {
  */
 async function sendMessage(req, res, next) {
   try {
+    const startTime = Date.now();
     const { message, conversationId, language } = req.body;
 
     if (!message || message.trim().length === 0) {
@@ -56,37 +57,62 @@ async function sendMessage(req, res, next) {
 
     const convId = conversationId || uuidv4();
 
-    // Load or create conversation session
-    let conversation = null;
-    try {
-      conversation = await Conversation.findOne({ conversationId: convId });
-      if (!conversation) {
-        conversation = new Conversation({ conversationId: convId });
-      }
-    } catch (dbError) {
-      console.warn(`[${new Date().toISOString()}] Could not load conversation:`, dbError.message);
-    }
-
-    // Get conversation history (last 5 messages for context)
-    let conversationHistory = [];
-    try {
-      const previousMessages = await Message.find({ conversationId: convId })
-        .sort({ createdAt: -1 })
-        .limit(10)
-        .lean();
-      
-      conversationHistory = previousMessages
-        .reverse()
-        .slice(-5) // Keep last 5 messages
-        .map(m => ({ role: m.role, content: m.content }));
-    } catch (dbError) {
-      console.warn(`[${new Date().toISOString()}] Could not fetch conversation history:`, dbError.message);
-    }
-
     // If frontend explicitly sends a language preference, respect it.
     // Only auto-detect if no preference sent.
     const rawLanguage = language ? language : detectLanguage(message);
     const detectedLanguage = (rawLanguage === 'bm') ? 'ms' : rawLanguage;
+
+    // Classify intent early for quick-response path
+    const intentResult = classifyIntent(message);
+
+    // Quick-response path: greetings and simple intents skip full RAG pipeline
+    if (!intentResult.needsRAG) {
+      const greetingResponse = getGreetingResponse(detectedLanguage);
+      const suggestions = detectedLanguage === 'en'
+        ? ['How do I register for courses?', 'What are the semester fees?', 'How do I apply for hostel?']
+        : ['Macam mana nak daftar kursus?', 'Berapa yuran semester ini?', 'Macam mana nak apply hostel?'];
+
+      console.log(`[${new Date().toISOString()}] Quick response (greeting) in ${Date.now() - startTime}ms`);
+      return res.json({
+        conversationId: convId,
+        messageId: null,
+        message: greetingResponse,
+        sources: [],
+        suggestions,
+        confidence: 1.0,
+        language: detectedLanguage,
+        intent: intentResult.intent,
+        isLowConfidence: false,
+        isFollowUp: false
+      });
+    }
+
+    // Parallel: load conversation + history simultaneously
+    const [conversation, previousMessages] = await Promise.all([
+      Conversation.findOne({ conversationId: convId }).catch(err => {
+        console.warn(`[${new Date().toISOString()}] Could not load conversation:`, err.message);
+        return null;
+      }),
+      Message.find({ conversationId: convId })
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .lean()
+        .catch(err => {
+          console.warn(`[${new Date().toISOString()}] Could not fetch conversation history:`, err.message);
+          return [];
+        })
+    ]);
+
+    // Create conversation if not found
+    let conv = conversation;
+    if (!conv) {
+      conv = new Conversation({ conversationId: convId });
+    }
+
+    const conversationHistory = (previousMessages || [])
+      .reverse()
+      .slice(-5)
+      .map(m => ({ role: m.role, content: m.content }));
 
     // Check if this is a follow-up query
     const isFollowUp = isFollowUpQuery(message);
@@ -97,58 +123,59 @@ async function sendMessage(req, res, next) {
     };
 
     // If follow-up, pass previous answer as additional context
-    if (isFollowUp && conversation?.lastAnswer?.content) {
+    if (isFollowUp && conv?.lastAnswer?.content) {
       ragOptions.followUpContext = {
-        previousQuery: conversation.lastAnswer.query,
-        previousAnswer: conversation.lastAnswer.content,
-        previousSources: conversation.lastAnswer.sources || [],
-        previousIntent: conversation.lastAnswer.intent
+        previousQuery: conv.lastAnswer.query,
+        previousAnswer: conv.lastAnswer.content,
+        previousSources: conv.lastAnswer.sources || [],
+        previousIntent: conv.lastAnswer.intent
       };
     }
 
     // Process through RAG pipeline
     const ragResponse = await queryRAG(message, ragOptions);
 
-    // Save user message
+    console.log(`[${new Date().toISOString()}] Full RAG response in ${Date.now() - startTime}ms`);
+
+    // Save messages and update conversation in parallel (non-blocking for response)
     let savedAssistantMsg = null;
     try {
-      await new Message({
-        conversationId: convId,
-        role: 'user',
-        content: message,
-        language: detectedLanguage
-      }).save();
-
-      // Save assistant response
-      savedAssistantMsg = await new Message({
-        conversationId: convId,
-        role: 'assistant',
-        content: ragResponse.content,
-        sources: ragResponse.sources,
-        language: detectedLanguage,
-        confidence: ragResponse.confidence,
-        metadata: ragResponse.metadata
-      }).save();
+      const [, assistantMsg] = await Promise.all([
+        new Message({
+          conversationId: convId,
+          role: 'user',
+          content: message,
+          language: detectedLanguage
+        }).save(),
+        new Message({
+          conversationId: convId,
+          role: 'assistant',
+          content: ragResponse.content,
+          sources: ragResponse.sources,
+          language: detectedLanguage,
+          confidence: ragResponse.confidence,
+          metadata: ragResponse.metadata
+        }).save()
+      ]);
+      savedAssistantMsg = assistantMsg;
     } catch (dbError) {
       console.warn(`[${new Date().toISOString()}] Could not save messages to DB:`, dbError.message);
     }
 
-    // Update conversation session with last answer
-    try {
-      if (conversation) {
-        conversation.lastAnswer = {
-          content: ragResponse.content,
-          query: message,
-          sources: ragResponse.sources || [],
-          intent: ragResponse.intent || 'general'
-        };
-        conversation.messageCount = (conversation.messageCount || 0) + 2;
-        conversation.language = detectedLanguage;
-        conversation.lastActiveAt = new Date();
-        await conversation.save();
-      }
-    } catch (dbError) {
-      console.warn(`[${new Date().toISOString()}] Could not update conversation:`, dbError.message);
+    // Update conversation session with last answer (non-blocking)
+    if (conv) {
+      conv.lastAnswer = {
+        content: ragResponse.content,
+        query: message,
+        sources: ragResponse.sources || [],
+        intent: ragResponse.intent || 'general'
+      };
+      conv.messageCount = (conv.messageCount || 0) + 2;
+      conv.language = detectedLanguage;
+      conv.lastActiveAt = new Date();
+      conv.save().catch(err => {
+        console.warn(`[${new Date().toISOString()}] Could not update conversation:`, err.message);
+      });
     }
 
     // Build response in unified format
@@ -171,19 +198,15 @@ async function sendMessage(req, res, next) {
       response.handoffContact = ragResponse.handoffContact;
     }
 
-    // Log query for popular questions tracking (non-blocking)
-    try {
-      await new QueryLog({
-        query: message,
-        normalizedQuery: message.toLowerCase().trim().replace(/\s+/g, ' '),
-        intent: ragResponse.intent || 'general',
-        language: detectedLanguage,
-        responseTime: ragResponse.metadata?.responseTime || 0,
-        provider: ragResponse.metadata?.provider || 'unknown'
-      }).save();
-    } catch (logErr) {
-      // Non-critical, don't fail the request
-    }
+    // Log query for popular questions tracking (fire-and-forget)
+    new QueryLog({
+      query: message,
+      normalizedQuery: message.toLowerCase().trim().replace(/\s+/g, ' '),
+      intent: ragResponse.intent || 'general',
+      language: detectedLanguage,
+      responseTime: Date.now() - startTime,
+      provider: ragResponse.metadata?.provider || 'unknown'
+    }).save().catch(() => {});
 
     res.json(response);
   } catch (error) {

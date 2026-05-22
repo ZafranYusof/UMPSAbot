@@ -27,10 +27,16 @@ function getTTLForHitCount(hitCount) {
 
 /**
  * Normalize a query string for exact-match lookup
- * Lowercase, trim, collapse multiple spaces
+ * Lowercase, trim, collapse spaces, strip punctuation for better matching
  */
 function normalizeQuery(query) {
-  return query.toLowerCase().trim().replace(/\s+/g, ' ');
+  return query
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, ' ')           // collapse multiple spaces
+    .replace(/[?!.,;:"'()\[\]{}]/g, '') // strip common punctuation
+    .replace(/\s+/g, ' ')           // re-collapse after punctuation removal
+    .trim();
 }
 
 /**
