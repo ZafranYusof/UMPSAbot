@@ -1,0 +1,1542 @@
+[
+  {
+    "num": 1,
+    "question": "Bila exam semester 2 2025/2026?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.47363828460593377,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0dee610cc07452bb58f9a9",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "UMPSA STUDENT FREQUENTLY ASKED QUESTIONS (FAQ)\n\nREGISTRATION & ENROLLMENT\nQ: Bila tarikh pendaftaran pelajar baru Semester 1 2026/2027?\nA: Pendaftaran pelajar baru Bachelor Degree pada 19 September 20...",
+          "score": 0.5128597628728455
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "ACADEMIC CALENDAR 2026/2027 SESSION UNIVERSITI MALAYSIA PAHANG AL – SULTAN ABDULLAH 1  DIPLOMA AND BACHELOR DEGREE PRELIMINARY SEMESTER 2026/2027 (DIPLOMA) ACTIVITIES DURATION DATE REMARKS Registratio...",
+          "score": 0.3915446181185118
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba207",
+          "title": "Academic Calendar 2025 2026",
+          "chunk": "ACADEMIC CALENDAR 2025/2026 SESSION UNIVERSITI MALAYSIA PAHANG AL – SULTAN ABDULLAH 1  DIPLOMA AND BACHELOR DEGREE PRELIMINARY SEMESTER 2025/2026 (DIPLOMA) ACTIVITIES DURATION DATE REMARKS Registratio...",
+          "score": 0.3894189957296904
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "(Deepavali) ▪ 9 November 2026 (Replacement Leave for Deepavali) ▪ 10 November – 13 November 2026 (Implementation of online classes)  Mid-Semester Break 1 Week 14 November 2026 (Saturday) to 22 Novembe...",
+          "score": 0.37500341174725116
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba207",
+          "title": "Academic Calendar 2025 2026",
+          "chunk": "Break 1 Week 22 November 2025 (Saturday) to 30 November 2025 (Sunday)    Lectures 7 Weeks 1 December 2025 (Monday) to 16 January 2026 (Friday)  ▪ 25 December 2025 (Christmas Day) ▪ 26 December 2025 (R...",
+          "score": 0.35732390494060556
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "Fitri 1448H) ▪ 12 March 2027 (Replacement Leave for Hari Raya Aidil Fitri 1448H)  Mid-Semester Break 1 Week 10 April 2027 (Saturday) to 18 April 2027 (Sunday)    Lectures 7 Weeks 19 April 2027 (Monday...",
+          "score": 0.3530638766549753
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.33889291170509533
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba207",
+          "title": "Academic Calendar 2025 2026",
+          "chunk": "March to 27 March 2026 (Implementation of online classes)  Mid-Semester Break 1 Week 25 April 2026 (Saturday) to 3 May 2026 (Sunday)  ▪ 1 May 2026 (Labour Day)  Lectures 7 Weeks 4 May 2026 (Monday) to...",
+          "score": 0.33886453409614353
+        }
+      ],
+      "suggestions": [
+        "Bagaimana cara saya boleh mendapatkan maklumat terkini tentang jadual peperiksaan semester 2 2025/2026?",
+        "Saya perlu menghubungi pejabat akademik UMPSA melalui saluran mana untuk mendapatkan bantuan tentang jadual peperiksaan?",
+        "Adakah terdapat laman web rasmi UMPSA yang menyediakan maklumat tentang jadual peperiksaan semester 2 2025/2026?"
+      ],
+      "confidence": 0.47363828460593377,
+      "language": "ms",
+      "intent": "academic",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 2,
+    "question": "Bila mid-semester break?",
+    "response": "Mid-Semester Break untuk Semester 1 2026/2027 adalah dari 14 November 2026 (Sabtu) hingga 22 November 2026 (Ahad) - 1 minggu. \n\nJuga, Mid-Semester Break untuk Semester 2 2026/2027 adalah dari 10 April 2027 (Sabtu) hingga 18 April 2027 (Ahad) - 1 minggu.",
+    "confidence": 0.3695761505437685,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0dee710cc07452bb58f9b7",
+      "message": "Mid-Semester Break untuk Semester 1 2026/2027 adalah dari 14 November 2026 (Sabtu) hingga 22 November 2026 (Ahad) - 1 minggu. \n\nJuga, Mid-Semester Break untuk Semester 2 2026/2027 adalah dari 10 April 2027 (Sabtu) hingga 18 April 2027 (Ahad) - 1 minggu.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "UMPSA STUDENT FREQUENTLY ASKED QUESTIONS (FAQ)\n\nREGISTRATION & ENROLLMENT\nQ: Bila tarikh pendaftaran pelajar baru Semester 1 2026/2027?\nA: Pendaftaran pelajar baru Bachelor Degree pada 19 September 20...",
+          "score": 0.3922129185146048
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "▪ 30 July 2027 (Birthday of KDPB Sultan Pahang) ▪ 15 August 2027 (Maulidur Rasul) ▪ 16 August 2027 (Replacement Leave for Maulidur Rasul) ▪ 31 August 2027 (National Day)  Examination 5 Days  6 Septemb...",
+          "score": 0.31941002263831575
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "Fitri 1448H) ▪ 12 March 2027 (Replacement Leave for Hari Raya Aidil Fitri 1448H)  Mid-Semester Break 1 Week 10 April 2027 (Saturday) to 18 April 2027 (Sunday)    Lectures 7 Weeks 19 April 2027 (Monday...",
+          "score": 0.3147099974252157
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "(Deepavali) ▪ 9 November 2026 (Replacement Leave for Deepavali) ▪ 10 November – 13 November 2026 (Implementation of online classes)  Mid-Semester Break 1 Week 14 November 2026 (Saturday) to 22 Novembe...",
+          "score": 0.3145087202830284
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "UMPSA Frequently Asked Questions (FAQ)\n=======================================\n\nQ: What is UMPSA?\nA: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA) is a public technical university in Malaysia,...",
+          "score": 0.307869896897061
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "main semesters and one short semester. Semester 1 usually starts in September, Semester 2 in February, and the short semester in July. Q: How do I check my exam results? A: Results can be checked thro...",
+          "score": 0.3072510275402025
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba232",
+          "title": "Sample Academic Guide",
+          "chunk": "all courses 2. Plagiarism: Zero tolerance policy. First offense may result in course failure. 3. Add/Drop: Course add/drop allowed within first 2 weeks of semester 4. Withdrawal: Course withdrawal all...",
+          "score": 0.29001226396789276
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "Appliances Overnight / Outing College Complaint Management Hostel Postgraduate Student Outside Campus Sistem Pelajar Pulang Ke Kampung Takwim Pelajar Student Profiling Sistem Pelajar Kembali Ke Kampus...",
+          "score": 0.2880813549615499
+        }
+      ],
+      "suggestions": [
+        "Adakah cuti semester dan cuti penggal berbeza?",
+        "Apakah tarikh-tarikh cuti tersebut sama setiap tahun?",
+        "Bagaimana saya boleh memperoleh maklumat lanjut tentang kalendar akademik universiti?"
+      ],
+      "confidence": 0.3695761505437685,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 3,
+    "question": "Bila kuliah bermula semester 1 2026/2027?",
+    "response": "ERROR: timeout",
+    "confidence": "N/A",
+    "raw": null
+  },
+  {
+    "num": 4,
+    "question": "Bila pendaftaran pelajar baru?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.4118246326136535,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0deead0cc07452bb58f9fd",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "UMPSA STUDENT FREQUENTLY ASKED QUESTIONS (FAQ)\n\nREGISTRATION & ENROLLMENT\nQ: Bila tarikh pendaftaran pelajar baru Semester 1 2026/2027?\nA: Pendaftaran pelajar baru Bachelor Degree pada 19 September 20...",
+          "score": 0.4462095088352353
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "Appliances Overnight / Outing College Complaint Management Hostel Postgraduate Student Outside Campus Sistem Pelajar Pulang Ke Kampung Takwim Pelajar Student Profiling Sistem Pelajar Kembali Ke Kampus...",
+          "score": 0.3845240613252002
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.34223038727681543
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "(Deepavali) ▪ 9 November 2026 (Replacement Leave for Deepavali) ▪ 10 November – 13 November 2026 (Implementation of online classes)  Mid-Semester Break 1 Week 14 November 2026 (Saturday) to 22 Novembe...",
+          "score": 0.308047168166975
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.30452625389248955
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.3018387018574974
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "main semesters and one short semester. Semester 1 usually starts in September, Semester 2 in February, and the short semester in July. Q: How do I check my exam results? A: Results can be checked thro...",
+          "score": 0.28363196570981264
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba22d",
+          "title": "Hostel Application Guidelines",
+          "chunk": "and identify roommates in the Room/Hostel Details section. === APPLICATION FOR APPEAL/SENIOR STUDENT === Step 1: Browse to https://gading.ump.edu.my/ump/f?p=116 or go to Student Life and search for St...",
+          "score": 0.2817379910423426
+        }
+      ],
+      "suggestions": [
+        "Bagaimanakah cara untuk menghubungi pejabat akademik UMPSA?",
+        "Apakah terdapat tarikh akhir untuk pendaftaran pelajar baru?",
+        "Adakah terdapat syarat khas untuk pendaftaran pelajar baru di UMPSA?"
+      ],
+      "confidence": 0.4118246326136535,
+      "language": "ms",
+      "intent": "registration",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 5,
+    "question": "Apa public holidays semester ni?",
+    "response": "Maaf, saya tidak menemui maklumat ini dalam dokumen saya. Dokumen yang saya miliki hanya menyediakan maklumat tentang kalendar akademik, tarikh penting, dan prosedur pendaftaran, tetapi tidak menyediakan maklumat tentang cuti umum semester ini. Anda boleh merujuk kepada laman web rasmi UMPSA atau menghubungi pejabat akademik untuk mendapatkan maklumat terkini tentang cuti umum.",
+    "confidence": 0.3677059737071113,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0deeb30cc07452bb58fa19",
+      "message": "Maaf, saya tidak menemui maklumat ini dalam dokumen saya. Dokumen yang saya miliki hanya menyediakan maklumat tentang kalendar akademik, tarikh penting, dan prosedur pendaftaran, tetapi tidak menyediakan maklumat tentang cuti umum semester ini. Anda boleh merujuk kepada laman web rasmi UMPSA atau menghubungi pejabat akademik untuk mendapatkan maklumat terkini tentang cuti umum.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "UMPSA Frequently Asked Questions (FAQ)\n=======================================\n\nQ: What is UMPSA?\nA: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA) is a public technical university in Malaysia,...",
+          "score": 0.382326310314557
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "UMPSA STUDENT FREQUENTLY ASKED QUESTIONS (FAQ)\n\nREGISTRATION & ENROLLMENT\nQ: Bila tarikh pendaftaran pelajar baru Semester 1 2026/2027?\nA: Pendaftaran pelajar baru Bachelor Degree pada 19 September 20...",
+          "score": 0.3461602931745941
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "main semesters and one short semester. Semester 1 usually starts in September, Semester 2 in February, and the short semester in July. Q: How do I check my exam results? A: Results can be checked thro...",
+          "score": 0.3328938693457653
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba232",
+          "title": "Sample Academic Guide",
+          "chunk": "all courses 2. Plagiarism: Zero tolerance policy. First offense may result in course failure. 3. Add/Drop: Course add/drop allowed within first 2 weeks of semester 4. Withdrawal: Course withdrawal all...",
+          "score": 0.3283170572422484
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "Appliances Overnight / Outing College Complaint Management Hostel Postgraduate Student Outside Campus Sistem Pelajar Pulang Ke Kampung Takwim Pelajar Student Profiling Sistem Pelajar Kembali Ke Kampus...",
+          "score": 0.3265108678681771
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.32206145894444543
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "UMPSA - ABOUT THE UNIVERSITY\n\nHISTORY\n- Established as a technical university in 2002\n- Originally named Kolej Universiti Kejuruteraan & Teknologi Malaysia (KUKTEM), established 16 February 2002\n- Ren...",
+          "score": 0.3161876470917242
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba22d",
+          "title": "Hostel Application Guidelines",
+          "chunk": "Browse to https://gading.ump.edu.my/ump/f?p=116 or go to Student Life and search for Student Residence then Hostel Application. Step 2: View the main page for Hostel Application where your Student Det...",
+          "score": 0.31427733566972565
+        }
+      ],
+      "suggestions": [
+        "Bagaimana saya boleh mendapatkan maklumat tentang kalendar akademik untuk semester ini?",
+        "Adakah terdapat sebarang tarikh penting yang perlu diambil perhatian dalam semester ini?",
+        "Di manakah saya boleh mendapatkan maklumat terkini tentang prosedur pendaftaran untuk semester ini?"
+      ],
+      "confidence": 0.3677059737071113,
+      "language": "ms",
+      "intent": "academic",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 6,
+    "question": "Apa jadual kelas hari Isnin?",
+    "response": "ERROR: timeout",
+    "confidence": "N/A",
+    "raw": null
+  },
+  {
+    "num": 7,
+    "question": "Apa courses yang ada sem ni?",
+    "response": "Maaf, saya tidak menemui maklumat ini dalam dokumen saya. Dokumen yang saya miliki hanya menyediakan maklumat tentang kalendar akademik, tarikh penting, dan prosedur pendaftaran, tetapi tidak menyediakan maklumat tentang kursus yang ada semester ini. Anda boleh merujuk kepada laman web rasmi UMPSA atau menghubungi pejabat akademik untuk mendapatkan maklumat terkini tentang kursus yang ada semester ini.\n\nNamun, saya dapat memberikan maklumat tentang cara untuk memeriksa kursus melalui E-Comm Student Portal di https://std-comm.ump.edu.my/ecommstudent/home.jsp. Anda boleh log masuk ke portal tersebut menggunakan ID pelajar dan kata laluan untuk memeriksa kursus yang ada.",
+    "confidence": 0.31420237696582826,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0deedb0cc07452bb58fa39",
+      "message": "Maaf, saya tidak menemui maklumat ini dalam dokumen saya. Dokumen yang saya miliki hanya menyediakan maklumat tentang kalendar akademik, tarikh penting, dan prosedur pendaftaran, tetapi tidak menyediakan maklumat tentang kursus yang ada semester ini. Anda boleh merujuk kepada laman web rasmi UMPSA atau menghubungi pejabat akademik untuk mendapatkan maklumat terkini tentang kursus yang ada semester ini.\n\nNamun, saya dapat memberikan maklumat tentang cara untuk memeriksa kursus melalui E-Comm Student Portal di https://std-comm.ump.edu.my/ecommstudent/home.jsp. Anda boleh log masuk ke portal tersebut menggunakan ID pelajar dan kata laluan untuk memeriksa kursus yang ada.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.32213001014857745
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba207",
+          "title": "Academic Calendar 2025 2026",
+          "chunk": "ACADEMIC CALENDAR 2025/2026 SESSION UNIVERSITI MALAYSIA PAHANG AL – SULTAN ABDULLAH 1  DIPLOMA AND BACHELOR DEGREE PRELIMINARY SEMESTER 2025/2026 (DIPLOMA) ACTIVITIES DURATION DATE REMARKS Registratio...",
+          "score": 0.30779102429908856
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "ACADEMIC CALENDAR 2026/2027 SESSION UNIVERSITI MALAYSIA PAHANG AL – SULTAN ABDULLAH 1  DIPLOMA AND BACHELOR DEGREE PRELIMINARY SEMESTER 2026/2027 (DIPLOMA) ACTIVITIES DURATION DATE REMARKS Registratio...",
+          "score": 0.30045462075758606
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba207",
+          "title": "Academic Calendar 2025 2026",
+          "chunk": "March to 27 March 2026 (Implementation of online classes)  Mid-Semester Break 1 Week 25 April 2026 (Saturday) to 3 May 2026 (Sunday)  ▪ 1 May 2026 (Labour Day)  Lectures 7 Weeks 4 May 2026 (Monday) to...",
+          "score": 0.2995677739424528
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba232",
+          "title": "Sample Academic Guide",
+          "chunk": "all courses 2. Plagiarism: Zero tolerance policy. First offense may result in course failure. 3. Add/Drop: Course add/drop allowed within first 2 weeks of semester 4. Withdrawal: Course withdrawal all...",
+          "score": 0.28949180784180717
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "- Research: https://research.umpsa.edu.my - Green/Sustainability: https://mygreen.umpsa.edu.my - Registrar (Jabatan Pendaftar): https://pendaftar.umpsa.edu.my ACADEMIC CALENDAR - 2026/2027 Session: - ...",
+          "score": 0.2832616048034278
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba218",
+          "title": "Ecomm Course Results",
+          "chunk": "# Course Results\n# Source: https://std-comm.ump.edu.my/ecommstudent/courseResult.jsp\n\nSorry, Page Not Found...",
+          "score": 0.28171132244783376
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba207",
+          "title": "Academic Calendar 2025 2026",
+          "chunk": "August 2026 (Maulidur Rasul) ▪ 31 August 2026 (National Day) ▪ 16 September 2026 (Malaysia Day)  Examination 5 Days  21 September 2026 (Monday) to 25 September 2026 (Friday)    Notes:  • Replacement L...",
+          "score": 0.28122836540786844
+        }
+      ],
+      "suggestions": [
+        "Bagaimana cara memeriksa kursus melalui E-Comm Stud?",
+        "Bolehkah saya mendapatkan maklumat tentang kursus semester ini melalui laman web rasmi UMPSA?",
+        "Apakah prosedur untuk menghubungi pejabat akademik bagi mendapatkan maklumat tentang kursus semester ini?"
+      ],
+      "confidence": 0.31420237696582826,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 8,
+    "question": "Kelas AI Techniques bila?",
+    "response": "Maaf, saya tidak menemui maklumat ini dalam dokumen saya. Dokumen yang saya miliki tidak menyediakan maklumat tentang jadual kelas AI Techniques. Anda boleh merujuk kepada laman web rasmi UMPSA atau menghubungi pejabat akademik untuk mendapatkan maklumat terkini tentang jadual kelas AI Techniques.\n\nNamun, saya dapat memberikan maklumat tentang cara untuk memeriksa jadual kelas melalui E-Comm Student Portal di https://std-comm.ump.edu.my/ecommstudent/home.jsp. Anda boleh log masuk ke portal tersebut menggunakan ID pelajar dan kata laluan untuk memeriksa jadual kelas yang ada.",
+    "confidence": 0.2038900912132672,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0deef10cc07452bb58fa53",
+      "message": "Maaf, saya tidak menemui maklumat ini dalam dokumen saya. Dokumen yang saya miliki tidak menyediakan maklumat tentang jadual kelas AI Techniques. Anda boleh merujuk kepada laman web rasmi UMPSA atau menghubungi pejabat akademik untuk mendapatkan maklumat terkini tentang jadual kelas AI Techniques.\n\nNamun, saya dapat memberikan maklumat tentang cara untuk memeriksa jadual kelas melalui E-Comm Student Portal di https://std-comm.ump.edu.my/ecommstudent/home.jsp. Anda boleh log masuk ke portal tersebut menggunakan ID pelajar dan kata laluan untuk memeriksa jadual kelas yang ada.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "UMPSA - ABOUT THE UNIVERSITY\n\nHISTORY\n- Established as a technical university in 2002\n- Originally named Kolej Universiti Kejuruteraan & Teknologi Malaysia (KUKTEM), established 16 February 2002\n- Ren...",
+          "score": 0.20591504651375686
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "UMPSA STUDENT FREQUENTLY ASKED QUESTIONS (FAQ)\n\nREGISTRATION & ENROLLMENT\nQ: Bila tarikh pendaftaran pelajar baru Semester 1 2026/2027?\nA: Pendaftaran pelajar baru Bachelor Degree pada 19 September 20...",
+          "score": 0.2049655177181935
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "main semesters and one short semester. Semester 1 usually starts in September, Semester 2 in February, and the short semester in July. Q: How do I check my exam results? A: Results can be checked thro...",
+          "score": 0.20473641411126398
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "Fitri 1448H) ▪ 12 March 2027 (Replacement Leave for Hari Raya Aidil Fitri 1448H)  Mid-Semester Break 1 Week 10 April 2027 (Saturday) to 18 April 2027 (Sunday)    Lectures 7 Weeks 19 April 2027 (Monday...",
+          "score": 0.20047311233476653
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba22d",
+          "title": "Hostel Application Guidelines",
+          "chunk": "Browse to https://gading.ump.edu.my/ump/f?p=116 or go to Student Life and search for Student Residence then Hostel Application. Step 2: View the main page for Hostel Application where your Student Det...",
+          "score": 0.1989972556816046
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "▪ 30 July 2027 (Birthday of KDPB Sultan Pahang) ▪ 15 August 2027 (Maulidur Rasul) ▪ 16 August 2027 (Replacement Leave for Maulidur Rasul) ▪ 31 August 2027 (National Day)  Examination 5 Days  6 Septemb...",
+          "score": 0.19648668847776804
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "Appliances Overnight / Outing College Complaint Management Hostel Postgraduate Student Outside Campus Sistem Pelajar Pulang Ke Kampung Takwim Pelajar Student Profiling Sistem Pelajar Kembali Ke Kampus...",
+          "score": 0.19329123396367837
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.1884562952959655
+        }
+      ],
+      "suggestions": [
+        "Bagaimana cara mengakses jadual kelas di E-Comm Student Portal?",
+        "Apakah terdapat cara lain untuk mendapatkan maklumat jadual kelas AI Techniques selain melalui portal dan laman web rasmi UMPSA?",
+        "Bolehkah saya mendapatkan bantuan daripada pejabat akademik untuk mencari jadual kelas AI Techniques?"
+      ],
+      "confidence": 0.2038900912132672,
+      "language": "en",
+      "intent": "academic",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 9,
+    "question": "Apa bilik untuk Software Engineering Practices?",
+    "response": "ERROR: timeout",
+    "confidence": "N/A",
+    "raw": null
+  },
+  {
+    "num": 10,
+    "question": "Macam mana nak apply hostel?",
+    "response": "Untuk memohon hostel di UMPSA, anda boleh mengikuti langkah-langkah berikut:\n\n1. Lawati laman web https://gading.ump.edu.my/ump/f?p=116 atau pergi ke Student Life dan cari Student Residence kemudian Hostel Application.\n2. Lihat butiran pelajar anda di halaman utama Hostel Application dan klik pada APPLY NEW STUDENT (untuk pelajar baru) atau APPLY APPEAL/SENIOR (untuk pelajar senior).\n3. Pilih HOSTEL, BLOCK, LEVEL, ROOM AND BED mengikut kampus dan kapasiti yang tersedia. Rujuk legenda untuk memeriksa ketersediaan.\n4. Setelah memilih tempat tinggal, akan muncul popup pengesahan. Baca dengan teliti dan fahami semua syarat yang dinyatakan. Jika anda bersetuju dengan syarat dan semua maklumat adalah betul, klik pada kotak semak.\n5. Klik pada SUBMIT untuk meneruskan permohonan. Setelah diserahkan, anda akan menerima HOSTEL SLIP. Cetak slip ini pada hari pengambilan kunci hostel.\n6. Setelah diserahkan, anda boleh memeriksa butiran anda lagi dengan mengklik pada butang MAIN dan mengenal pasti rakan serumah di bahagian Butiran Hostel/Room.\n\nAnda juga boleh menggunakan aplikasi ADAB untuk memohon hostel. Sila rujuk dokumen yang berkaitan untuk maklumat lanjut.",
+    "confidence": 0.4037180645295462,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def1a0cc07452bb58fa9b",
+      "message": "Untuk memohon hostel di UMPSA, anda boleh mengikuti langkah-langkah berikut:\n\n1. Lawati laman web https://gading.ump.edu.my/ump/f?p=116 atau pergi ke Student Life dan cari Student Residence kemudian Hostel Application.\n2. Lihat butiran pelajar anda di halaman utama Hostel Application dan klik pada APPLY NEW STUDENT (untuk pelajar baru) atau APPLY APPEAL/SENIOR (untuk pelajar senior).\n3. Pilih HOSTEL, BLOCK, LEVEL, ROOM AND BED mengikut kampus dan kapasiti yang tersedia. Rujuk legenda untuk memeriksa ketersediaan.\n4. Setelah memilih tempat tinggal, akan muncul popup pengesahan. Baca dengan teliti dan fahami semua syarat yang dinyatakan. Jika anda bersetuju dengan syarat dan semua maklumat adalah betul, klik pada kotak semak.\n5. Klik pada SUBMIT untuk meneruskan permohonan. Setelah diserahkan, anda akan menerima HOSTEL SLIP. Cetak slip ini pada hari pengambilan kunci hostel.\n6. Setelah diserahkan, anda boleh memeriksa butiran anda lagi dengan mengklik pada butang MAIN dan mengenal pasti rakan serumah di bahagian Butiran Hostel/Room.\n\nAnda juga boleh menggunakan aplikasi ADAB untuk memohon hostel. Sila rujuk dokumen yang berkaitan untuk maklumat lanjut.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.44662354470858867
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.3030536974272068
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "Appliances Overnight / Outing College Complaint Management Hostel Postgraduate Student Outside Campus Sistem Pelajar Pulang Ke Kampung Takwim Pelajar Student Profiling Sistem Pelajar Kembali Ke Kampus...",
+          "score": 0.29464479325467946
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "main semesters and one short semester. Semester 1 usually starts in September, Semester 2 in February, and the short semester in July. Q: How do I check my exam results? A: Results can be checked thro...",
+          "score": 0.2869381132326664
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba22d",
+          "title": "Hostel Application Guidelines",
+          "chunk": "and identify roommates in the Room/Hostel Details section. === APPLICATION FOR APPEAL/SENIOR STUDENT === Step 1: Browse to https://gading.ump.edu.my/ump/f?p=116 or go to Student Life and search for St...",
+          "score": 0.2796836941778057
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba22d",
+          "title": "Hostel Application Guidelines",
+          "chunk": "HOSTEL APPLICATION GUIDELINES - UMPSA\n\nURL: https://gading.ump.edu.my/ump/f?p=116\n\nHow to access: Go to Student Life > Student Residence > Hostel Application.\n\n=== APPLICATION FOR NEW STUDENT ===\n\nSte...",
+          "score": 0.2791750785031184
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.2777716490246473
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba22d",
+          "title": "Hostel Application Guidelines",
+          "chunk": "Browse to https://gading.ump.edu.my/ump/f?p=116 or go to Student Life and search for Student Residence then Hostel Application. Step 2: View the main page for Hostel Application where your Student Det...",
+          "score": 0.2609516492321973
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.4037180645295462,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 11,
+    "question": "Apa steps untuk permohonan hostel pelajar baru?",
+    "response": "ERROR: timeout",
+    "confidence": "N/A",
+    "raw": null
+  },
+  {
+    "num": 12,
+    "question": "Macam mana nak check availability hostel?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.406387792721919,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def450cc07452bb58fafb",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.4335460471905791
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba22d",
+          "title": "Hostel Application Guidelines",
+          "chunk": "Browse to https://gading.ump.edu.my/ump/f?p=116 or go to Student Life and search for Student Residence then Hostel Application. Step 2: View the main page for Hostel Application where your Student Det...",
+          "score": 0.36803633673543623
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.35418300027989497
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba22d",
+          "title": "Hostel Application Guidelines",
+          "chunk": "and identify roommates in the Room/Hostel Details section. === APPLICATION FOR APPEAL/SENIOR STUDENT === Step 1: Browse to https://gading.ump.edu.my/ump/f?p=116 or go to Student Life and search for St...",
+          "score": 0.338083563586659
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba22d",
+          "title": "Hostel Application Guidelines",
+          "chunk": "HOSTEL APPLICATION GUIDELINES - UMPSA\n\nURL: https://gading.ump.edu.my/ump/f?p=116\n\nHow to access: Go to Student Life > Student Residence > Hostel Application.\n\n=== APPLICATION FOR NEW STUDENT ===\n\nSte...",
+          "score": 0.3247819533912173
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "main semesters and one short semester. Semester 1 usually starts in September, Semester 2 in February, and the short semester in July. Q: How do I check my exam results? A: Results can be checked thro...",
+          "score": 0.3207307161129773
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "Appliances Overnight / Outing College Complaint Management Hostel Postgraduate Student Outside Campus Sistem Pelajar Pulang Ke Kampung Takwim Pelajar Student Profiling Sistem Pelajar Kembali Ke Kampus...",
+          "score": 0.3098886465900621
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.2948979944735385
+        }
+      ],
+      "suggestions": [
+        "Bagaimanakah caranya untuk menghubungi pejabat akademik UMPSA?",
+        "Apakah jam operasi pejabat akademik UMPSA?",
+        "Adakah terdapat alternatif lain untuk semak ketersediaan hostel selain menghubungi pejabat akademik?"
+      ],
+      "confidence": 0.406387792721919,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 13,
+    "question": "Apa contact number UMPSA?",
+    "response": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+    "confidence": 0.34729359004485594,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def460cc07452bb58fb15",
+      "message": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.3670695508010699
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.34697649786218104
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "UMPSA - Universiti Malaysia Pahang Al-Sultan Abdullah\nOfficial Portal: https://umpsa.edu.my\n\nGENERAL INFORMATION\n- Full Name: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)\n- Previously known a...",
+          "score": 0.2933143418804466
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "UMPSA Frequently Asked Questions (FAQ)\n=======================================\n\nQ: What is UMPSA?\nA: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA) is a public technical university in Malaysia,...",
+          "score": 0.2929341251035025
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "- Research: https://research.umpsa.edu.my - Green/Sustainability: https://mygreen.umpsa.edu.my - Registrar (Jabatan Pendaftar): https://pendaftar.umpsa.edu.my ACADEMIC CALENDAR - 2026/2027 Session: - ...",
+          "score": 0.29277140405100105
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba207",
+          "title": "Academic Calendar 2025 2026",
+          "chunk": "August 2026 (Maulidur Rasul) ▪ 31 August 2026 (National Day) ▪ 16 September 2026 (Malaysia Day)  Examination 5 Days  21 September 2026 (Monday) to 25 September 2026 (Friday)    Notes:  • Replacement L...",
+          "score": 0.27916016319553505
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "UMPSA - ABOUT THE UNIVERSITY\n\nHISTORY\n- Established as a technical university in 2002\n- Originally named Kolej Universiti Kejuruteraan & Teknologi Malaysia (KUKTEM), established 16 February 2002\n- Ren...",
+          "score": 0.2687531920172112
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.26821817799857295
+        }
+      ],
+      "suggestions": [
+        "Apa alamat kantor akademik UMPSA?",
+        "Bagaimana cara menghubungi kantor akademik UMPSA?",
+        "Apa jam operasional kantor akademik UMPSA?"
+      ],
+      "confidence": 0.34729359004485594,
+      "language": "mixed",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 14,
+    "question": "UMPSA ada berapa kampus?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.37398469989554545,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def470cc07452bb58fb25",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.4133925512515439
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.32629933034081754
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "+609 431 6784 / 6788 - Email: intake@ump.edu.my PROGRAMMES OFFERED: - Diploma - Bachelor Degree - Master (Coursework) - Master (Research) - Master (Mixed Mode) - PhD PROGRAMME FIELDS: Diploma: Enginee...",
+          "score": 0.27808813467327304
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "UMPSA - Universiti Malaysia Pahang Al-Sultan Abdullah\nOfficial Portal: https://umpsa.edu.my\n\nGENERAL INFORMATION\n- Full Name: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)\n- Previously known a...",
+          "score": 0.274782155091532
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "UMPSA Frequently Asked Questions (FAQ)\n=======================================\n\nQ: What is UMPSA?\nA: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA) is a public technical university in Malaysia,...",
+          "score": 0.27332691480743054
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "UMPSA STUDENT FREQUENTLY ASKED QUESTIONS (FAQ)\n\nREGISTRATION & ENROLLMENT\nQ: Bila tarikh pendaftaran pelajar baru Semester 1 2026/2027?\nA: Pendaftaran pelajar baru Bachelor Degree pada 19 September 20...",
+          "score": 0.2506007284127518
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "- Research: https://research.umpsa.edu.my - Green/Sustainability: https://mygreen.umpsa.edu.my - Registrar (Jabatan Pendaftar): https://pendaftar.umpsa.edu.my ACADEMIC CALENDAR - 2026/2027 Session: - ...",
+          "score": 0.2243917392703149
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "main semesters and one short semester. Semester 1 usually starts in September, Semester 2 in February, and the short semester in July. Q: How do I check my exam results? A: Results can be checked thro...",
+          "score": 0.215382820004729
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.37398469989554545,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 15,
+    "question": "Apa email untuk admission?",
+    "response": "ERROR: timeout",
+    "confidence": "N/A",
+    "raw": null
+  },
+  {
+    "num": 16,
+    "question": "Macam mana nak hubungi JHEPA?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.39146718638651556,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def770cc07452bb58fb5b",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.429982664389502
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.35330519076788164
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "UMPSA - ABOUT THE UNIVERSITY\n\nHISTORY\n- Established as a technical university in 2002\n- Originally named Kolej Universiti Kejuruteraan & Teknologi Malaysia (KUKTEM), established 16 February 2002\n- Ren...",
+          "score": 0.29686086593138633
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "public university (UA) with 10 dual degree programmes RESEARCH - Ranked among the best in research and innovation within MTUN and Non-Research University (Non-RU) classifications - Collaborates with l...",
+          "score": 0.2794345561960233
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "UMPSA Frequently Asked Questions (FAQ)\n=======================================\n\nQ: What is UMPSA?\nA: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA) is a public technical university in Malaysia,...",
+          "score": 0.27506155912069674
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.2648350849621321
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "UMPSA - Universiti Malaysia Pahang Al-Sultan Abdullah\nOfficial Portal: https://umpsa.edu.my\n\nGENERAL INFORMATION\n- Full Name: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)\n- Previously known a...",
+          "score": 0.2639635241859777
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "▪ 30 July 2027 (Birthday of KDPB Sultan Pahang) ▪ 15 August 2027 (Maulidur Rasul) ▪ 16 August 2027 (Replacement Leave for Maulidur Rasul) ▪ 31 August 2027 (National Day)  Examination 5 Days  6 Septemb...",
+          "score": 0.24933845614944392
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.39146718638651556,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 17,
+    "question": "Apa programme yang ditawarkan UMPSA?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.38299962572016094,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def780cc07452bb58fb77",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.4050304953243466
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.3881482252179486
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "+609 431 6784 / 6788 - Email: intake@ump.edu.my PROGRAMMES OFFERED: - Diploma - Bachelor Degree - Master (Coursework) - Master (Research) - Master (Mixed Mode) - PhD PROGRAMME FIELDS: Diploma: Enginee...",
+          "score": 0.32729706967105404
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "UMPSA - Universiti Malaysia Pahang Al-Sultan Abdullah\nOfficial Portal: https://umpsa.edu.my\n\nGENERAL INFORMATION\n- Full Name: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)\n- Previously known a...",
+          "score": 0.3159356361229467
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "UMPSA - ABOUT THE UNIVERSITY\n\nHISTORY\n- Established as a technical university in 2002\n- Originally named Kolej Universiti Kejuruteraan & Teknologi Malaysia (KUKTEM), established 16 February 2002\n- Ren...",
+          "score": 0.31215357273185657
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "- Research: https://research.umpsa.edu.my - Green/Sustainability: https://mygreen.umpsa.edu.my - Registrar (Jabatan Pendaftar): https://pendaftar.umpsa.edu.my ACADEMIC CALENDAR - 2026/2027 Session: - ...",
+          "score": 0.30797369343064407
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "public university (UA) with 10 dual degree programmes RESEARCH - Ranked among the best in research and innovation within MTUN and Non-Research University (Non-RU) classifications - Collaborates with l...",
+          "score": 0.30421048730430356
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba207",
+          "title": "Academic Calendar 2025 2026",
+          "chunk": "March to 27 March 2026 (Implementation of online classes)  Mid-Semester Break 1 Week 25 April 2026 (Saturday) to 3 May 2026 (Sunday)  ▪ 1 May 2026 (Labour Day)  Lectures 7 Weeks 4 May 2026 (Monday) to...",
+          "score": 0.292004926680056
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.38299962572016094,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 18,
+    "question": "Macam mana nak apply masuk UMPSA?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.41970812899442383,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def790cc07452bb58fb93",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.4749588592328103
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.33378127029795396
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "+609 431 6784 / 6788 - Email: intake@ump.edu.my PROGRAMMES OFFERED: - Diploma - Bachelor Degree - Master (Coursework) - Master (Research) - Master (Mixed Mode) - PhD PROGRAMME FIELDS: Diploma: Enginee...",
+          "score": 0.27831093184699396
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "UMPSA - Universiti Malaysia Pahang Al-Sultan Abdullah\nOfficial Portal: https://umpsa.edu.my\n\nGENERAL INFORMATION\n- Full Name: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)\n- Previously known a...",
+          "score": 0.27086465904124996
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "public university (UA) with 10 dual degree programmes RESEARCH - Ranked among the best in research and innovation within MTUN and Non-Research University (Non-RU) classifications - Collaborates with l...",
+          "score": 0.25731110354350484
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "main semesters and one short semester. Semester 1 usually starts in September, Semester 2 in February, and the short semester in July. Q: How do I check my exam results? A: Results can be checked thro...",
+          "score": 0.23967943663486707
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.23695937317195606
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "- Research: https://research.umpsa.edu.my - Green/Sustainability: https://mygreen.umpsa.edu.my - Registrar (Jabatan Pendaftar): https://pendaftar.umpsa.edu.my ACADEMIC CALENDAR - 2026/2027 Session: - ...",
+          "score": 0.23445243373617536
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.41970812899442383,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 19,
+    "question": "Ada dual degree programme?",
+    "response": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+    "confidence": 0.3866261611447714,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def7a0cc07452bb58fba3",
+      "message": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "+609 431 6784 / 6788 - Email: intake@ump.edu.my PROGRAMMES OFFERED: - Diploma - Bachelor Degree - Master (Coursework) - Master (Research) - Master (Mixed Mode) - PhD PROGRAMME FIELDS: Diploma: Enginee...",
+          "score": 0.41172402820138826
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "- Research: https://research.umpsa.edu.my - Green/Sustainability: https://mygreen.umpsa.edu.my - Registrar (Jabatan Pendaftar): https://pendaftar.umpsa.edu.my ACADEMIC CALENDAR - 2026/2027 Session: - ...",
+          "score": 0.3876707322084388
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.34468901232862287
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "UMPSA - Universiti Malaysia Pahang Al-Sultan Abdullah\nOfficial Portal: https://umpsa.edu.my\n\nGENERAL INFORMATION\n- Full Name: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)\n- Previously known a...",
+          "score": 0.3017453293013042
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.30090983656497583
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "public university (UA) with 10 dual degree programmes RESEARCH - Ranked among the best in research and innovation within MTUN and Non-Research University (Non-RU) classifications - Collaborates with l...",
+          "score": 0.2988193760100851
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.29262568334197286
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba207",
+          "title": "Academic Calendar 2025 2026",
+          "chunk": "ACADEMIC CALENDAR 2025/2026 SESSION UNIVERSITI MALAYSIA PAHANG AL – SULTAN ABDULLAH 1  DIPLOMA AND BACHELOR DEGREE PRELIMINARY SEMESTER 2025/2026 (DIPLOMA) ACTIVITIES DURATION DATE REMARKS Registratio...",
+          "score": 0.2863317728112014
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.3866261611447714,
+      "language": "mixed",
+      "intent": "academic",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 20,
+    "question": "Macam mana nak guna ADAB app?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.39414004107541956,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def7b0cc07452bb58fbbf",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.43985458036711006
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "Fitri 1448H) ▪ 12 March 2027 (Replacement Leave for Hari Raya Aidil Fitri 1448H)  Mid-Semester Break 1 Week 10 April 2027 (Saturday) to 18 April 2027 (Sunday)    Lectures 7 Weeks 19 April 2027 (Monday...",
+          "score": 0.31928408764948846
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.303979839226663
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "▪ 30 July 2027 (Birthday of KDPB Sultan Pahang) ▪ 15 August 2027 (Maulidur Rasul) ▪ 16 August 2027 (Replacement Leave for Maulidur Rasul) ▪ 31 August 2027 (National Day)  Examination 5 Days  6 Septemb...",
+          "score": 0.2724904914358457
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "public university (UA) with 10 dual degree programmes RESEARCH - Ranked among the best in research and innovation within MTUN and Non-Research University (Non-RU) classifications - Collaborates with l...",
+          "score": 0.24911836062732626
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "UMPSA - ABOUT THE UNIVERSITY\n\nHISTORY\n- Established as a technical university in 2002\n- Originally named Kolej Universiti Kejuruteraan & Teknologi Malaysia (KUKTEM), established 16 February 2002\n- Ren...",
+          "score": 0.2480628576069376
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "(Deepavali) ▪ 9 November 2026 (Replacement Leave for Deepavali) ▪ 10 November – 13 November 2026 (Implementation of online classes)  Mid-Semester Break 1 Week 14 November 2026 (Saturday) to 22 Novembe...",
+          "score": 0.23732189109658858
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "+609 431 6784 / 6788 - Email: intake@ump.edu.my PROGRAMMES OFFERED: - Diploma - Bachelor Degree - Master (Coursework) - Master (Research) - Master (Mixed Mode) - PhD PROGRAMME FIELDS: Diploma: Enginee...",
+          "score": 0.22967015381517533
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.39414004107541956,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 21,
+    "question": "Apa features dalam E-Comm portal?",
+    "response": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+    "confidence": 0.34802612290698676,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def7c0cc07452bb58fbda",
+      "message": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.3676647604094999
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "UMPSA - Universiti Malaysia Pahang Al-Sultan Abdullah\nOfficial Portal: https://umpsa.edu.my\n\nGENERAL INFORMATION\n- Full Name: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)\n- Previously known a...",
+          "score": 0.30010642145299393
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "UMPSA - ABOUT THE UNIVERSITY\n\nHISTORY\n- Established as a technical university in 2002\n- Originally named Kolej Universiti Kejuruteraan & Teknologi Malaysia (KUKTEM), established 16 February 2002\n- Ren...",
+          "score": 0.29810545276809947
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.2970213255386802
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba21b",
+          "title": "Ecomm Course Structure",
+          "chunk": "# Course Structure\n# Source: https://std-comm.ump.edu.my/ecommstudent/courseStructure.jsp\n\nSorry, Page Not Found...",
+          "score": 0.2969956159364027
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.29106580514251934
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "Appliances Overnight / Outing College Complaint Management Hostel Postgraduate Student Outside Campus Sistem Pelajar Pulang Ke Kampung Takwim Pelajar Student Profiling Sistem Pelajar Kembali Ke Kampus...",
+          "score": 0.28822464951080873
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba207",
+          "title": "Academic Calendar 2025 2026",
+          "chunk": "August 2026 (Maulidur Rasul) ▪ 31 August 2026 (National Day) ▪ 16 September 2026 (Malaysia Day)  Examination 5 Days  21 September 2026 (Monday) to 25 September 2026 (Friday)    Notes:  • Replacement L...",
+          "score": 0.27843705244997746
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.34802612290698676,
+      "language": "mixed",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 22,
+    "question": "Macam mana nak buat aduan?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.41613904949411074,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def7d0cc07452bb58fbf5",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.4640861232069494
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.34317893685503936
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "UMPSA - ABOUT THE UNIVERSITY\n\nHISTORY\n- Established as a technical university in 2002\n- Originally named Kolej Universiti Kejuruteraan & Teknologi Malaysia (KUKTEM), established 16 February 2002\n- Ren...",
+          "score": 0.3060055322818567
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "UMPSA - Universiti Malaysia Pahang Al-Sultan Abdullah\nOfficial Portal: https://umpsa.edu.my\n\nGENERAL INFORMATION\n- Full Name: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)\n- Previously known a...",
+          "score": 0.28760160453986333
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "public university (UA) with 10 dual degree programmes RESEARCH - Ranked among the best in research and innovation within MTUN and Non-Research University (Non-RU) classifications - Collaborates with l...",
+          "score": 0.2691276950463342
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "- Research: https://research.umpsa.edu.my - Green/Sustainability: https://mygreen.umpsa.edu.my - Registrar (Jabatan Pendaftar): https://pendaftar.umpsa.edu.my ACADEMIC CALENDAR - 2026/2027 Session: - ...",
+          "score": 0.2580920362444411
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.2558607953268126
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "Appliances Overnight / Outing College Complaint Management Hostel Postgraduate Student Outside Campus Sistem Pelajar Pulang Ke Kampung Takwim Pelajar Student Profiling Sistem Pelajar Kembali Ke Kampus...",
+          "score": 0.25014762981193456
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.41613904949411074,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 23,
+    "question": "Macam mana nak bayar yuran?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.38239172103539165,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def7e0cc07452bb58fc11",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.4191189387778342
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.3616840857547988
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "UMPSA - ABOUT THE UNIVERSITY\n\nHISTORY\n- Established as a technical university in 2002\n- Originally named Kolej Universiti Kejuruteraan & Teknologi Malaysia (KUKTEM), established 16 February 2002\n- Ren...",
+          "score": 0.2872337105542506
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba207",
+          "title": "Academic Calendar 2025 2026",
+          "chunk": "March to 27 March 2026 (Implementation of online classes)  Mid-Semester Break 1 Week 25 April 2026 (Saturday) to 3 May 2026 (Sunday)  ▪ 1 May 2026 (Labour Day)  Lectures 7 Weeks 4 May 2026 (Monday) to...",
+          "score": 0.2677212515661643
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba20f",
+          "title": "Academic Calendar 2026 2027",
+          "chunk": "Fitri 1448H) ▪ 12 March 2027 (Replacement Leave for Hari Raya Aidil Fitri 1448H)  Mid-Semester Break 1 Week 10 April 2027 (Saturday) to 18 April 2027 (Sunday)    Lectures 7 Weeks 19 April 2027 (Monday...",
+          "score": 0.26277180510036097
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba207",
+          "title": "Academic Calendar 2025 2026",
+          "chunk": "August 2026 (Maulidur Rasul) ▪ 31 August 2026 (National Day) ▪ 16 September 2026 (Malaysia Day)  Examination 5 Days  21 September 2026 (Monday) to 25 September 2026 (Friday)    Notes:  • Replacement L...",
+          "score": 0.26099631357010344
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "UMPSA - Universiti Malaysia Pahang Al-Sultan Abdullah\nOfficial Portal: https://umpsa.edu.my\n\nGENERAL INFORMATION\n- Full Name: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)\n- Previously known a...",
+          "score": 0.25823143184733466
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.25580149992002593
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.38239172103539165,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 24,
+    "question": "Apa contact untuk student finance?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.4080892092325953,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def7f0cc07452bb58fc21",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.4175681287409328
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "Appliances Overnight / Outing College Complaint Management Hostel Postgraduate Student Outside Campus Sistem Pelajar Pulang Ke Kampung Takwim Pelajar Student Profiling Sistem Pelajar Kembali Ke Kampus...",
+          "score": 0.4149692867147708
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba22d",
+          "title": "Hostel Application Guidelines",
+          "chunk": "HOSTEL APPLICATION GUIDELINES - UMPSA\n\nURL: https://gading.ump.edu.my/ump/f?p=116\n\nHow to access: Go to Student Life > Student Residence > Hostel Application.\n\n=== APPLICATION FOR NEW STUDENT ===\n\nSte...",
+          "score": 0.40076583188642073
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba226",
+          "title": "Ecomm Student Ledger Fees",
+          "chunk": "# Student Ledger Fees\n# Source: https://std-comm.ump.edu.my/ecommstudent/studentLedger.jsp\n\nSorry, Page Not Found...",
+          "score": 0.390235445530164
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "public university (UA) with 10 dual degree programmes RESEARCH - Ranked among the best in research and innovation within MTUN and Non-Research University (Non-RU) classifications - Collaborates with l...",
+          "score": 0.374302708547157
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba22d",
+          "title": "Hostel Application Guidelines",
+          "chunk": "and identify roommates in the Room/Hostel Details section. === APPLICATION FOR APPEAL/SENIOR STUDENT === Step 1: Browse to https://gading.ump.edu.my/ump/f?p=116 or go to Student Life and search for St...",
+          "score": 0.3735933996596067
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "main semesters and one short semester. Semester 1 usually starts in September, Semester 2 in February, and the short semester in July. Q: How do I check my exam results? A: Results can be checked thro...",
+          "score": 0.36310820900664914
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba22d",
+          "title": "Hostel Application Guidelines",
+          "chunk": "Browse to https://gading.ump.edu.my/ump/f?p=116 or go to Student Life and search for Student Residence then Hostel Application. Step 2: View the main page for Hostel Application where your Student Det...",
+          "score": 0.35323083295276175
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.4080892092325953,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 25,
+    "question": "Apa itu UMPSA?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.30683154065254575,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def800cc07452bb58fc3d",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.31978217645983276
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba21b",
+          "title": "Ecomm Course Structure",
+          "chunk": "# Course Structure\n# Source: https://std-comm.ump.edu.my/ecommstudent/courseStructure.jsp\n\nSorry, Page Not Found...",
+          "score": 0.30965840676982404
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "UMPSA - Universiti Malaysia Pahang Al-Sultan Abdullah\nOfficial Portal: https://umpsa.edu.my\n\nGENERAL INFORMATION\n- Full Name: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)\n- Previously known a...",
+          "score": 0.29218483681754615
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "- Research: https://research.umpsa.edu.my - Green/Sustainability: https://mygreen.umpsa.edu.my - Registrar (Jabatan Pendaftar): https://pendaftar.umpsa.edu.my ACADEMIC CALENDAR - 2026/2027 Session: - ...",
+          "score": 0.28191123459976913
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba218",
+          "title": "Ecomm Course Results",
+          "chunk": "# Course Results\n# Source: https://std-comm.ump.edu.my/ecommstudent/courseResult.jsp\n\nSorry, Page Not Found...",
+          "score": 0.2736910224148225
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba215",
+          "title": "Ecomm Course Registration",
+          "chunk": "# Course Registration\n# Source: https://std-comm.ump.edu.my/ecommstudent/courseRegistration.jsp\n\nSorry, Page Not Found...",
+          "score": 0.25361365679867504
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.2453698358737413
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "main semesters and one short semester. Semester 1 usually starts in September, Semester 2 in February, and the short semester in July. Q: How do I check my exam results? A: Results can be checked thro...",
+          "score": 0.23669595375013106
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.30683154065254575,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 26,
+    "question": "Siapa chancellor UMPSA?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.302887347996436,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def810cc07452bb58fc59",
+      "message": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.31840329063728295
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "UMPSA Frequently Asked Questions (FAQ)\n=======================================\n\nQ: What is UMPSA?\nA: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA) is a public technical university in Malaysia,...",
+          "score": 0.2771526806769244
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "431 5000 - Fax: +609 431 5555 - Email: pro@umpsa.edu.my - Alamat: 26600 Pekan, Pahang, Malaysia Q: Jabatan mana untuk hal ehwal pelajar? A: JHEPA (Jabatan Hal Ehwal Pelajar & Alumni) - https://jhepa.u...",
+          "score": 0.27670327552583124
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23f",
+          "title": "Umpsa General Info",
+          "chunk": "UMPSA - Universiti Malaysia Pahang Al-Sultan Abdullah\nOfficial Portal: https://umpsa.edu.my\n\nGENERAL INFORMATION\n- Full Name: Universiti Malaysia Pahang Al-Sultan Abdullah (UMPSA)\n- Previously known a...",
+          "score": 0.2722773522398104
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "UMPSA - ABOUT THE UNIVERSITY\n\nHISTORY\n- Established as a technical university in 2002\n- Originally named Kolej Universiti Kejuruteraan & Teknologi Malaysia (KUKTEM), established 16 February 2002\n- Ren...",
+          "score": 0.26458349414839183
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "public university (UA) with 10 dual degree programmes RESEARCH - Ranked among the best in research and innovation within MTUN and Non-Research University (Non-RU) classifications - Collaborates with l...",
+          "score": 0.25603485205985393
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "+609 431 6784 / 6788 - Email: intake@ump.edu.my PROGRAMMES OFFERED: - Diploma - Bachelor Degree - Master (Coursework) - Master (Research) - Master (Mixed Mode) - PhD PROGRAMME FIELDS: Diploma: Enginee...",
+          "score": 0.24049113021762128
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "main semesters and one short semester. Semester 1 usually starts in September, Semester 2 in February, and the short semester in July. Q: How do I check my exam results? A: Results can be checked thro...",
+          "score": 0.2278217791699633
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.302887347996436,
+      "language": "ms",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 27,
+    "question": "Hello",
+    "response": "Hello! I'm UMPSABot, an AI assistant for UMPSA students. How can I help you today?",
+    "confidence": 1,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def820cc07452bb58fc72",
+      "message": "Hello! I'm UMPSABot, an AI assistant for UMPSA students. How can I help you today?",
+      "sources": [],
+      "suggestions": [
+        "How do I register for courses?",
+        "What are the semester fees?",
+        "How do I apply for hostel?"
+      ],
+      "confidence": 1,
+      "language": "en",
+      "intent": "greeting",
+      "isLowConfidence": false
+    }
+  },
+  {
+    "num": 28,
+    "question": "Terima kasih",
+    "response": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+    "confidence": 0.2790985180287576,
+    "raw": {
+      "conversationId": "test-session",
+      "messageId": "6a0def830cc07452bb58fc86",
+      "message": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+      "sources": [
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "Appliances Overnight / Outing College Complaint Management Hostel Postgraduate Student Outside Campus Sistem Pelajar Pulang Ke Kampung Takwim Pelajar Student Profiling Sistem Pelajar Kembali Ke Kampus...",
+          "score": 0.2916108911282317
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "+609 431 6784 / 6788 - Email: intake@ump.edu.my PROGRAMMES OFFERED: - Diploma - Bachelor Degree - Master (Coursework) - Master (Research) - Master (Mixed Mode) - PhD PROGRAMME FIELDS: Diploma: Enginee...",
+          "score": 0.28502057983853635
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba221",
+          "title": "Ecomm Home Menu",
+          "chunk": "# Home Menu # Source: https://std-comm.ump.edu.my/ecommstudent/home.jsp\n\nMUHAMMAD ZAFRAN BIN MUHAMAD YUSOF , 11:59:49 PM MYT\nHOME\nLOGOUT\nLOGOUT SSO\nUNDER MAINTENANCE\nMay\n2026\nS M T W T F S\n          1...",
+          "score": 0.26866489945447336
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba236",
+          "title": "Sample Faq",
+          "chunk": "main semesters and one short semester. Semester 1 usually starts in September, Semester 2 in February, and the short semester in July. Q: How do I check my exam results? A: Results can be checked thro...",
+          "score": 0.2388617406687136
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "public university (UA) with 10 dual degree programmes RESEARCH - Ranked among the best in research and innovation within MTUN and Non-Research University (Non-RU) classifications - Collaborates with l...",
+          "score": 0.23739507180962136
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba23a",
+          "title": "Umpsa About Admission",
+          "chunk": "UMPSA - ABOUT THE UNIVERSITY\n\nHISTORY\n- Established as a technical university in 2002\n- Originally named Kolej Universiti Kejuruteraan & Teknologi Malaysia (KUKTEM), established 16 February 2002\n- Ren...",
+          "score": 0.23327775404053971
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "UMPSA STUDENT FREQUENTLY ASKED QUESTIONS (FAQ)\n\nREGISTRATION & ENROLLMENT\nQ: Bila tarikh pendaftaran pelajar baru Semester 1 2026/2027?\nA: Pendaftaran pelajar baru Bachelor Degree pada 19 September 20...",
+          "score": 0.2229375702515856
+        },
+        {
+          "documentId": "6a0ded6b7a5904e1668ba243",
+          "title": "Umpsa Student Faq",
+          "chunk": "dari 22 Jun 2026 (Isnin) hingga 7 Julai 2026 (Rabu). Q: Bila semester break selepas Sem 2 2025/2026? A: Semester break bermula selepas peperiksaan tamat (Julai 2026). PORTALS & APPS Q: Macam mana nak ...",
+          "score": 0.2214553391815106
+        }
+      ],
+      "suggestions": [],
+      "confidence": 0.2790985180287576,
+      "language": "en",
+      "intent": "general",
+      "isLowConfidence": false
+    }
+  }
+]

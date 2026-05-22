@@ -1,0 +1,49 @@
+COURSE REGISTRATION - USER MANUAL
+Source: Pusat Pengurusan Akademik (Centre for Academic Management), UMPSA
+
+IMPORTANT REMINDERS:
+1. Pastikan tiada hutang tertunggak dengan Jabatan Bendahari sebelum mendaftar kursus. Hubungi Jabatan Bendahari untuk maklumat lanjut.
+2. Pelajar KB & KC boleh mendaftar maksimum 20 jam kredit.
+3. Pelajar P1 & P2 boleh mendaftar maksimum 12 jam kredit.
+4. Tempoh Add (tanpa penalti): Minggu 1 hingga Minggu 2
+5. Tempoh Add (dengan penalti): Minggu 3 hingga Minggu 9
+6. Tempoh Drop (tanpa penalti): Minggu 1 hingga Minggu 9
+7. Tempoh Drop (dengan penalti): Minggu 10
+
+STEP-BY-STEP COURSE REGISTRATION:
+
+Step 1: Buka website Universiti Malaysia Pahang dalam browser dan klik "User".
+
+Step 2: Klik "Current Student".
+
+Step 3: Klik "Open Registration (OR)" atau "Open Registration (OR) V2 - Beta".
+
+Step 4: Masukkan username dan password e-Community untuk login ke Open Course Registration System.
+- Nota: Pastikan username dan password e-community dimasukkan dengan betul.
+
+Step 5: Klik "Course Catalog" jika nak lihat kursus yang ditawarkan.
+
+Step 6: Klik butang semester di sebelah kiri halaman.
+- Contoh: Course Registration Semester 1 2122 atau Course Registration Semester 2 2122
+
+Step 7: Pilih kursus dan daftar:
+1. Pilih "Course" — senarai section dan tutorial/lab akan muncul
+2. Pilih "Section"
+3. Pilih "Tutorial/Lab" (jika ada)
+4. Pilih "Repeat Subject" (jika ada)
+5. Klik butang "Add" — kursus akan muncul dalam jadual "Course Registration for Approval"
+
+Step 8: Jika nak drop kursus, klik butang "Drop" dalam jadual "Course Registration" atau "Course Registration for Approval".
+
+Step 9: Selepas selesai add atau drop kursus:
+1. Klik butang "Notify" untuk maklumkan Academic Advisor
+2. Klik "Log out" di bahagian atas kanan halaman
+
+NOTA PENTING:
+- Butang "Notify" digunakan untuk maklumkan Academic Advisor supaya dia boleh approve permohonan pendaftaran kursus.
+- Pendaftaran kursus TIDAK SAH sehingga mendapat kelulusan daripada Academic Advisor.
+- Senarai kursus yang telah diluluskan boleh dilihat dalam jadual "Course Registration".
+
+CONTACT:
+Pusat Pengurusan Akademik (Centre for Academic Management)
+Universiti Malaysia Pahang Al-Sultan Abdullah

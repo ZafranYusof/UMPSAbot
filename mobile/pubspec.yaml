@@ -1,0 +1,33 @@
+name: umpsa_chatbot
+description: UMPSA Chatbot - Your AI assistant for all things UMPSA
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  provider: ^6.1.1
+  dio: ^5.4.0
+  shared_preferences: ^2.2.2
+  go_router: ^13.0.0
+  uuid: ^4.2.1
+  connectivity_plus: ^5.0.2
+  animated_text_kit: ^4.2.2
+  intl: ^0.19.0
+  flutter_animate: ^4.3.0
+  shimmer: ^3.0.0
+  google_fonts: ^6.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/

@@ -1,0 +1,70 @@
+UMPSA Library Services
+======================
+
+Website: https://library.umpsa.edu.my/
+Contact: +609 431 5035 (Pekan) | +609 431 5063 (Gambang)
+Email: umplibrary@umpsa.edu.my
+
+SERVICES OVERVIEW
+-----------------
+
+1. DISCOVERY@LIB
+   - One-stop platform to search, discover, and access everything in one place
+   - Access via: https://efind.ump.edu.my
+
+2. eLIB eBOOK PORTAL
+   - Borrow and read books digitally
+   - Steps: (1) Register account (2) Borrow book (3) Read book
+   - Available to all UMPSA staff and students
+
+3. INTER LIBRARY LOAN (ILL)
+   - Service to source materials (printed or electronic) not available in UMPSA Library
+   - Practiced between libraries in Malaysia
+   - Materials: books or journal articles
+   - Books must be returned within 1 month from date of borrowing
+   - Check availability first at https://efind.ump.edu.my
+   - Apply online: https://forms.gle/smbfEsFAPcBKcQT96
+
+4. ELECTRONIC DOCUMENT DELIVERY (eDDS)
+   - Request copies of book chapters or pages from UMPSA library collection
+   - For users who are not near campus
+   - Material will be scanned and sent to user
+   - Limited to required chapters/pages only
+   - Strictly for UMPSA staff and students
+   - Apply online: https://bit.ly/eDDSprint
+
+5. UMPSA INSTITUTIONAL REPOSITORY (UMPSA-IR)
+   - Deposit articles/items to UMPSA-IR
+   - For postgraduates: email submissions to amelia@umpsa.edu.my or norsaini@umpsa.edu.my
+   - Officers will deposit and confirm via email
+
+LIBRARY COLLECTIONS
+-------------------
+- eBooks
+- Thesis
+- Open Shelf
+- CD & DVD
+- Reference materials
+- PTC (Professional Training Centre)
+- Special Collections
+- FYP (Final Year Project)
+
+LIBRARY USERS
+-------------
+- Undergraduates
+- Postgraduates
+- Staff
+
+CONTACT INFORMATION
+-------------------
+Pekan Library:
+- En. Muhammed Fawwaz Bin Abdul Rasid
+- Email: mfawwaz@ump.edu.my
+- Tel: +609-431 6340
+
+General:
+- Email: umplibrary@umpsa.edu.my
+- Pekan: +609 431 5035
+- Gambang: +609 431 5063
+
+#PowerUpYourMind@UMPSALib

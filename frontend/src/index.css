@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply antialiased bg-primary text-text-primary;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Scrollbar - thin and subtle */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3a5a;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply text-accent border border-accent/40 px-5 py-2.5 rounded-lg font-medium transition-colors duration-200 hover:bg-accent/10;
+  }
+
+  .btn-ghost {
+    @apply text-text-secondary px-4 py-2 rounded-lg font-medium transition-colors duration-200 hover:text-text-primary hover:bg-secondary;
+  }
+}
+
+/* === Animations === */
+
+/* Fade-in up for bot messages */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide-in from right for user messages */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Typing indicator bounce */
+@keyframes typingBounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* Sources expand */
+@keyframes expandDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+  }
+}
+
+/* Chip stagger fade-in */
+@keyframes chipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Welcome pulse glow */
+@keyframes subtleGlow {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.25s ease-out both;
+}
+
+.animate-typing-bounce {
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+
+.animate-expand-down {
+  animation: expandDown 0.25s ease-out both;
+  overflow: hidden;
+}
+
+.animate-chip-fade-in {
+  animation: chipFadeIn 0.3s ease-out both;
+}
+
+.animate-subtle-glow {
+  animation: subtleGlow 3s ease-in-out infinite;
+}
+
+/* Smooth scroll for chat container */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Mobile keyboard fix */
+@supports (height: 100dvh) {
+  .h-dvh {
+    height: 100dvh;
+  }
+}

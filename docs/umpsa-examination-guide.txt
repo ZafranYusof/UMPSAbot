@@ -1,0 +1,93 @@
+UMPSA Examination Information Guide
+=====================================
+
+EXAMINATION SYSTEM
+------------------
+UMPSA uses a continuous assessment and final examination system. Students are evaluated through coursework and final examinations each semester.
+
+ASSESSMENT METHODS
+------------------
+1. Continuous Assessment (Coursework):
+   - Assignments
+   - Quizzes
+   - Lab reports
+   - Projects
+   - Presentations
+   - Mid-semester tests
+   - Tutorials
+
+2. Final Examination:
+   - Held at the end of each semester
+   - Duration varies by course (typically 2-3 hours)
+   - Scheduled by the university examination unit
+
+EXAMINATION SCHEDULE
+--------------------
+- Final examination schedule is published on E-Community (E-Comm) portal
+- Students can check their personal exam timetable via E-Comm
+- Examination period is specified in the Academic Calendar
+- Typically held in the last 2-3 weeks of each semester
+
+EXAMINATION RULES AND REGULATIONS
+-----------------------------------
+1. Students MUST bring their student ID card (matric card) to all examinations
+2. Students must be seated at least 15 minutes before the exam starts
+3. No entry allowed after 30 minutes from the start of the examination
+4. No electronic devices (phones, smartwatches) allowed in the exam hall
+5. Only approved materials (calculator, drawing tools) as specified by the course lecturer
+6. Students must not communicate with other students during the examination
+7. Any form of cheating will result in disciplinary action
+
+GRADING SYSTEM
+--------------
+Grade    Points    Marks (%)
+A+       4.00      90-100
+A        4.00      80-89
+A-       3.67      75-79
+B+       3.33      70-74
+B        3.00      65-69
+B-       2.67      60-64
+C+       2.33      55-59
+C        2.00      50-54
+C-       1.67      45-49
+D+       1.33      40-44
+D        1.00      35-39
+E        0.00      0-34
+
+ACADEMIC STANDING
+-----------------
+- Good Standing: CGPA 2.00 and above
+- Conditional (Bersyarat): CGPA below 2.00
+- Academic Probation: Two consecutive semesters with CGPA below 2.00
+- Dismissal: May occur after continued poor academic performance
+
+GPA AND CGPA CALCULATION
+--------------------------
+- GPA (Grade Point Average): Calculated per semester
+- CGPA (Cumulative Grade Point Average): Calculated across all semesters
+- Formula: Sum of (Credit Hours x Grade Points) / Total Credit Hours
+
+SPECIAL EXAMINATION
+-------------------
+- Students who miss examinations due to valid reasons (medical, emergency) may apply for special examination
+- Must provide supporting documents (medical certificate, etc.)
+- Application must be submitted within specified timeframe
+- Approved by the Faculty/Department
+
+EXAMINATION RESULTS
+-------------------
+- Results are released on E-Community (E-Comm) portal
+- Students can view results after the official release date
+- Any queries about results should be directed to the respective faculty
+
+ACADEMIC INTEGRITY
+------------------
+- Plagiarism and cheating are serious offences
+- Penalties range from zero marks to expulsion
+- All work submitted must be original
+- Proper citation required for referenced materials
+
+IMPORTANT PORTALS
+-----------------
+- E-Community (E-Comm): For exam schedule, results, and academic records
+- Access via: https://ecomm.ump.edu.my

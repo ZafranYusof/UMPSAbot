@@ -1,0 +1,422 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../config/theme.dart';
+import '../services/api_service.dart';
+import '../providers/chat_provider.dart';
+import '../l10n/app_strings.dart';
+
+class TimetableScreen extends StatefulWidget {
+  const TimetableScreen({super.key});
+
+  @override
+  State<TimetableScreen> createState() => _TimetableScreenState();
+}
+
+class _TimetableScreenState extends State<TimetableScreen> {
+  final TextEditingController _courseController = TextEditingController();
+  final List<String> _courses = [];
+  String _semester = 'SEM2-2025/2026';
+  List<Map<String, dynamic>> _results = [];
+  bool _isLoading = false;
+  String? _error;
+
+  final List<String> _semesters = [
+    'SEM1-2025/2026',
+    'SEM2-2025/2026',
+    'SEM3-2025/2026',
+  ];
+
+  void _addCourse() {
+    final code = _courseController.text.trim().toUpperCase();
+    if (code.isEmpty) return;
+    if (_courses.contains(code)) {
+      final lang = context.read<ChatProvider>().language;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.get('course_already_added', lang))),
+      );
+      return;
+    }
+    setState(() {
+      _courses.add(code);
+      _courseController.clear();
+    });
+  }
+
+  void _removeCourse(String code) {
+    setState(() => _courses.remove(code));
+  }
+
+  Future<void> _planTimetable() async {
+    final lang = context.read<ChatProvider>().language;
+    if (_courses.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.get('add_at_least_one', lang))),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _error = null;
+      _results = [];
+    });
+
+    try {
+      final api = context.read<ApiService>();
+      final response = await api.planTimetable(
+        courses: _courses,
+        semester: _semester,
+      );
+
+      final schedule = response['schedule'] as List<dynamic>? ??
+          response['timetable'] as List<dynamic>? ??
+          [];
+
+      setState(() {
+        _results = schedule.cast<Map<String, dynamic>>();
+        _isLoading = false;
+      });
+    } on ApiException catch (e) {
+      setState(() {
+        _error = e.message;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = AppStrings.get('failed_plan_timetable', context.read<ChatProvider>().language);
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _courseController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = context.watch<ChatProvider>().language;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(AppStrings.get('timetable_planner', lang)),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Semester selector
+            Text(
+              AppStrings.get('semester', lang),
+              style: AppTheme.body(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                border: Border.all(color: AppColors.border),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _semester,
+                  isExpanded: true,
+                  dropdownColor: AppColors.surface,
+                  style: AppTheme.body(color: AppColors.textPrimary),
+                  items: _semesters.map((s) {
+                    return DropdownMenuItem(value: s, child: Text(s));
+                  }).toList(),
+                  onChanged: (val) {
+                    if (val != null) setState(() => _semester = val);
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Course input
+            Text(
+              AppStrings.get('course_codes', lang),
+              style: AppTheme.body(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _courseController,
+                    textCapitalization: TextCapitalization.characters,
+                    style: AppTheme.body(color: AppColors.textPrimary),
+                    decoration: InputDecoration(
+                      hintText: AppStrings.get('course_hint', lang),
+                      hintStyle: AppTheme.body(color: AppColors.textMuted),
+                      filled: true,
+                      fillColor: AppColors.surface,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                    onSubmitted: (_) => _addCourse(),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: _addCourse,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.add, color: AppColors.background),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+
+            // Course chips
+            if (_courses.isNotEmpty)
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _courses.map((code) {
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      border: Border.all(color: AppColors.primary.withOpacity(0.4)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          code,
+                          style: AppTheme.body(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primaryLight,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        GestureDetector(
+                          onTap: () => _removeCourse(code),
+                          child: const Icon(Icons.close, size: 16, color: AppColors.textMuted),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            const SizedBox(height: 20),
+
+            // Plan button
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton.icon(
+                onPressed: _isLoading ? null : _planTimetable,
+                icon: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.background,
+                        ),
+                      )
+                    : const Icon(Icons.schedule),
+                label: Text(
+                  _isLoading
+                      ? AppStrings.get('planning', lang)
+                      : AppStrings.get('plan_timetable', lang),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Error
+            if (_error != null)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.error.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.error.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.error_outline, color: AppColors.error),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _error!,
+                        style: AppTheme.body(color: AppColors.error),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+            // Results
+            if (_results.isNotEmpty) ...[
+              Text(
+                AppStrings.get('your_schedule', lang),
+                style: AppTheme.heading(fontSize: 18),
+              ),
+              const SizedBox(height: 12),
+              ..._results.map((item) => _buildScheduleCard(item, lang)),
+            ],
+
+            // Empty results
+            if (!_isLoading && _results.isEmpty && _error == null && _courses.isNotEmpty)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: Column(
+                    children: [
+                      const Icon(
+                        Icons.calendar_today_outlined,
+                        size: 48,
+                        color: AppColors.textMuted,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        AppStrings.get('tap_plan_timetable', lang),
+                        style: AppTheme.body(color: AppColors.textMuted),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScheduleCard(Map<String, dynamic> item, String lang) {
+    final course = item['course'] as String? ?? item['courseCode'] as String? ?? 'Unknown';
+    final day = item['day'] as String? ?? '';
+    final time = item['time'] as String? ?? '';
+    final venue = item['venue'] as String? ?? item['location'] as String? ?? '';
+    final section = item['section'] as String? ?? '';
+    final lecturer = item['lecturer'] as String? ?? '';
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  course,
+                  style: AppTheme.body(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.background,
+                  ),
+                ),
+              ),
+              if (section.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                Text(
+                  '${AppStrings.get('section', lang)} $section',
+                  style: AppTheme.body(
+                    fontSize: 13,
+                    color: AppColors.textMuted,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (day.isNotEmpty || time.isNotEmpty)
+            Row(
+              children: [
+                const Icon(Icons.access_time, size: 16, color: AppColors.primary),
+                const SizedBox(width: 6),
+                Text(
+                  '$day ${time.isNotEmpty ? "• $time" : ""}'.trim(),
+                  style: AppTheme.body(fontSize: 14, color: AppColors.textPrimary),
+                ),
+              ],
+            ),
+          if (venue.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.location_on_outlined, size: 16, color: AppColors.primary),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    venue,
+                    style: AppTheme.body(fontSize: 14, color: AppColors.textPrimary),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (lecturer.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.person_outline, size: 16, color: AppColors.primary),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    lecturer,
+                    style: AppTheme.body(fontSize: 14, color: AppColors.textPrimary),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}

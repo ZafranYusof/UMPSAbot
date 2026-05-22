@@ -1,0 +1,34 @@
+UMPSA Bursary Department (Jabatan Bendahari)
+
+Website: https://bendahari.umpsa.edu.my
+
+Services Available:
+- Students Menu: For students information, payment and queries
+- Vendors Menu: For vendors information, registration and queries
+- Staffs Menu: For staffs information, payment and queries
+- Visitors: E-payment menu for Visitors (Non-Student)
+
+Contact Information:
+
+Pekan Campus:
+Bursary Department
+Universiti Malaysia Pahang Al-Sultan Abdullah
+Canseleri Tun Abdul Razak
+26600, Pekan, Pahang
+Tel: +609 4315025
+E-mail: bursary@umpsa.edu.my
+
+Gambang Campus:
+Bursary Department
+Universiti Malaysia Pahang Al-Sultan Abdullah
+Lebuh Persiaran Tun Khalil Yaakob
+26300, Kuantan Pahang, Malaysia
+Tel: +609 4316099
+E-mail: bursary@umpsa.edu.my
+
+Policies:
+- Privacy Policy
+- ICT Security Policy
+- Disclaimer
+- Quality Policy
+- Objective Quality

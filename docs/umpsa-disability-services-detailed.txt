@@ -1,0 +1,38 @@
+UMPSA Student With Disability Services
+
+UMP Disability Services Unit (OkUMP)
+
+UMP has designated the Disability Services Unit (OkUMP) to determine eligibility for reasonable accommodations (academic adjustments, auxiliary aids, and modification) for students with disabilities. This unit acts as a governance coordinator to create an inclusive and conducive campus environment/ecosystem for disabled people, coordinating efficient and effective management of disabled people at all levels of the university administration.
+
+Computer Labs for Students with Disabilities:
+UMP offers computer labs with disability access at UMP Pekan and Gambang.
+For reservation: https://umplibrary.ump.edu.my/index.php/en/self-help/facilities/computer-lab
+
+Screen Reader Information:
+- A screen reader converts text on the screen into speech so that visually impaired people can listen to what is happening on the screen.
+- Download any screen reader and install. Different screen readers have different styles/features.
+- Once installed, you can turn it on or off, or set it to automatically turn on every time you power on your computer.
+
+Flow of Use:
+- Screen reader converts text to speech
+- When users browse a website, the screen reader will automatically read the whole website from top left to bottom right
+- Users can stop anywhere by pressing a specific key shortcut (for NVDA, press "Ctrl" to stop)
+- Users can press the next button to read web elements one by one
+- Users can skip to the next landmark, title, heading, link, button, or image
+- For input forms, press "Enter" to change into focus mode to type
+- To use a button or enter a link, press "Enter"
+- Some applications have their own shortcut keys (e.g., Shift+V to turn on camera in Zoom)
+
+Disability Friendly University:
+- Disability is not an obstacle to becoming a member of the UMP community
+- Most buildings have access for disabled people
+- University is constantly being built, reconstructed, adjusted, and adapted to the needs of students with physical disabilities
+- Students with disabilities live in dormitory rooms adapted to their needs, with a possibility for companions to be accommodated together
+- Many academic programmes are flexible and can be adapted to needs of students with disabilities (distance learning, various forms of examination)
+- The university provides students with disabilities with learning or educational tools and devices
+
+Sign Language Interpreter or Note-takers for Hearing Impaired:
+Visually impaired students are assisted by Disability Service Unit.
+Contact: Dr. Munira Binti Abdul Razak
+Email: munira@ump.edu.my
+Phone: 095493119

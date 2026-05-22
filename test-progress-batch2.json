@@ -1,0 +1,86 @@
+[
+  {
+    "num": 15,
+    "question": "Apa email untuk admission?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.3258679169745325
+  },
+  {
+    "num": 16,
+    "question": "Macam mana nak hubungi JHEPA?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.39146718638651556
+  },
+  {
+    "num": 17,
+    "question": "Apa programme yang ditawarkan UMPSA?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.38299962572016094
+  },
+  {
+    "num": 18,
+    "question": "Macam mana nak apply masuk UMPSA?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.41970812899442383
+  },
+  {
+    "num": 19,
+    "question": "Ada dual degree programme?",
+    "response": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+    "confidence": 0.3866261611447714
+  },
+  {
+    "num": 20,
+    "question": "Macam mana nak guna ADAB app?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.39414004107541956
+  },
+  {
+    "num": 21,
+    "question": "Apa features dalam E-Comm portal?",
+    "response": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+    "confidence": 0.34802612290698676
+  },
+  {
+    "num": 22,
+    "question": "Macam mana nak buat aduan?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.41613904949411074
+  },
+  {
+    "num": 23,
+    "question": "Macam mana nak bayar yuran?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.38239172103539165
+  },
+  {
+    "num": 24,
+    "question": "Apa contact untuk student finance?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.4080892092325953
+  },
+  {
+    "num": 25,
+    "question": "Apa itu UMPSA?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.30683154065254575
+  },
+  {
+    "num": 26,
+    "question": "Siapa chancellor UMPSA?",
+    "response": "Maaf, saya tidak dapat memproses soalan anda sekarang. Sila cuba lagi sebentar atau hubungi pejabat akademik UMPSA untuk bantuan.",
+    "confidence": 0.302887347996436
+  },
+  {
+    "num": 27,
+    "question": "Hello",
+    "response": "Hello! I'm UMPSABot, an AI assistant for UMPSA students. How can I help you today?",
+    "confidence": 1
+  },
+  {
+    "num": 28,
+    "question": "Terima kasih",
+    "response": "I'm sorry, I'm unable to process your question right now. Please try again in a moment or contact the UMPSA academic office for assistance.",
+    "confidence": 0.2790985180287576
+  }
+]

@@ -1,0 +1,47 @@
+UMPSA ICT Services (DiTec - Digital Technology Centre)
+=======================================================
+Source: https://ditec.umpsa.edu.my/ (redirected from ptmk.umpsa.edu.my)
+Last updated: 2026
+
+OVERVIEW
+========
+DiTec (Digital Technology Centre) is UMPSA's ICT services department, providing digital infrastructure and support for students and staff.
+
+SERVICES FOR STUDENTS
+=====================
+
+WiFi / Internet Access:
+- EDUROAM - University WiFi network available across both campuses
+- Guide available: "Connect to EDUROAM" (downloadable from DiTec website)
+
+Software (Free for Students & Staff):
+- Adobe Creative Cloud (CC) 2020 - Collection of 20+ creative desktop and mobile apps including Photoshop, Illustrator, Acrobat Pro
+  - Installation guide available on DiTec website
+- Microsoft 365 (formerly Office 365) - Create, share, and collaborate for free with Office on the web
+  - Access via: https://umplive.umpsa.edu.my/
+
+Account Management:
+- Self Password Reset guide available
+- Java Configuration for IMS (Integrated Management System)
+
+Other Resources:
+- Printer IP address change manual
+- Digital support downloads
+
+QUICK LINKS
+============
+- Microsoft 365: https://umplive.umpsa.edu.my/
+- DiTec Website: https://ditec.umpsa.edu.my/
+
+STUDENT PORTALS & SYSTEMS
+==========================
+- E-community: Student portal for hostel applications, student services
+- IMS (Integrated Management System): Academic management
+- ADAB App: Mobile app for student information (available on iOS and Android)
+  - iOS: https://apps.apple.com/us/app/ump-adab/id1574433441
+  - Android: https://play.google.com/store/apps/details?id=my.edu.ump.adab
+  - Features: academics info, student welfare, student finances, facilities, zakat applications, e-complaints, connections to official portals, government agencies, banks, and private online payments
+
+CONTACT
+=======
+Website: https://ditec.umpsa.edu.my/
