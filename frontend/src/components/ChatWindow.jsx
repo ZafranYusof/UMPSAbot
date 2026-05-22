@@ -27,10 +27,19 @@ function ChatWindow({ messages, isLoading, suggestedQuestions, onSendMessage, co
       ];
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-6">
+    <div className="flex-1 overflow-y-auto px-4 py-6 scroll-smooth">
       <div className="max-w-3xl mx-auto space-y-4">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-4 pt-20">
+            {/* UMPSA Logo */}
+            <div className="relative mb-6">
+              <div className="absolute inset-0 w-20 h-20 mx-auto rounded-full bg-accent/10 blur-2xl animate-subtle-glow" />
+              <img
+                src="/umpsa-logo.png"
+                alt="UMPSA Logo"
+                className="relative w-20 h-20 object-contain mx-auto"
+              />
+            </div>
             <h2 className="text-xl font-medium text-text-primary mb-2">
               {t.welcome || 'How can I help?'}
             </h2>
@@ -42,7 +51,8 @@ function ChatWindow({ messages, isLoading, suggestedQuestions, onSendMessage, co
                 <button
                   key={i}
                   onClick={() => onSendMessage(suggestion)}
-                  className="text-sm px-4 py-2 rounded-lg border border-border text-accent hover:bg-accent/10 hover:border-accent/30 transition-colors"
+                  className="animate-chip-fade-in text-sm px-4 py-2 rounded-full border border-border text-accent hover:bg-accent/10 hover:border-accent/40 hover:shadow-[0_0_8px_rgba(212,175,55,0.15)] transition-all duration-200"
+                  style={{ animationDelay: `${i * 0.1}s` }}
                 >
                   {suggestion}
                 </button>
