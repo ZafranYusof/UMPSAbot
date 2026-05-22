@@ -70,6 +70,7 @@ class ChatBubble extends StatelessWidget {
                     else
                       Text(
                         _stripMarkdown(message.content),
+                        textAlign: isUser ? TextAlign.start : TextAlign.justify,
                         style: AppTheme.body(
                           fontSize: 15,
                           color: isUser
