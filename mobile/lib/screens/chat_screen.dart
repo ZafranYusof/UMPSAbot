@@ -437,68 +437,48 @@ class _ChatScreenState extends State<ChatScreen> {
 
     final itemCount = visibleMessages.length + (chatProvider.isTyping ? 1 : 0);
 
-    return Column(
-      children: [
-        // Loading more indicator
-        if (_loadingMore || startIndex > 0)
-          if (_loadingMore)
-            const Padding(
-              padding: EdgeInsets.all(8),
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Color(0xFFD4AF37),
-                ),
-              ),
-            ),
-        Expanded(
-          child: ListView.builder(
-            controller: _scrollController,
-            padding: const EdgeInsets.only(top: 16, bottom: 8),
-            itemCount: itemCount,
-            itemBuilder: (context, index) {
-              if (index < visibleMessages.length) {
-                final message = visibleMessages[index];
-                final widgets = <Widget>[ChatBubble(message: message)];
+    return ListView.builder(
+      controller: _scrollController,
+      padding: const EdgeInsets.only(top: 16, bottom: 8),
+      itemCount: itemCount,
+      itemBuilder: (context, index) {
+        if (index < visibleMessages.length) {
+          final message = visibleMessages[index];
+          final widgets = <Widget>[ChatBubble(message: message)];
 
-                // Show sources after bot messages
-                if (!message.isUser &&
-                    message.sources != null &&
-                    message.sources!.isNotEmpty &&
-                    !message.isStreaming) {
-                  widgets.add(SourceCitation(sources: message.sources!));
-                }
+          // Show sources after bot messages
+          if (!message.isUser &&
+              message.sources != null &&
+              message.sources!.isNotEmpty &&
+              !message.isStreaming) {
+            widgets.add(SourceCitation(sources: message.sources!));
+          }
 
-                // Show suggestions after the last bot message
-                if (!message.isUser &&
-                    index == visibleMessages.length - 1 &&
-                    message.suggestions != null &&
-                    message.suggestions!.isNotEmpty &&
-                    !message.isStreaming) {
-                  widgets.add(SuggestionChips(
-                    suggestions: message.suggestions!,
-                    onTap: _sendMessage,
-                  ));
-                }
+          // Show suggestions after the last bot message
+          if (!message.isUser &&
+              index == visibleMessages.length - 1 &&
+              message.suggestions != null &&
+              message.suggestions!.isNotEmpty &&
+              !message.isStreaming) {
+            widgets.add(SuggestionChips(
+              suggestions: message.suggestions!,
+              onTap: _sendMessage,
+            ));
+          }
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: widgets,
-                );
-              }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: widgets,
+          );
+        }
 
-              // Typing indicator
-              if (chatProvider.isTyping) {
-                return const TypingIndicator();
-              }
+        // Typing indicator
+        if (chatProvider.isTyping) {
+          return const TypingIndicator();
+        }
 
-              return const SizedBox.shrink();
-            },
-          ),
-        ),
-      ],
+        return const SizedBox.shrink();
+      },
     );
   }
 
