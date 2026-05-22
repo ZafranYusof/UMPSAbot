@@ -1,8 +1,12 @@
 /**
  * Embedding Service
  * Generates vector embeddings for text chunks
- * Priority: HuggingFace (free, unlimited) → Jina AI → Local TF-IDF fallback
+ * Priority: Ollama Cloud → HuggingFace → Jina AI → Local TF-IDF fallback
  */
+
+// Ollama Cloud (FREE, uses existing OPENAI_BASE_URL)
+const OLLAMA_EMBED_MODEL = process.env.OLLAMA_EMBED_MODEL || 'nomic-embed-text';
+const OLLAMA_DIMS = 768;
 
 // HuggingFace Inference API (FREE, unlimited)
 const HF_API_URL = 'https://api-inference.huggingface.co/pipeline/feature-extraction';
@@ -21,9 +25,14 @@ const LOCAL_DIMS = 384;
  * Check which embedding provider is available
  */
 function getProvider() {
-  if (process.env.HF_API_KEY || process.env.HUGGINGFACE_API_KEY) return 'huggingface';
-  if (process.env.JINA_API_KEY) return 'jina';
+  if (isOllamaEnabled()) return 'ollama';
+  if (isHuggingFaceEnabled()) return 'huggingface';
+  if (isJinaEnabled()) return 'jina';
   return 'local';
+}
+
+function isOllamaEnabled() {
+  return !!(process.env.OPENAI_BASE_URL || process.env.OLLAMA_EMBED_URL);
 }
 
 function isJinaEnabled() {
@@ -39,9 +48,62 @@ function isHuggingFaceEnabled() {
  */
 function getEmbeddingDimension() {
   const provider = getProvider();
+  if (provider === 'ollama') return OLLAMA_DIMS;
   if (provider === 'huggingface') return HF_DIMS;
   if (provider === 'jina') return JINA_DIMS;
   return LOCAL_DIMS;
+}
+
+/**
+ * Get Ollama embedding URL
+ */
+function getOllamaUrl() {
+  if (process.env.OLLAMA_EMBED_URL) return process.env.OLLAMA_EMBED_URL;
+  // Use same base as LLM but switch to embeddings endpoint
+  const base = (process.env.OPENAI_BASE_URL || '').replace(/\/v1\/?$/, '').replace(/\/api\/?$/, '');
+  return `${base}/api/embeddings`;
+}
+
+/**
+ * Generate embedding using Ollama Cloud
+ */
+async function ollamaEmbed(text) {
+  const url = getOllamaUrl();
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(process.env.OPENAI_API_KEY ? { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` } : {})
+    },
+    body: JSON.stringify({
+      model: OLLAMA_EMBED_MODEL,
+      prompt: text
+    })
+  });
+
+  if (!response.ok) {
+    const errBody = await response.text().catch(() => '');
+    throw new Error(`Ollama embedding error ${response.status}: ${errBody}`);
+  }
+
+  const data = await response.json();
+  if (data.embedding) return data.embedding;
+  if (data.embeddings && data.embeddings[0]) return data.embeddings[0];
+  throw new Error('Ollama returned unexpected embedding format');
+}
+
+/**
+ * Batch embed using Ollama (one at a time, Ollama doesn't support batch natively)
+ */
+async function ollamaBatchEmbed(texts) {
+  const embeddings = [];
+  for (const text of texts) {
+    const embedding = await ollamaEmbed(text);
+    embeddings.push(embedding);
+    // Small delay between requests
+    await new Promise(r => setTimeout(r, 50));
+  }
+  return embeddings;
 }
 
 /**
@@ -189,15 +251,22 @@ async function jinaBatchEmbed(texts) {
 
 /**
  * Generate embedding for a single text
- * Priority: HuggingFace → Jina AI → Local TF-IDF
+ * Priority: Ollama → HuggingFace → Jina AI → Local TF-IDF
  */
 async function generateEmbedding(text) {
+  if (isOllamaEnabled()) {
+    try {
+      return await ollamaEmbed(text);
+    } catch (error) {
+      console.error(`[${new Date().toISOString()}] Ollama embedding failed:`, error.message);
+      // Fall through to next provider
+    }
+  }
   if (isHuggingFaceEnabled()) {
     try {
       return await hfEmbed(text);
     } catch (error) {
       console.error(`[${new Date().toISOString()}] HuggingFace embedding failed:`, error.message);
-      // Fall through to Jina or local
     }
   }
   if (isJinaEnabled()) {
@@ -213,12 +282,18 @@ async function generateEmbedding(text) {
 
 /**
  * Generate embeddings for multiple texts (batch)
- * Priority: HuggingFace → Jina AI → Local
+ * Priority: Ollama → HuggingFace → Jina AI → Local
  */
 async function generateEmbeddings(texts) {
+  if (isOllamaEnabled()) {
+    try {
+      return await ollamaBatchEmbed(texts);
+    } catch (error) {
+      console.error(`[${new Date().toISOString()}] Ollama batch failed:`, error.message);
+    }
+  }
   if (isHuggingFaceEnabled()) {
     try {
-      // HF has input size limits, batch in groups of 32
       const allEmbeddings = [];
       for (let i = 0; i < texts.length; i += 32) {
         const batch = texts.slice(i, i + 32);
@@ -231,7 +306,6 @@ async function generateEmbeddings(texts) {
       return allEmbeddings;
     } catch (error) {
       console.error(`[${new Date().toISOString()}] HuggingFace batch failed:`, error.message);
-      // Fall through
     }
   }
   if (isJinaEnabled()) {
@@ -351,8 +425,10 @@ module.exports = {
   localEmbedding,
   isJinaEnabled,
   isHuggingFaceEnabled,
+  isOllamaEnabled,
   getProvider,
   getEmbeddingDimension,
+  OLLAMA_DIMS,
   JINA_DIMS,
   HF_DIMS,
   LOCAL_DIMS
