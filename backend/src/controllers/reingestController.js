@@ -142,4 +142,46 @@ async function debugDocs(req, res) {
   res.json(results);
 }
 
-module.exports = { reingestDocuments, ingestNewDocs, debugDocs };
+/**
+ * GET /api/admin/reingest-batch
+ * Re-embed docs in small batches. ?skip=N&limit=M to control range.
+ */
+async function reingestBatch(req, res) {
+  if (!isJinaEnabled()) {
+    return res.status(400).json({ error: 'JINA_API_KEY not configured' });
+  }
+
+  const skip = parseInt(req.query.skip) || 0;
+  const limit = parseInt(req.query.limit) || 10;
+  const expectedDims = getEmbeddingDimension();
+
+  try {
+    const documents = await Document.find({ isProcessed: true }).skip(skip).limit(limit);
+    let processed = 0;
+    let errors = [];
+
+    for (const doc of documents) {
+      if (!doc.chunks || doc.chunks.length === 0) continue;
+      try {
+        const chunkTexts = doc.chunks.map(c => c.content);
+        const embeddings = await generateEmbeddings(chunkTexts);
+        for (let i = 0; i < doc.chunks.length; i++) {
+          doc.chunks[i].embedding = embeddings[i];
+        }
+        await doc.save();
+        processed++;
+      } catch (err) {
+        errors.push({ title: doc.title, error: err.message });
+      }
+      // Delay between docs
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    const total = await Document.countDocuments({ isProcessed: true });
+    res.json({ success: true, processed, errors, skip, limit, totalDocs: total, nextSkip: skip + limit });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+module.exports = { reingestDocuments, ingestNewDocs, debugDocs, reingestBatch };

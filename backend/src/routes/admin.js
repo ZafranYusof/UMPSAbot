@@ -4,7 +4,7 @@ const multer = require('multer');
 const { adminAuth } = require('../middleware');
 const { getStats, getFeedback, getDocuments, clearCacheHandler } = require('../controllers/adminController');
 const { uploadDocument, deleteDocument } = require('../controllers/documentController');
-const { reingestDocuments, ingestNewDocs, debugDocs } = require('../controllers/reingestController');
+const { reingestDocuments, ingestNewDocs, debugDocs, reingestBatch } = require('../controllers/reingestController');
 const QueryLog = require('../models/QueryLog');
 
 // Configure multer for admin uploads
@@ -49,6 +49,9 @@ router.get('/ingest-new', ingestNewDocs);
 
 // Debug: show docs filesystem path and files
 router.get('/debug-docs', debugDocs);
+
+// Re-embed docs in batches (?skip=N&limit=M)
+router.get('/reingest-batch', reingestBatch);
 
 // Popular questions - aggregates top 20 queries
 router.get('/popular-questions', async (req, res, next) => {
