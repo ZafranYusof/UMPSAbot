@@ -157,9 +157,10 @@ cd mobile/android
 ## Performance
 
 - **Accuracy:** 80%+ on test queries
-- **Response time:** < 3 seconds
-- **Knowledge base:** 96 documents, 400+ chunks
+- **Response time:** < 3 seconds (streaming)
+- **Knowledge base:** 114 documents, 400+ chunks
 - **Uptime:** 5-layer failover ensures near-zero downtime
+- **Caching:** Popular answers cached, < 500ms repeat queries
 - **Cost:** $0 (all free tiers)
 
 ## License
