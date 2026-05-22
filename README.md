@@ -16,6 +16,7 @@ Not a generic ChatGPT wrapper, trained specifically on UMPSA data.
 
 - **RAG Pipeline** — Retrieval-Augmented Generation for accurate, sourced answers
 - **96 Knowledge Base Documents** — fees, registration, hostel, academic calendar, clubs, facilities
+- **Web Scraping** — automated scraping of UMPSA official pages (114 documents ingested)
 - **Jina AI Embeddings** — semantic search (768-dim vectors) with keyword boosting
 - **5-Layer LLM Failover** — DeepSeek → Groq → OpenRouter → Cerebras → Template fallback
 - **Timetable Planner** — input course codes, get non-clashing combinations
