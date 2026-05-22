@@ -21,7 +21,11 @@ function stripMarkdown(text) {
     .replace(/_(.+?)_/g, '$1')        // _italic_ → italic
     .replace(/^#{1,6}\s+/gm, '')      // ### headers → plain
     .replace(/```[\s\S]*?```/g, m => m.replace(/```\w*\n?/g, '').trim()) // code blocks → content only
-    .replace(/`(.+?)`/g, '$1');       // `code` → code
+    .replace(/`(.+?)`/g, '$1')       // `code` → code
+    .replace(/\n{3,}/g, '\n\n')       // 3+ newlines → 2
+    .replace(/^\s+$/gm, '')           // blank lines with spaces → empty
+    .replace(/(\d+\.)\s*\n\s*/g, '$1 ') // numbered list: remove break after number
+    .trim();
 }
 
 // Local provider: Ollama (self-hosted, no API key needed)
