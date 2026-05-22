@@ -152,30 +152,22 @@ async function sendMessage(req, res, next) {
       });
     }
 
-    // Parallel: load conversation + history simultaneously
-    const [conversation, previousMessages] = await Promise.all([
-      Conversation.findOne({ conversationId: convId }).catch(err => {
-        console.warn(`[${new Date().toISOString()}] Could not load conversation:`, err.message);
-        return null;
-      }),
-      Message.find({ conversationId: convId })
-        .sort({ createdAt: -1 })
-        .limit(10)
-        .lean()
-        .catch(err => {
-          console.warn(`[${new Date().toISOString()}] Could not fetch conversation history:`, err.message);
-          return [];
-        })
-    ]);
+    // Load conversation from MongoDB (persistent multi-turn memory)
+    let conv = null;
+    try {
+      conv = await Conversation.findOne({ conversationId: convId });
+    } catch (err) {
+      console.warn(`[${new Date().toISOString()}] Could not load conversation:`, err.message);
+    }
 
     // Create conversation if not found
-    let conv = conversation;
     if (!conv) {
       conv = new Conversation({ conversationId: convId });
     }
 
-    const conversationHistory = (previousMessages || [])
-      .reverse()
+    // Load last 5 messages from MongoDB conversation document
+    const storedMessages = conv.messages || [];
+    const conversationHistory = storedMessages
       .slice(-5)
       .map(m => ({ role: m.role, content: m.content }));
 
@@ -212,7 +204,7 @@ async function sendMessage(req, res, next) {
 
     console.log(`[${new Date().toISOString()}] Full RAG response in ${Date.now() - startTime}ms`);
 
-    // Save messages and update conversation in parallel (non-blocking for response)
+    // Save messages to both Message collection and Conversation document
     let savedAssistantMsg = null;
     try {
       const [, assistantMsg] = await Promise.all([
@@ -234,11 +226,15 @@ async function sendMessage(req, res, next) {
       ]);
       savedAssistantMsg = assistantMsg;
     } catch (dbError) {
-      console.warn(`[${new Date().toISOString()}] Could not save messages to DB:`, dbError.message);
+      console.warn(`[${new Date().toISOString()}] Could not save messages to Message collection:`, dbError.message);
     }
 
-    // Update conversation session with last answer (non-blocking)
-    if (conv) {
+    // Persist messages in Conversation document for multi-turn memory
+    try {
+      conv.messages.push(
+        { role: 'user', content: message, timestamp: new Date() },
+        { role: 'assistant', content: ragResponse.content, timestamp: new Date() }
+      );
       conv.lastAnswer = {
         content: ragResponse.content,
         query: message,
@@ -247,10 +243,10 @@ async function sendMessage(req, res, next) {
       };
       conv.messageCount = (conv.messageCount || 0) + 2;
       conv.language = detectedLanguage;
-      conv.lastActiveAt = new Date();
-      conv.save().catch(err => {
-        console.warn(`[${new Date().toISOString()}] Could not update conversation:`, err.message);
-      });
+      conv.lastActive = new Date();
+      await conv.save();
+    } catch (err) {
+      console.warn(`[${new Date().toISOString()}] Could not update conversation:`, err.message);
     }
 
     // Build response in unified format
@@ -290,7 +286,7 @@ async function sendMessage(req, res, next) {
 }
 
 /**
- * Get conversation history
+ * Get conversation history (from Message collection - full details)
  */
 async function getConversation(req, res, next) {
   try {
@@ -310,6 +306,45 @@ async function getConversation(req, res, next) {
         confidence: m.confidence,
         timestamp: m.createdAt
       }))
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Get conversation history from persistent Conversation document
+ * GET /api/chat/history/:conversationId
+ * Returns last 20 messages for restoring chat on page load
+ */
+async function getConversationHistory(req, res, next) {
+  try {
+    const { conversationId } = req.params;
+
+    const conversation = await Conversation.findOne({ conversationId });
+
+    if (!conversation) {
+      return res.json({
+        conversationId,
+        messages: [],
+        language: 'mixed'
+      });
+    }
+
+    // Return last 20 messages
+    const messages = (conversation.messages || [])
+      .slice(-20)
+      .map(m => ({
+        role: m.role,
+        content: m.content,
+        timestamp: m.timestamp
+      }));
+
+    res.json({
+      conversationId,
+      messages,
+      language: conversation.language || 'mixed',
+      lastActive: conversation.lastActive
     });
   } catch (error) {
     next(error);
@@ -441,7 +476,7 @@ async function streamMessage(req, res, next) {
       'X-Accel-Buffering': 'no'
     });
 
-    // Load conversation for context
+    // Load conversation from MongoDB (persistent multi-turn memory)
     let conversation = null;
     let conversationHistory = [];
     try {
@@ -449,12 +484,9 @@ async function streamMessage(req, res, next) {
       if (!conversation) {
         conversation = new Conversation({ conversationId: convId });
       }
-      const previousMessages = await Message.find({ conversationId: convId })
-        .sort({ createdAt: -1 })
-        .limit(10)
-        .lean();
-      conversationHistory = previousMessages
-        .reverse()
+      // Load last 5 messages from conversation document
+      const storedMessages = conversation.messages || [];
+      conversationHistory = storedMessages
         .slice(-5)
         .map(m => ({ role: m.role, content: m.content }));
     } catch (dbError) {
@@ -556,19 +588,29 @@ async function streamMessage(req, res, next) {
         res.write(`data: ${JSON.stringify({ type: 'done', conversationId: convId, sources, suggestions, confidence, intent: intentResult.intent, metadata: result.metadata })}\n\n`);
         res.end();
 
-        // Save messages to DB (non-blocking)
+        // Save messages to both Message collection and Conversation document
         try {
           await new Message({ conversationId: convId, role: 'user', content: message, language: detectedLanguage }).save();
           await new Message({ conversationId: convId, role: 'assistant', content: result.content, sources, language: detectedLanguage, confidence, metadata: result.metadata }).save();
+        } catch (dbErr) {
+          console.warn(`[${new Date().toISOString()}] Stream: Message collection save failed:`, dbErr.message);
+        }
+
+        // Persist in Conversation document for multi-turn memory
+        try {
           if (conversation) {
+            conversation.messages.push(
+              { role: 'user', content: message, timestamp: new Date() },
+              { role: 'assistant', content: result.content, timestamp: new Date() }
+            );
             conversation.lastAnswer = { content: result.content, query: message, sources, intent: intentResult.intent };
             conversation.messageCount = (conversation.messageCount || 0) + 2;
             conversation.language = detectedLanguage;
-            conversation.lastActiveAt = new Date();
+            conversation.lastActive = new Date();
             await conversation.save();
           }
         } catch (dbErr) {
-          console.warn(`[${new Date().toISOString()}] Stream: DB save failed:`, dbErr.message);
+          console.warn(`[${new Date().toISOString()}] Stream: Conversation save failed:`, dbErr.message);
         }
 
         // Log query for popular questions tracking
@@ -601,6 +643,7 @@ module.exports = {
   sendMessage,
   streamMessage,
   getConversation,
+  getConversationHistory,
   listConversations,
   deleteConversation,
   detectLanguage

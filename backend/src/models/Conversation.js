@@ -2,8 +2,25 @@ const mongoose = require('mongoose');
 
 /**
  * Conversation Model
- * Tracks conversation sessions with metadata and last answer for follow-up detection
+ * Tracks conversation sessions with full message history for persistent multi-turn memory.
+ * Messages are stored directly in the conversation document for fast retrieval.
  */
+const messageEntrySchema = new mongoose.Schema({
+  role: {
+    type: String,
+    enum: ['user', 'assistant'],
+    required: true
+  },
+  content: {
+    type: String,
+    required: true
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
+}, { _id: false });
+
 const conversationSchema = new mongoose.Schema({
   conversationId: {
     type: String,
@@ -15,7 +32,12 @@ const conversationSchema = new mongoose.Schema({
     type: String,
     default: null
   },
-  // Store last assistant answer for multi-turn follow-up
+  // Full message history embedded in conversation
+  messages: {
+    type: [messageEntrySchema],
+    default: []
+  },
+  // Store last assistant answer for follow-up detection
   lastAnswer: {
     content: { type: String, default: '' },
     query: { type: String, default: '' },
@@ -37,13 +59,13 @@ const conversationSchema = new mongoose.Schema({
     enum: ['en', 'ms', 'mixed'],
     default: 'mixed'
   },
-  lastActiveAt: {
+  lastActive: {
     type: Date,
     default: Date.now
   }
 }, { timestamps: true });
 
-// Auto-expire conversations after 7 days of inactivity
-conversationSchema.index({ lastActiveAt: 1 }, { expireAfterSeconds: 7 * 24 * 60 * 60 });
+// Auto-expire conversations after 30 days of inactivity
+conversationSchema.index({ lastActive: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 });
 
 module.exports = mongoose.model('Conversation', conversationSchema);

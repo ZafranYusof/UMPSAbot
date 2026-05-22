@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { sendMessage, streamMessage, getConversation, listConversations, deleteConversation } = require('../controllers/chatController');
+const { sendMessage, streamMessage, getConversation, getConversationHistory, listConversations, deleteConversation } = require('../controllers/chatController');
 const { submitFeedback } = require('../controllers/feedbackController');
 const { chatRateLimiter } = require('../middleware');
 
@@ -12,6 +12,9 @@ router.post('/stream', chatRateLimiter, streamMessage);
 
 // Feedback endpoint
 router.post('/feedback', submitFeedback);
+
+// Get conversation history (persistent, for page reload restore)
+router.get('/history/:conversationId', getConversationHistory);
 
 // Get conversation history
 router.get('/conversations', listConversations);
