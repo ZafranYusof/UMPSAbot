@@ -105,4 +105,31 @@ async function ingestNewDocs(req, res) {
   }
 }
 
-module.exports = { reingestDocuments, ingestNewDocs };
+/**
+ * GET /api/admin/debug-docs
+ * Show what docs files are visible on the filesystem
+ */
+async function debugDocs(req, res) {
+  const path = require('path');
+  const fs = require('fs');
+  const DOCS_DIR = path.resolve(__dirname, '../../../docs');
+  const DOCS_DIR2 = path.resolve(__dirname, '../../docs');
+  const results = { docsDir: DOCS_DIR, docsDir2: DOCS_DIR2 };
+  try {
+    if (fs.existsSync(DOCS_DIR)) {
+      results.files = fs.readdirSync(DOCS_DIR).filter(f => f.endsWith('.txt'));
+      results.count = results.files.length;
+    } else {
+      results.exists = false;
+    }
+    if (fs.existsSync(DOCS_DIR2)) {
+      results.files2 = fs.readdirSync(DOCS_DIR2).filter(f => f.endsWith('.txt'));
+      results.count2 = results.files2.length;
+    }
+  } catch (e) {
+    results.error = e.message;
+  }
+  res.json(results);
+}
+
+module.exports = { reingestDocuments, ingestNewDocs, debugDocs };
