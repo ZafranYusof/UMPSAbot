@@ -24,23 +24,88 @@ const FOLLOWUP_PATTERNS = [
   /^(what do you mean|maksud|apa maksud)/i,
 ];
 
+// Pronouns and references that imply previous context (BM + EN + Manglish)
+const PRONOUN_REFERENCES = new Set([
+  'dia', 'tu', 'ni', 'yang', 'itu', 'ini', 'nya', 'mereka',
+  'it', 'that', 'this', 'they', 'them', 'those', 'these',
+  'the one', 'yang tu', 'yang ni', 'benda tu', 'pasal tu'
+]);
+
+// Conjunctions/connectors that start follow-up queries
+const FOLLOWUP_STARTERS = /^(dan|tapi|kalau|so|then|but|and|or|also|what about|how about|pastu|lepas tu|selain|besides|furthermore)/i;
+
 /**
  * Detect if a query is a follow-up to previous answer
+ * Enhanced detection: patterns, pronouns, short contextual queries, conjunctions
  */
-function isFollowUpQuery(query) {
+function isFollowUpQuery(query, hasHistory = false) {
   const trimmed = query.trim().toLowerCase();
-  // Short queries that reference previous context
-  if (trimmed.length < 40) {
+  const words = trimmed.split(/\s+/);
+  const wordCount = words.length;
+
+  // 1. Check explicit follow-up patterns (e.g. "tell me more", "terangkan lagi")
+  if (trimmed.length < 60) {
     for (const pattern of FOLLOWUP_PATTERNS) {
       if (pattern.test(trimmed)) return true;
     }
   }
-  // Very short queries (< 4 words) are likely follow-ups
-  const wordCount = trimmed.split(/\s+/).length;
-  if (wordCount <= 3 && (trimmed.includes('?') || trimmed.includes('lagi') || trimmed.includes('more'))) {
-    return true;
+
+  // 2. Queries starting with conjunctions/connectors ("dan", "tapi", "kalau", "so", "then")
+  if (FOLLOWUP_STARTERS.test(trimmed)) return true;
+
+  // 3. Short queries (< 5 words) containing pronouns/references
+  //    e.g. "untuk diploma?", "yang tu?", "berapa?", "macam mana?"
+  if (wordCount < 5) {
+    // Check if any word is a pronoun/reference
+    for (const word of words) {
+      if (PRONOUN_REFERENCES.has(word)) return true;
+    }
+    // Also check multi-word references
+    for (const ref of PRONOUN_REFERENCES) {
+      if (ref.includes(' ') && trimmed.includes(ref)) return true;
+    }
+    // Very short queries with question mark are likely follow-ups
+    if (wordCount <= 3 && trimmed.includes('?')) return true;
+    // Single word queries like "berapa?", "bila?", "where?" are follow-ups
+    if (wordCount === 1 && /^(berapa|bila|mana|siapa|apa|where|when|who|how|what)\??$/.test(trimmed)) return true;
   }
+
+  // 4. Short queries (< 5 words) with contextual particles
+  if (wordCount < 5) {
+    const contextParticles = ['je', 'la', 'lah', 'kan', 'eh', 'ke', 'kot'];
+    const hasParticle = words.some(w => contextParticles.includes(w));
+    if (hasParticle && (trimmed.includes('?') || wordCount <= 3)) return true;
+  }
+
   return false;
+}
+
+/**
+ * Build follow-up context from conversation history
+ * Extracts the last user query + assistant answer pair
+ */
+function buildFollowUpContextFromHistory(conversationHistory) {
+  if (!conversationHistory || conversationHistory.length < 2) return null;
+
+  // Find the last assistant message and its preceding user message
+  let lastUserMsg = null;
+  let lastAssistantMsg = null;
+
+  for (let i = conversationHistory.length - 1; i >= 0; i--) {
+    if (!lastAssistantMsg && conversationHistory[i].role === 'assistant') {
+      lastAssistantMsg = conversationHistory[i];
+    } else if (lastAssistantMsg && !lastUserMsg && conversationHistory[i].role === 'user') {
+      lastUserMsg = conversationHistory[i];
+      break;
+    }
+  }
+
+  if (!lastUserMsg || !lastAssistantMsg) return null;
+
+  return {
+    previousQuery: lastUserMsg.content,
+    previousAnswer: lastAssistantMsg.content
+  };
 }
 
 /**
@@ -114,22 +179,32 @@ async function sendMessage(req, res, next) {
       .slice(-5)
       .map(m => ({ role: m.role, content: m.content }));
 
-    // Check if this is a follow-up query
-    const isFollowUp = isFollowUpQuery(message);
+    // Check if this is a follow-up query (pass history presence for smarter detection)
+    const hasHistory = conversationHistory.length > 0;
+    const isFollowUp = isFollowUpQuery(message, hasHistory);
     let ragOptions = {
       language: detectedLanguage,
       conversationHistory,
       sessionId: convId
     };
 
-    // If follow-up, pass previous answer as additional context
-    if (isFollowUp && conv?.lastAnswer?.content) {
-      ragOptions.followUpContext = {
-        previousQuery: conv.lastAnswer.query,
-        previousAnswer: conv.lastAnswer.content,
-        previousSources: conv.lastAnswer.sources || [],
-        previousIntent: conv.lastAnswer.intent
-      };
+    // If follow-up detected, attach previous context for the RAG pipeline
+    if (isFollowUp && hasHistory) {
+      if (conv?.lastAnswer?.content) {
+        // Use stored last answer from conversation document
+        ragOptions.followUpContext = {
+          previousQuery: conv.lastAnswer.query,
+          previousAnswer: conv.lastAnswer.content,
+          previousSources: conv.lastAnswer.sources || [],
+          previousIntent: conv.lastAnswer.intent
+        };
+      } else {
+        // Fallback: build context from conversation history messages
+        const historyContext = buildFollowUpContextFromHistory(conversationHistory);
+        if (historyContext) {
+          ragOptions.followUpContext = historyContext;
+        }
+      }
     }
 
     // Process through RAG pipeline
@@ -389,6 +464,24 @@ async function streamMessage(req, res, next) {
     // Classify intent
     const intentResult = classifyIntent(message);
 
+    // Check if this is a follow-up query
+    const hasHistory = conversationHistory.length > 0;
+    const isFollowUp = isFollowUpQuery(message, hasHistory);
+    let followUpContext = null;
+
+    if (isFollowUp && hasHistory) {
+      if (conversation?.lastAnswer?.content) {
+        followUpContext = {
+          previousQuery: conversation.lastAnswer.query,
+          previousAnswer: conversation.lastAnswer.content,
+          previousSources: conversation.lastAnswer.sources || [],
+          previousIntent: conversation.lastAnswer.intent
+        };
+      } else {
+        followUpContext = buildFollowUpContextFromHistory(conversationHistory);
+      }
+    }
+
     // Handle greetings without streaming
     if (!intentResult.needsRAG) {
       const greetingResponse = getGreetingResponse(detectedLanguage);
@@ -416,8 +509,12 @@ async function streamMessage(req, res, next) {
 
     // Run RAG retrieval (embedding + search) without LLM generation
     const { searchSimilarChunks } = require('../services/rag');
-    const queryEmbedding = await generateEmbedding(message);
-    const searchResults = await searchSimilarChunks(queryEmbedding, 8, message);
+    // For follow-ups, augment the search query with previous context for better retrieval
+    const searchQuery = (isFollowUp && followUpContext?.previousQuery)
+      ? `${followUpContext.previousQuery} ${message}`
+      : message;
+    const queryEmbedding = await generateEmbedding(searchQuery);
+    const searchResults = await searchSimilarChunks(queryEmbedding, 8, searchQuery);
 
     const contexts = searchResults.map((r) => {
       return `Document: ${r.documentTitle}\nContent: ${r.chunk.content}`;
@@ -430,7 +527,7 @@ async function streamMessage(req, res, next) {
     await streamGenerateResponse(
       message,
       contexts,
-      { language: detectedLanguage, conversationHistory, intent: intentResult.intent },
+      { language: detectedLanguage, conversationHistory, intent: intentResult.intent, followUpContext },
       (chunk) => {
         // Send each chunk as SSE event (strip markdown formatting)
         res.write(`data: ${JSON.stringify({ type: 'chunk', content: stripMarkdown(chunk) })}\n\n`);
