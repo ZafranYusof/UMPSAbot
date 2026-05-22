@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../models/message.dart';
+import 'offline_cache.dart';
 
 class ApiService {
   static const String _prodBaseUrl = 'https://umpsa-chatbot-api.onrender.com/api';
@@ -9,6 +10,7 @@ class ApiService {
 
   late final Dio _dio;
   bool _useProduction = true;
+  final OfflineCacheService _offlineCache = OfflineCacheService();
 
   ApiService() {
     _dio = Dio(BaseOptions(
@@ -121,6 +123,14 @@ class ApiService {
     }
   }
 
+  /// Initialize the offline cache (call once at app startup)
+  Future<void> initOfflineCache() async {
+    await _offlineCache.init();
+  }
+
+  /// Get the offline cache service instance
+  OfflineCacheService get offlineCache => _offlineCache;
+
   Future<Message> sendMessage({
     required String message,
     required String sessionId,
@@ -134,9 +144,14 @@ class ApiService {
       });
 
       final data = response.data;
+      final content = data['message'] as String? ?? data['content'] as String? ?? 'No response received.';
+
+      // Cache successful response
+      await _offlineCache.cacheAnswer(message, content, language);
+
       return Message(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        content: data['message'] as String? ?? data['content'] as String? ?? 'No response received.',
+        content: content,
         isUser: false,
         timestamp: DateTime.now(),
         sources: (data['sources'] as List<dynamic>?)?.map((s) => s is Map ? (s['title'] as String? ?? '') : s.toString()).toList(),
@@ -145,6 +160,17 @@ class ApiService {
         intent: data['intent'] as String?,
       );
     } on DioException catch (e) {
+      // On connection failure, try offline cache
+      final cachedAnswer = await _offlineCache.getCachedAnswer(message);
+      if (cachedAnswer != null) {
+        return Message(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          content: cachedAnswer,
+          isUser: false,
+          timestamp: DateTime.now(),
+          isCached: true,
+        );
+      }
       throw ApiException(
         message: _getErrorMessage(e),
         statusCode: e.response?.statusCode,

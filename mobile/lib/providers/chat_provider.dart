@@ -5,6 +5,7 @@ import '../models/message.dart';
 import '../models/conversation.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
+import '../services/offline_cache.dart';
 
 class ChatProvider extends ChangeNotifier {
   final ApiService _api;
@@ -91,13 +92,25 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
 
     if (!_isOnline) {
-      _messages.add(Message(
-        id: const Uuid().v4(),
-        content: 'No internet connection. Please check your network and try again.',
-        isUser: false,
-        timestamp: DateTime.now(),
-        isError: true,
-      ));
+      // Try offline cache when no internet
+      final cachedAnswer = await _api.offlineCache.getCachedAnswer(text.trim());
+      if (cachedAnswer != null) {
+        _messages.add(Message(
+          id: const Uuid().v4(),
+          content: '$cachedAnswer\n\n_(Jawapan dari cache — mungkin tak terkini)_',
+          isUser: false,
+          timestamp: DateTime.now(),
+          isCached: true,
+        ));
+      } else {
+        _messages.add(Message(
+          id: const Uuid().v4(),
+          content: 'No internet connection. Please check your network and try again.',
+          isUser: false,
+          timestamp: DateTime.now(),
+          isError: true,
+        ));
+      }
       _isTyping = false;
       notifyListeners();
       return;
@@ -116,13 +129,35 @@ class ChatProvider extends ChangeNotifier {
         );
         _messages.add(botMessage);
       } on ApiException catch (e) {
-        _messages.add(Message(
-          id: const Uuid().v4(),
-          content: e.message,
-          isUser: false,
-          timestamp: DateTime.now(),
-          isError: true,
-        ));
+        // If connection error, try offline cache
+        if (e.isConnectionError) {
+          final cachedAnswer = await _api.offlineCache.getCachedAnswer(text.trim());
+          if (cachedAnswer != null) {
+            _messages.add(Message(
+              id: const Uuid().v4(),
+              content: '$cachedAnswer\n\n_(Jawapan dari cache — mungkin tak terkini)_',
+              isUser: false,
+              timestamp: DateTime.now(),
+              isCached: true,
+            ));
+          } else {
+            _messages.add(Message(
+              id: const Uuid().v4(),
+              content: e.message,
+              isUser: false,
+              timestamp: DateTime.now(),
+              isError: true,
+            ));
+          }
+        } else {
+          _messages.add(Message(
+            id: const Uuid().v4(),
+            content: e.message,
+            isUser: false,
+            timestamp: DateTime.now(),
+            isError: true,
+          ));
+        }
       } catch (e) {
         _messages.add(Message(
           id: const Uuid().v4(),
@@ -199,6 +234,10 @@ class ChatProvider extends ChangeNotifier {
             intent: intent,
           );
           notifyListeners();
+        }
+        // Cache the streamed response
+        if (accumulatedContent.isNotEmpty) {
+          _api.offlineCache.cacheAnswer(text, accumulatedContent, _language);
         }
         _streamSubscription = null;
         if (!completer.isCompleted) completer.complete();

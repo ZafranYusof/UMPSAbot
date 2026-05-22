@@ -14,6 +14,7 @@ void main() async {
   await storageService.init();
 
   final apiService = ApiService();
+  await apiService.initOfflineCache();
 
   runApp(
     MultiProvider(
