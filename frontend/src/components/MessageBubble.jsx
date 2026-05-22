@@ -22,7 +22,7 @@ function MessageBubble({ message, conversationId }) {
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-[85%] md:max-w-[70%] group`}>
+      <div className={`max-w-[85%] md:max-w-[70%] group ${isUser ? 'animate-slide-in-right' : 'animate-fade-in-up'}`}>
         {/* Message content */}
         <div
           className={`
@@ -70,11 +70,11 @@ function MessageBubble({ message, conversationId }) {
               </button>
 
               {showSources && (
-                <div className="mt-2 space-y-1.5">
+                <div className="mt-2 space-y-1.5 animate-expand-down">
                   {message.sources.map((source, i) => (
                     <div
                       key={i}
-                      className="text-xs px-3 py-2 rounded bg-secondary border border-border/50"
+                      className="text-xs px-3 py-2 rounded bg-secondary border border-border/50 transition-colors hover:border-accent/20"
                     >
                       <span className="text-accent font-medium">
                         {source.title || 'Unknown Document'}

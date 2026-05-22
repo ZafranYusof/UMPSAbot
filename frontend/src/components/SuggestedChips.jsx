@@ -7,7 +7,8 @@ function SuggestedChips({ suggestions, onSelect }) {
         <button
           key={i}
           onClick={() => onSelect(suggestion)}
-          className="text-xs px-3 py-1.5 rounded-lg border border-border text-accent hover:bg-accent/10 hover:border-accent/30 transition-colors"
+          className="animate-chip-fade-in text-xs px-4 py-2 rounded-full border border-border text-accent hover:bg-accent/10 hover:border-accent/40 hover:shadow-[0_0_8px_rgba(212,175,55,0.15)] transition-all duration-200"
+          style={{ animationDelay: `${i * 0.08}s` }}
         >
           {suggestion}
         </button>

@@ -26,7 +26,7 @@ function InputBar({ onSend, isLoading }) {
   };
 
   return (
-    <div className="px-4 py-4 border-t border-border">
+    <div className="px-4 py-4 border-t border-border bg-primary/80 backdrop-blur-sm">
       <form
         onSubmit={handleSubmit}
         className="max-w-3xl mx-auto relative"
@@ -38,7 +38,7 @@ function InputBar({ onSend, isLoading }) {
           onKeyDown={handleKeyDown}
           placeholder="Ask about UMPSA..."
           rows={1}
-          className="w-full resize-none min-h-[48px] max-h-[120px] rounded-xl px-4 py-3 pr-12 bg-secondary border border-border text-text-primary placeholder-text-secondary focus:outline-none focus:border-accent/40 transition-colors"
+          className="w-full resize-none min-h-[48px] max-h-[120px] rounded-xl px-4 py-3 pr-12 bg-secondary border border-border text-text-primary placeholder-text-secondary focus:outline-none focus:border-accent/40 focus:shadow-[0_0_12px_rgba(212,175,55,0.08)] transition-all duration-200"
           style={{ height: 'auto', overflow: 'hidden' }}
           onInput={(e) => {
             e.target.style.height = 'auto';

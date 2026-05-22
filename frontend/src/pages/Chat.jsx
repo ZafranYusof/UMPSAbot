@@ -54,7 +54,7 @@ function Chat() {
   };
 
   return (
-    <div className="h-screen flex overflow-hidden bg-primary">
+    <div className="h-screen h-dvh flex overflow-hidden bg-primary">
       {/* Sidebar */}
       <Sidebar
         isOpen={sidebarOpen}
