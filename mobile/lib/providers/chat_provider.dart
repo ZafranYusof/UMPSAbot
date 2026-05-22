@@ -22,6 +22,7 @@ class ChatProvider extends ChangeNotifier {
 
   ChatProvider(this._api, this._storage) {
     _initSession();
+    _language = _storage.language; // Load saved language preference
     _loadConversations();
     _loadBookmarks();
   }
