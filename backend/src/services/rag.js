@@ -343,8 +343,21 @@ async function queryRAG(query, options = {}) {
     }
   }
 
-  // Step 10: Add disclaimer if low confidence (but still share the info!)
+  // Step 10: Post-process — catch LLM saying "tak jumpa" when we have context
   let responseContent = llmResponse.content;
+  if (searchResults.length > 0 && responseContent) {
+    const rejectPatterns = /tak jumpa|tidak menemui|tiada maklumat|tidak pasti|don't have.*information|no information|tidak mempunyai/i;
+    if (rejectPatterns.test(responseContent.substring(0, 150))) {
+      // LLM rejected despite having context — use template fallback instead
+      console.log(`[${new Date().toISOString()}] LLM falsely rejected (said tak jumpa with ${searchResults.length} results) — using template fallback`);
+      const templateResult = generateTemplateFallback(searchResults, language);
+      if (templateResult) {
+        responseContent = templateResult.content;
+      }
+    }
+  }
+
+  // Step 10b: Add disclaimer if low confidence (but still share the info!)
   if (confidence < CONFIDENCE_THRESHOLD) {
     const disclaimer = language === 'ms'
       ? '\n\nNota: Maklumat ni berdasarkan dokumen yang ada, tapi mungkin tak 100% tepat untuk situasi kau. Boleh double check dengan pejabat berkaitan ya.'
