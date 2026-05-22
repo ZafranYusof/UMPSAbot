@@ -256,96 +256,149 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildEmptyState(BuildContext context, ChatProvider chatProvider) {
-    final starterQuestions = [
-      'Macam mana nak daftar kursus?',
-      'Berapa yuran semester?',
-      'Apa syarat kemasukan UMPSA?',
-      'Senarai fakulti di UMPSA',
-      'How to check exam results?',
-      'Where is the library?',
+    final lang = chatProvider.language;
+    final isBm = lang == 'bm' || lang == 'ms';
+
+    final categories = [
+      {
+        'icon': Icons.school_rounded,
+        'title': isBm ? 'Akademik' : 'Academic',
+        'questions': isBm
+            ? ['Macam mana nak daftar kursus?', 'Apa syarat kemasukan UMPSA?']
+            : ['How to register courses?', 'What are UMPSA entry requirements?'],
+      },
+      {
+        'icon': Icons.payments_rounded,
+        'title': isBm ? 'Kewangan' : 'Finance',
+        'questions': isBm
+            ? ['Berapa yuran semester?', 'Ada biasiswa tak?']
+            : ['How much is semester fees?', 'Any scholarships available?'],
+      },
+      {
+        'icon': Icons.location_on_rounded,
+        'title': isBm ? 'Kampus' : 'Campus',
+        'questions': isBm
+            ? ['Senarai fakulti di UMPSA', 'Perpustakaan kat mana?']
+            : ['List of faculties in UMPSA', 'Where is the library?'],
+      },
     ];
 
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 80,
-              height: 80,
+              width: 72,
+              height: 72,
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: AppColors.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.border),
+                border: Border.all(color: AppColors.primary.withOpacity(0.3)),
               ),
               child: const Icon(
                 Icons.school_rounded,
-                size: 40,
+                size: 36,
                 color: AppColors.primary,
               ),
             ),
-            const SizedBox(height: 28),
+            const SizedBox(height: 20),
             Text(
-              AppStrings.get('greeting', chatProvider.language),
-              style: AppTheme.heading(fontSize: 26),
+              AppStrings.get('greeting', lang),
+              style: AppTheme.heading(fontSize: 24),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Text(
-              AppStrings.get('greeting_subtitle', chatProvider.language),
+              AppStrings.get('greeting_subtitle', lang),
               textAlign: TextAlign.center,
               style: AppTheme.body(
-                fontSize: 15,
+                fontSize: 14,
                 color: AppColors.textSecondary,
               ),
             ),
-            const SizedBox(height: 36),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Text(
-                AppStrings.get('popular_questions', chatProvider.language),
+            const SizedBox(height: 28),
+            // Category cards
+            ...categories.map((cat) => _buildQuestionCategory(
+              icon: cat['icon'] as IconData,
+              title: cat['title'] as String,
+              questions: cat['questions'] as List<String>,
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuestionCategory({
+    required IconData icon,
+    required String title,
+    required List<String> questions,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: AppColors.primary),
+              const SizedBox(width: 8),
+              Text(
+                title,
                 style: AppTheme.body(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textMuted,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ...questions.map((q) => Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                _sendMessage(q);
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceLight,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        q,
+                        style: AppTheme.body(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 12,
+                      color: AppColors.primary.withOpacity(0.6),
+                    ),
+                  ],
                 ),
               ),
             ),
-            Wrap(
-              spacing: 8,
-              runSpacing: 10,
-              alignment: WrapAlignment.center,
-              children: starterQuestions.map((q) {
-                return GestureDetector(
-                  onTap: () {
-                    HapticFeedback.selectionClick();
-                    _sendMessage(q);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 9,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      border: Border.all(
-                        color: AppColors.primary.withOpacity(0.4),
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      q,
-                      style: AppTheme.body(
-                        fontSize: 13,
-                        color: AppColors.primaryLight,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
+          )),
+        ],
       ),
     );
   }
