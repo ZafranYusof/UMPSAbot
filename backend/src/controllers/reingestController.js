@@ -92,9 +92,19 @@ async function ingestNewDocs(req, res) {
   try {
     const { autoIngestDocs } = require('../services/ingest');
     const force = req.query.force === 'true';
-    // Return immediately, run in background
+    const sync = req.query.sync === 'true';
+    if (sync) {
+      // Synchronous mode - wait and return result (for debugging)
+      try {
+        await autoIngestDocs(force);
+        const count = await Document.countDocuments({ isProcessed: true });
+        return res.json({ success: true, totalDocuments: count, forced: force });
+      } catch (err) {
+        return res.status(500).json({ success: false, error: err.message, stack: err.stack });
+      }
+    }
+    // Async mode - return immediately
     res.json({ success: true, message: 'Ingest started in background', forced: force });
-    // Run after response sent
     autoIngestDocs(force).then(() => {
       console.log('[ingest-new] Background ingest completed');
     }).catch(err => {
