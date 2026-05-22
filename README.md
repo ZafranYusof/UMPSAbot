@@ -4,7 +4,7 @@ AI-powered chatbot for UMPSA students. Answers questions about fees, registratio
 
 ## Live Demo
 - **API:** [https://umpsa-chatbot-api.onrender.com](https://umpsa-chatbot-api.onrender.com)
-- **Mobile:** Android APK available in Releases
+- **Mobile:** Android APK available in [Releases](https://github.com/ZafranYusof/umpsa-chatbot/releases)
 
 ## What It Does
 
@@ -22,11 +22,12 @@ Not a generic ChatGPT wrapper, trained specifically on UMPSA data.
 - **Streaming Responses** — SSE-based real-time response streaming
 - **Conversation Memory** — remembers last 5 messages for follow-up questions
 - **Multi-language** — BM, English, Manglish with auto-detection
+- **Full i18n** — All UI strings localized (English/Bahasa Melayu)
 - **Smart Caching** — popular answers cached with TTL refresh
 - **Feedback System** — thumbs up/down to track answer quality
 - **Source Citations** — every answer shows which document it came from
 - **WhatsApp Integration** — chat via WhatsApp (Twilio)
-- **Mobile App** — Flutter Android app with full chat functionality
+- **Mobile App** — Flutter Android app with SAMs-inspired premium dark theme
 - **Admin Panel** — document upload, stats, popular questions tracking
 
 ## Tech Stack
@@ -38,7 +39,7 @@ Not a generic ChatGPT wrapper, trained specifically on UMPSA data.
 | Database | MongoDB Atlas |
 | LLM | DeepSeek (primary) + 4 fallback providers |
 | Embeddings | Jina AI (jina-embeddings-v2-base-en, 768d) |
-| Mobile | Flutter 3.29 |
+| Mobile | Flutter 3.29 (Google Fonts, Provider) |
 | Deploy | Vercel (frontend) + Render (backend) |
 
 ## AI Tools Used
