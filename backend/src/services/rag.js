@@ -13,7 +13,7 @@ const Document = require('../models/Document');
 const UserPreference = require('../models/UserPreference');
 
 const TOP_K = parseInt(process.env.TOP_K_RESULTS) || 8;
-const CONFIDENCE_THRESHOLD = parseFloat(process.env.CONFIDENCE_THRESHOLD) || 0.2;
+const CONFIDENCE_THRESHOLD = parseFloat(process.env.CONFIDENCE_THRESHOLD) || 0.15;
 const HANDOFF_THRESHOLD = parseFloat(process.env.HANDOFF_THRESHOLD) || 0.15;
 
 // Track low-confidence attempts per session for handoff logic
@@ -57,6 +57,7 @@ const HANDOFF_CONTACTS = {
  * @returns {object} Response with sources, confidence, suggestions, handoff
  */
 async function queryRAG(query, options = {}) {
+  const ragStart = Date.now();
   const { language = 'mixed', conversationHistory = [], topK = TOP_K, sessionId = 'default', followUpContext = null, userId = null } = options;
 
   // Step 0: Load user preferences for personalization
@@ -79,7 +80,9 @@ async function queryRAG(query, options = {}) {
   }
 
   // Step 1: Classify intent
+  const intentClassifyStart = Date.now();
   const intentResult = classifyIntent(query);
+  console.log(`[${new Date().toISOString()}] RAG intent classify: ${Date.now() - intentClassifyStart}ms`);
 
   // Step 2: Handle greetings without RAG (skip caching for greetings)
   if (!intentResult.needsRAG) {
@@ -132,9 +135,11 @@ async function queryRAG(query, options = {}) {
 
   // Step 2.5: Check cache before running full RAG pipeline
   try {
+    const cacheStart = Date.now();
     const cached = await getCachedResponse(query, language);
+    console.log(`[${new Date().toISOString()}] RAG cache lookup: ${Date.now() - cacheStart}ms`);
     if (cached) {
-      console.log(`[${new Date().toISOString()}] Cache HIT for: "${query.substring(0, 50)}..."`);
+      console.log(`[${new Date().toISOString()}] Cache HIT for: "${query.substring(0, 50)}..." | Total: ${Date.now() - ragStart}ms`);
       return {
         content: cached.content,
         sources: cached.sources || [],
@@ -198,10 +203,14 @@ async function queryRAG(query, options = {}) {
   }
 
   // Step 3b: Generate embedding for the query
+  const embedStart = Date.now();
   const queryEmbedding = await generateEmbedding(query);
+  console.log(`[${new Date().toISOString()}] RAG embedding: ${Date.now() - embedStart}ms`);
 
   // Step 4: Search for similar chunks in the vector store
+  const searchStart = Date.now();
   const searchResults = await searchSimilarChunks(queryEmbedding, topK, query);
+  console.log(`[${new Date().toISOString()}] RAG vector search: ${Date.now() - searchStart}ms | Results: ${searchResults.length}`);
 
   // Step 5: Check confidence
   const scores = searchResults.map(r => r.score);
@@ -224,18 +233,26 @@ async function queryRAG(query, options = {}) {
     lowConfidenceTracker.set(sessionId, 0);
   }
 
-  // Step 7: If confidence is too low and no results, return fallback
+  // Step 7: If confidence is too low and no results at all, provide general guidance fallback
   if (confidence < CONFIDENCE_THRESHOLD && searchResults.length === 0) {
     return {
-      content: getLowConfidenceResponse(language),
+      content: getLowConfidenceResponse(language, intentResult.intent),
       sources: [],
       confidence,
       isLowConfidence: true,
       intent: intentResult.intent,
-      suggestions: [],
+      suggestions: getLowConfidenceSuggestions(language, intentResult.intent),
       handoff,
       handoffContact
     };
+  }
+
+  // Step 7b: If confidence is low but we DO have search results, still use them with a disclaimer
+  // This prevents the bot from saying "tak jumpa" when there ARE relevant docs
+  if (confidence < CONFIDENCE_THRESHOLD && searchResults.length > 0) {
+    // Continue to Step 8 - let the LLM use whatever context we found
+    // The disclaimer will be added in Step 10
+    console.log(`[${new Date().toISOString()}] Low confidence (${confidence.toFixed(3)}) but found ${searchResults.length} results - proceeding with context`);
   }
 
   // Step 8: Format context texts with source labels for LLM
@@ -244,12 +261,14 @@ async function queryRAG(query, options = {}) {
   });
 
   // Step 9: Generate response using LLM with retrieved context
+  const llmStart = Date.now();
   const llmResponse = await generateResponse(query, contexts, {
     language,
     conversationHistory,
     intent: intentResult.intent,
     userContext
   });
+  console.log(`[${new Date().toISOString()}] RAG LLM generation: ${Date.now() - llmStart}ms`);
 
   // Step 9.5: If LLM returned fallback (all providers failed), try template fallback
   if (llmResponse.metadata?.model === 'fallback' && searchResults.length > 0) {
@@ -281,12 +300,12 @@ async function queryRAG(query, options = {}) {
     }
   }
 
-  // Step 10: Add disclaimer if low confidence
+  // Step 10: Add disclaimer if low confidence (but still share the info!)
   let responseContent = llmResponse.content;
   if (confidence < CONFIDENCE_THRESHOLD) {
     const disclaimer = language === 'ms'
-      ? '\n\n⚠️ Saya tidak pasti tentang jawapan ini. Sila hubungi pejabat berkaitan untuk pengesahan.'
-      : "\n\n⚠️ I'm not fully confident about this answer. Please contact the relevant office for confirmation.";
+      ? '\n\nNota: Maklumat ni berdasarkan dokumen yang ada, tapi mungkin tak 100% tepat untuk situasi kau. Boleh double check dengan pejabat berkaitan ya.'
+      : "\n\nNote: This information is based on available documents but may not be 100% accurate for your situation. You can double-check with the relevant office.";
     responseContent += disclaimer;
   }
 
@@ -323,6 +342,7 @@ async function queryRAG(query, options = {}) {
     console.error(`[${new Date().toISOString()}] Cache save failed:`, err.message);
   });
 
+  console.log(`[${new Date().toISOString()}] RAG total pipeline: ${Date.now() - ragStart}ms`);
   return finalResult;
 }
 
@@ -332,10 +352,13 @@ async function queryRAG(query, options = {}) {
  * Lower similarity threshold to include more relevant results
  */
 async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
+  const searchStart = Date.now();
   const documents = await Document.find({ isProcessed: true }).lean();
 
   const results = [];
   const MIN_SIMILARITY = 0.1; // Low threshold to include more chunks
+  const MAX_CHUNKS_TO_SCAN = 2000; // Cap scanning to avoid slow searches on large DBs
+  let chunksScanned = 0;
   const expectedDims = getEmbeddingDimension();
   let dimensionMismatchWarned = false;
 
@@ -395,6 +418,9 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
   for (const doc of documents) {
     if (!doc.chunks || doc.chunks.length === 0) continue;
 
+    // Cap total chunks scanned to avoid slow searches
+    if (chunksScanned >= MAX_CHUNKS_TO_SCAN) break;
+
     // Document-level title boost: if query keywords match doc title, boost ALL chunks
     const titleLower = (doc.title || '').toLowerCase();
     let titleBoost = 0;
@@ -409,6 +435,7 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
 
     for (const chunk of doc.chunks) {
       if (!chunk.embedding || chunk.embedding.length === 0) continue;
+      chunksScanned++;
 
       // Warn once if stored embeddings have different dimensions (needs re-ingestion)
       if (!dimensionMismatchWarned && chunk.embedding.length !== expectedDims) {
@@ -447,6 +474,7 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
 
   // Sort by similarity score (descending) and return top K
   results.sort((a, b) => b.score - a.score);
+  console.log(`[${new Date().toISOString()}] searchSimilarChunks: scanned ${chunksScanned} chunks from ${documents.length} docs in ${Date.now() - searchStart}ms`);
   return results.slice(0, topK);
 }
 
@@ -502,13 +530,85 @@ async function ingestDocument(fileBuffer, metadata) {
 }
 
 /**
- * Get low confidence response
+ * Get low confidence response - still tries to be helpful with general guidance
  */
-function getLowConfidenceResponse(language) {
+function getLowConfidenceResponse(language, intent = 'general') {
+  const contactInfo = HANDOFF_CONTACTS[intent] || HANDOFF_CONTACTS.general;
+  
   if (language === 'ms') {
-    return 'Maaf, saya tidak menemui maklumat yang cukup dalam pangkalan data untuk menjawab soalan ini. Sila hubungi pejabat akademik UMPSA atau semak portal pelajar untuk maklumat terkini.';
+    let response = 'Hmm, tak jumpa maklumat spesifik pasal ni dalam dokumen yang ada.';
+    
+    // Add intent-specific general guidance
+    switch (intent) {
+      case 'academic':
+        response += ' Tapi untuk hal akademik, biasanya boleh check kat portal E-Comm (https://std-comm.ump.edu.my) atau Student Portal. Kalau tak jumpa jugak, boleh terus pergi Pejabat Akademik.';
+        break;
+      case 'hostel':
+        response += ' Untuk hal kolej/hostel, biasanya boleh check kat portal SMAS atau hubungi pejabat kolej kediaman. Kalau nak apply atau ada masalah bilik, pergi je terus office kolej.';
+        break;
+      case 'fees':
+        response += ' Untuk hal yuran/bayaran, boleh check kat portal pelajar bahagian kewangan. Kalau ada masalah bayaran, hubungi Pejabat Bendahari.';
+        break;
+      case 'registration':
+        response += ' Untuk pendaftaran, biasanya semua buat online kat portal E-Comm. Kalau ada masalah, boleh pergi Pejabat Pendaftar.';
+        break;
+      default:
+        response += ' Tapi boleh cuba check kat Student Portal atau pergi One Stop Centre (OSC) untuk bantuan.';
+    }
+    
+    response += `\n\nKalau nak cakap terus dengan staff, boleh hubungi ${contactInfo.office} (${contactInfo.phone}) atau email ${contactInfo.email}.`;
+    return response;
   }
-  return "I don't have enough information in my knowledge base to answer this question. Please check the UMPSA student portal or contact the academic office for the most up-to-date information.";
+  
+  let response = "I don't have specific information about this in my documents.";
+  
+  switch (intent) {
+    case 'academic':
+      response += ' For academic matters, you can usually check the E-Comm portal (https://std-comm.ump.edu.my) or Student Portal. If you can\'t find it there, visit the Academic Office directly.';
+      break;
+    case 'hostel':
+      response += ' For hostel/residential matters, check the SMAS portal or contact the Residential College office. For room issues or applications, visit the college office directly.';
+      break;
+    case 'fees':
+      response += ' For fees and payment matters, check the student portal finance section. For payment issues, contact the Bursar\'s Office.';
+      break;
+    case 'registration':
+      response += ' For registration matters, most things are done online via E-Comm portal. For issues, visit the Registrar\'s Office.';
+      break;
+    default:
+      response += ' You can try checking the Student Portal or visit the One Stop Centre (OSC) for assistance.';
+  }
+  
+  response += `\n\nFor direct assistance, contact ${contactInfo.office} (${contactInfo.phone}) or email ${contactInfo.email}.`;
+  return response;
+}
+
+/**
+ * Get helpful suggestions when confidence is low
+ */
+function getLowConfidenceSuggestions(language, intent = 'general') {
+  if (language === 'ms') {
+    switch (intent) {
+      case 'academic':
+        return ['Macam mana nak daftar kursus?', 'Apa syarat graduation?', 'Macam mana nak check result?'];
+      case 'hostel':
+        return ['Macam mana nak apply hostel?', 'Apa peraturan kolej?', 'Macam mana nak tukar bilik?'];
+      case 'fees':
+        return ['Berapa yuran semester?', 'Macam mana nak bayar yuran?', 'Ada biasiswa tak?'];
+      default:
+        return ['Macam mana nak daftar kursus?', 'Berapa yuran semester?', 'Macam mana nak apply hostel?'];
+    }
+  }
+  switch (intent) {
+    case 'academic':
+      return ['How to register courses?', 'What are graduation requirements?', 'How to check results?'];
+    case 'hostel':
+      return ['How to apply for hostel?', 'What are college rules?', 'How to change room?'];
+    case 'fees':
+      return ['How much are semester fees?', 'How to pay fees?', 'Are there scholarships?'];
+    default:
+      return ['How to register courses?', 'What are semester fees?', 'How to apply for hostel?'];
+  }
 }
 
 /**
