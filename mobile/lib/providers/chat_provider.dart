@@ -72,6 +72,8 @@ class ChatProvider extends ChangeNotifier {
 
   void setLanguage(String lang) {
     _language = lang;
+    _storage.setLanguage(lang);
+    notifyListeners();
   }
 
   Future<void> sendMessage(String text) async {
