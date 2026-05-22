@@ -1,33 +1,130 @@
 /**
  * Embedding Service
- * Generates vector embeddings for text chunks using Jina AI API
- * Falls back to simple TF-IDF-like embeddings when API is unavailable
+ * Generates vector embeddings for text chunks
+ * Priority: HuggingFace (free, unlimited) → Jina AI → Local TF-IDF fallback
  */
 
+// HuggingFace Inference API (FREE, unlimited)
+const HF_API_URL = 'https://api-inference.huggingface.co/pipeline/feature-extraction';
+const HF_MODEL = 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2';
+const HF_DIMS = 384;
+
+// Jina AI (paid/limited)
 const JINA_API_URL = 'https://api.jina.ai/v1/embeddings';
 const JINA_MODEL = 'jina-embeddings-v2-base-en';
 const JINA_DIMS = 768;
-const JINA_BATCH_SIZE = 100; // Max texts per request
+const JINA_BATCH_SIZE = 100;
+
 const LOCAL_DIMS = 384;
 
 /**
- * Check if Jina AI is configured
+ * Check which embedding provider is available
  */
+function getProvider() {
+  if (process.env.HF_API_KEY || process.env.HUGGINGFACE_API_KEY) return 'huggingface';
+  if (process.env.JINA_API_KEY) return 'jina';
+  return 'local';
+}
+
 function isJinaEnabled() {
   return !!process.env.JINA_API_KEY;
+}
+
+function isHuggingFaceEnabled() {
+  return !!(process.env.HF_API_KEY || process.env.HUGGINGFACE_API_KEY);
 }
 
 /**
  * Get the current embedding dimension based on provider
  */
 function getEmbeddingDimension() {
-  return isJinaEnabled() ? JINA_DIMS : LOCAL_DIMS;
+  const provider = getProvider();
+  if (provider === 'huggingface') return HF_DIMS;
+  if (provider === 'jina') return JINA_DIMS;
+  return LOCAL_DIMS;
+}
+
+/**
+ * Generate embedding using HuggingFace Inference API (FREE)
+ * Model: paraphrase-multilingual-MiniLM-L12-v2 (384d, supports BM+EN)
+ */
+async function hfEmbed(text) {
+  const apiKey = process.env.HF_API_KEY || process.env.HUGGINGFACE_API_KEY;
+  const response = await fetch(`${HF_API_URL}/${HF_MODEL}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({ inputs: text, options: { wait_for_model: true } })
+  });
+
+  if (!response.ok) {
+    const errBody = await response.text().catch(() => '');
+    throw new Error(`HuggingFace API error ${response.status}: ${errBody}`);
+  }
+
+  const data = await response.json();
+  // HF returns array of arrays for feature-extraction
+  if (Array.isArray(data) && Array.isArray(data[0])) {
+    // Mean pooling if multiple token embeddings returned
+    if (Array.isArray(data[0][0])) {
+      const tokens = data[0];
+      const dims = tokens[0].length;
+      const pooled = new Array(dims).fill(0);
+      for (const token of tokens) {
+        for (let i = 0; i < dims; i++) pooled[i] += token[i];
+      }
+      for (let i = 0; i < dims; i++) pooled[i] /= tokens.length;
+      return pooled;
+    }
+    return data[0];
+  }
+  if (Array.isArray(data)) return data;
+  throw new Error('HuggingFace API returned unexpected format');
+}
+
+/**
+ * Batch embed using HuggingFace (supports array input)
+ */
+async function hfBatchEmbed(texts) {
+  const apiKey = process.env.HF_API_KEY || process.env.HUGGINGFACE_API_KEY;
+  const response = await fetch(`${HF_API_URL}/${HF_MODEL}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({ inputs: texts, options: { wait_for_model: true } })
+  });
+
+  if (!response.ok) {
+    const errBody = await response.text().catch(() => '');
+    throw new Error(`HuggingFace batch API error ${response.status}: ${errBody}`);
+  }
+
+  const data = await response.json();
+  // HF returns array of embeddings for batch input
+  if (Array.isArray(data) && data.length === texts.length) {
+    return data.map(item => {
+      if (Array.isArray(item) && Array.isArray(item[0])) {
+        // Mean pooling
+        const dims = item[0].length;
+        const pooled = new Array(dims).fill(0);
+        for (const token of item) {
+          for (let i = 0; i < dims; i++) pooled[i] += token[i];
+        }
+        for (let i = 0; i < dims; i++) pooled[i] /= item.length;
+        return pooled;
+      }
+      return item;
+    });
+  }
+  throw new Error('HuggingFace batch API returned unexpected format');
 }
 
 /**
  * Generate embedding using Jina AI API
- * @param {string} text - Text to embed
- * @returns {number[]} Embedding vector (768 dims)
  */
 async function jinaEmbed(text) {
   const response = await fetch(JINA_API_URL, {
@@ -92,9 +189,17 @@ async function jinaBatchEmbed(texts) {
 
 /**
  * Generate embedding for a single text
- * Uses Jina AI if configured, falls back to local TF-IDF hash
+ * Priority: HuggingFace → Jina AI → Local TF-IDF
  */
 async function generateEmbedding(text) {
+  if (isHuggingFaceEnabled()) {
+    try {
+      return await hfEmbed(text);
+    } catch (error) {
+      console.error(`[${new Date().toISOString()}] HuggingFace embedding failed:`, error.message);
+      // Fall through to Jina or local
+    }
+  }
   if (isJinaEnabled()) {
     try {
       return await jinaEmbed(text);
@@ -108,19 +213,34 @@ async function generateEmbedding(text) {
 
 /**
  * Generate embeddings for multiple texts (batch)
- * Uses Jina AI batch API if configured, falls back to local
+ * Priority: HuggingFace → Jina AI → Local
  */
 async function generateEmbeddings(texts) {
+  if (isHuggingFaceEnabled()) {
+    try {
+      // HF has input size limits, batch in groups of 32
+      const allEmbeddings = [];
+      for (let i = 0; i < texts.length; i += 32) {
+        const batch = texts.slice(i, i + 32);
+        const batchEmbeddings = await hfBatchEmbed(batch);
+        allEmbeddings.push(...batchEmbeddings);
+        if (i + 32 < texts.length) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+      return allEmbeddings;
+    } catch (error) {
+      console.error(`[${new Date().toISOString()}] HuggingFace batch failed:`, error.message);
+      // Fall through
+    }
+  }
   if (isJinaEnabled()) {
     try {
       const allEmbeddings = [];
-      // Process in batches of JINA_BATCH_SIZE
       for (let i = 0; i < texts.length; i += JINA_BATCH_SIZE) {
         const batch = texts.slice(i, i + JINA_BATCH_SIZE);
         const batchEmbeddings = await jinaBatchEmbed(batch);
         allEmbeddings.push(...batchEmbeddings);
-
-        // Small delay between batches to respect rate limits
         if (i + JINA_BATCH_SIZE < texts.length) {
           await new Promise(resolve => setTimeout(resolve, 200));
         }
@@ -128,12 +248,9 @@ async function generateEmbeddings(texts) {
       return allEmbeddings;
     } catch (error) {
       console.error(`[${new Date().toISOString()}] Jina batch embedding failed, falling back to local:`, error.message);
-      // Fallback: generate locally one by one
       return texts.map(text => localEmbedding(text));
     }
   }
-
-  // Local fallback
   return texts.map(text => localEmbedding(text));
 }
 
@@ -233,7 +350,10 @@ module.exports = {
   cosineSimilarity,
   localEmbedding,
   isJinaEnabled,
+  isHuggingFaceEnabled,
+  getProvider,
   getEmbeddingDimension,
   JINA_DIMS,
+  HF_DIMS,
   LOCAL_DIMS
 };
