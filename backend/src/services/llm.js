@@ -507,7 +507,8 @@ function estimateConfidence(scores) {
   const topScore = Math.max(...scores);
   const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
 
-  return (topScore * 0.7) + (avgScore * 0.3);
+  // Clamp to [0, 1] to prevent validation errors
+  return Math.min(1, Math.max(0, (topScore * 0.7) + (avgScore * 0.3)));
 }
 
 /**
