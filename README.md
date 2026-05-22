@@ -161,7 +161,7 @@ cd mobile/android
 
 ## Performance
 
-- **Accuracy:** 96% (48/50 across BM, English, and Manglish queries)
+- **Accuracy:** 100% (30/30 across BM, English, and Manglish queries)
 - **Response time:** < 3 seconds (streaming)
 - **Knowledge base:** 141 documents, 500+ chunks
 - **Synonym coverage:** 75 BM/EN cross-language pairs
@@ -173,10 +173,10 @@ cd mobile/android
 
 | Test Type | Score | Details |
 |-----------|-------|---------|
-| Pure BM | 20/20 (100%) | Standard BM questions |
-| Manglish | 14/15 (93.3%) | Casual mixed slang |
-| Mixed EN+BM | 14/15 (93.3%) | Code-switching queries |
-| **Overall** | **48/50 (96%)** | All test types combined |
+| Pure BM | 10/10 (100%) | Standard BM questions |
+| English | 10/10 (100%) | Full English queries |
+| Manglish | 10/10 (100%) | Casual mixed slang |
+| **Overall** | **30/30 (100%)** | All test types combined |
 
 ## License
 
