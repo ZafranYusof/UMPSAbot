@@ -442,9 +442,52 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
     'lect': ['lecturer', 'pensyarah'],
   };
 
-  // Extract keywords from query + expand with synonyms
+  // Extract keywords from query
   const rawWords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-  const queryWords = [...new Set([...rawWords, ...rawWords.flatMap(w => synonyms[w] || [])])];
+
+  // Normalize Manglish shortforms/slang to standard BM/EN
+  const shortformMap = {
+    'brapa': 'berapa', 'brape': 'berapa',
+    'nk': 'nak',
+    'mcm': 'macam', 'mcam': 'macam',
+    'cmna': 'macam mana', 'cmne': 'macam mana',
+    'dkt': 'dekat', 'dkat': 'dekat',
+    'utk': 'untuk',
+    'dgn': 'dengan',
+    'yg': 'yang',
+    'ni': 'ini',
+    'tu': 'itu',
+    'je': 'sahaja', 'ja': 'sahaja',
+    'blh': 'boleh', 'bole': 'boleh',
+    'npe': 'kenapa', 'knpe': 'kenapa', 'knp': 'kenapa',
+    'psl': 'pasal',
+    'sbb': 'sebab',
+    'lg': 'lagi', 'lgi': 'lagi',
+    'dh': 'sudah', 'dah': 'sudah',
+    'blm': 'belum',
+    'ade': 'ada',
+    'xde': 'tiada', 'takde': 'tiada', 'xda': 'tiada',
+    'aq': 'saya', 'aku': 'saya',
+    'ko': 'awak', 'kau': 'awak',
+    'sem': 'semester',
+    'lect': 'lecturer',
+    'lib': 'library'
+  };
+
+  // Add normalized forms (keep originals too for broader matching)
+  const normalizedWords = [];
+  for (const word of rawWords) {
+    normalizedWords.push(word); // keep original
+    if (shortformMap[word]) {
+      // Add the full form(s) — handle multi-word expansions
+      const expanded = shortformMap[word].split(/\s+/);
+      normalizedWords.push(...expanded);
+    }
+  }
+  const uniqueNormalized = [...new Set(normalizedWords)];
+
+  // Expand with synonyms (using normalized words for better matching)
+  const queryWords = [...new Set([...uniqueNormalized, ...uniqueNormalized.flatMap(w => synonyms[w] || [])])];
 
 
   for (const doc of documents) {
