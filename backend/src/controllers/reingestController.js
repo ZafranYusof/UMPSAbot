@@ -83,4 +83,20 @@ async function reingestDocuments(req, res) {
   }
 }
 
-module.exports = { reingestDocuments };
+/**
+ * GET /api/admin/ingest-new
+ * Ingest new docs from filesystem (force=true drops all and re-ingests)
+ */
+async function ingestNewDocs(req, res) {
+  try {
+    const { autoIngestDocs } = require('../services/ingest');
+    const force = req.query.force === 'true';
+    await autoIngestDocs(force);
+    const count = await Document.countDocuments({ isProcessed: true });
+    res.json({ success: true, totalDocuments: count, forced: force });
+  } catch (error) {
+    res.status(500).json({ error: 'Ingest failed', details: error.message });
+  }
+}
+
+module.exports = { reingestDocuments, ingestNewDocs };
