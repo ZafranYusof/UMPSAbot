@@ -85,15 +85,21 @@ async function reingestDocuments(req, res) {
 
 /**
  * GET /api/admin/ingest-new
- * Ingest new docs from filesystem (force=true drops all and re-ingests)
+ * Ingest new docs from filesystem (?force=true drops all and re-ingests)
+ * Runs async - returns immediately, processes in background
  */
 async function ingestNewDocs(req, res) {
   try {
     const { autoIngestDocs } = require('../services/ingest');
     const force = req.query.force === 'true';
-    await autoIngestDocs(force);
-    const count = await Document.countDocuments({ isProcessed: true });
-    res.json({ success: true, totalDocuments: count, forced: force });
+    // Return immediately, run in background
+    res.json({ success: true, message: 'Ingest started in background', forced: force });
+    // Run after response sent
+    autoIngestDocs(force).then(() => {
+      console.log('[ingest-new] Background ingest completed');
+    }).catch(err => {
+      console.error('[ingest-new] Background ingest failed:', err.message);
+    });
   } catch (error) {
     res.status(500).json({ error: 'Ingest failed', details: error.message });
   }
