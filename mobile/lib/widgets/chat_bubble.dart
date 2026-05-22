@@ -15,13 +15,20 @@ class ChatBubble extends StatelessWidget {
   });
 
   String _stripMarkdown(String text) {
-    return text
-        .replaceAll(RegExp(r'\*\*(.+?)\*\*'), r'$1')
-        .replaceAll(RegExp(r'\*(.+?)\*'), r'$1')
-        .replaceAll(RegExp(r'__(.+?)__'), r'$1')
-        .replaceAll(RegExp(r'_(.+?)_'), r'$1')
-        .replaceAll(RegExp(r'^#{1,6}\s+', multiLine: true), '')
-        .replaceAll(RegExp(r'`(.+?)`'), r'$1');
+    var result = text;
+    // Strip **bold**
+    result = result.replaceAllMapped(RegExp(r'\*\*(.+?)\*\*'), (m) => m.group(1) ?? '');
+    // Strip *italic*
+    result = result.replaceAllMapped(RegExp(r'\*(.+?)\*'), (m) => m.group(1) ?? '');
+    // Strip __bold__
+    result = result.replaceAllMapped(RegExp(r'__(.+?)__'), (m) => m.group(1) ?? '');
+    // Strip _italic_
+    result = result.replaceAllMapped(RegExp(r'_(.+?)_'), (m) => m.group(1) ?? '');
+    // Strip headers
+    result = result.replaceAll(RegExp(r'^#{1,6}\s+', multiLine: true), '');
+    // Strip `code`
+    result = result.replaceAllMapped(RegExp(r'`(.+?)`'), (m) => m.group(1) ?? '');
+    return result;
   }
 
   @override
