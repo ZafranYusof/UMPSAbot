@@ -25,7 +25,7 @@ function generateTemplateFallback(searchResults, language = 'mixed') {
   const bullets = topResults.map(result => {
     const title = result.documentTitle || 'Document';
     const content = cleanChunkContent(result.chunk?.content || '');
-    return `• **${title}**\n  ${content}`;
+    return `• ${title}\n  ${content}`;
   });
 
   const responseContent = `${intro}\n\n${bullets.join('\n\n')}`;

@@ -364,8 +364,11 @@ async function streamMessage(req, res, next) {
     // Handle greetings without streaming
     if (!intentResult.needsRAG) {
       const greetingResponse = getGreetingResponse(detectedLanguage);
+      const greetingSuggestions = detectedLanguage === 'en'
+        ? ['How do I register for courses?', 'What are the semester fees?', 'How do I apply for hostel?']
+        : ['Macam mana nak daftar kursus?', 'Berapa yuran semester ini?', 'Macam mana nak apply hostel?'];
       res.write(`data: ${JSON.stringify({ type: 'chunk', content: greetingResponse })}\n\n`);
-      res.write(`data: ${JSON.stringify({ type: 'done', conversationId: convId, sources: [], suggestions: [], confidence: 1.0, intent: intentResult.intent })}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: 'done', conversationId: convId, sources: [], suggestions: greetingSuggestions, confidence: 1.0, intent: intentResult.intent })}\n\n`);
       res.end();
       return;
     }
@@ -374,7 +377,7 @@ async function streamMessage(req, res, next) {
     try {
       const cached = await getCachedResponse(message, detectedLanguage);
       if (cached) {
-        res.write(`data: ${JSON.stringify({ type: 'chunk', content: cached.content })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: 'chunk', content: stripMarkdown(cached.content) })}\n\n`);
         res.write(`data: ${JSON.stringify({ type: 'done', conversationId: convId, sources: cached.sources || [], suggestions: cached.suggestions || [], confidence: cached.confidence || 0.8, intent: cached.intent || intentResult.intent, fromCache: true })}\n\n`);
         res.end();
         return;
@@ -401,8 +404,8 @@ async function streamMessage(req, res, next) {
       contexts,
       { language: detectedLanguage, conversationHistory, intent: intentResult.intent },
       (chunk) => {
-        // Send each chunk as SSE event
-        res.write(`data: ${JSON.stringify({ type: 'chunk', content: chunk })}\n\n`);
+        // Send each chunk as SSE event (strip markdown formatting)
+        res.write(`data: ${JSON.stringify({ type: 'chunk', content: stripMarkdown(chunk) })}\n\n`);
       },
       async (result) => {
         const responseTime = Date.now() - startTime;

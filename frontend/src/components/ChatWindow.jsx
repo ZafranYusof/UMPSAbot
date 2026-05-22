@@ -6,18 +6,25 @@ import { useLanguage } from '../context/LanguageContext';
 
 function ChatWindow({ messages, isLoading, suggestedQuestions, onSendMessage, conversationId }) {
   const bottomRef = useRef(null);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  const welcomeSuggestions = [
-    'How do I register for courses?',
-    'What is the grading system?',
-    'Macam mana nak apply hostel?',
-    'FYP requirements'
-  ];
+  const welcomeSuggestions = language === 'bm'
+    ? [
+        'Macam mana nak daftar kursus?',
+        'Apa sistem gred UMPSA?',
+        'Macam mana nak apply hostel?',
+        'Keperluan FYP'
+      ]
+    : [
+        'How do I register for courses?',
+        'What is the grading system?',
+        'How do I apply for hostel?',
+        'FYP requirements'
+      ];
 
   return (
     <div className="flex-1 overflow-y-auto px-4 py-6">
