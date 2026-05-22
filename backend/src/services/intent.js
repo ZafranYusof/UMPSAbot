@@ -6,6 +6,49 @@
 // Course code pattern: 3 uppercase letters + 4 digits
 const COURSE_CODE_REGEX = /[A-Z]{3}\d{4}/g;
 
+// Comparison patterns for detecting "beza X vs Y" queries
+const COMPARISON_PATTERNS = /\b(beza|bezanya|perbezaan|compare|comparison|berbanding|difference between)\b/i;
+const COMPARISON_VS_PATTERN = /\bvs\.?\b/i;
+
+/**
+ * Extract the two items being compared from a query
+ * Handles patterns like: "beza X dan Y", "X vs Y", "compare X and Y", "difference between X and Y"
+ */
+function extractCompareItems(message) {
+  const lower = message.toLowerCase().trim();
+  
+  // Pattern: "difference between X and Y"
+  let match = lower.match(/difference between\s+(.+?)\s+and\s+(.+?)(?:\?|$|\.|\!)/i);
+  if (match) return [match[1].trim(), match[2].trim()];
+  
+  // Pattern: "beza/bezanya/perbezaan X dan/dengan/and Y"
+  match = lower.match(/(?:beza|bezanya|perbezaan)\s+(.+?)\s+(?:dan|dengan|and|&)\s+(.+?)(?:\?|$|\.|\!)/i);
+  if (match) return [match[1].trim(), match[2].trim()];
+
+  // Pattern: "beza/bezanya/perbezaan X vs Y"
+  match = lower.match(/(?:beza|bezanya|perbezaan)\s+(.+?)\s+vs\.?\s+(.+?)(?:\?|$|\.|\!)/i);
+  if (match) return [match[1].trim(), match[2].trim()];
+
+  // Pattern: "compare X and/with Y"
+  match = lower.match(/compare\s+(.+?)\s+(?:and|with|dan|dengan)\s+(.+?)(?:\?|$|\.|\!)/i);
+  if (match) return [match[1].trim(), match[2].trim()];
+
+  // Pattern: "X vs Y" (standalone)
+  match = lower.match(/(.+?)\s+vs\.?\s+(.+?)(?:\?|$|\.|\!)/i);
+  if (match) return [match[1].trim(), match[2].trim()];
+
+  // Pattern: "X berbanding Y"
+  match = lower.match(/(.+?)\s+berbanding\s+(.+?)(?:\?|$|\.|\!)/i);
+  if (match) return [match[1].trim(), match[2].trim()];
+
+  // Fallback: try splitting by "dan"/"and"/"dengan" after removing the comparison keyword
+  const cleaned = lower.replace(/(?:beza|bezanya|perbezaan|compare|comparison|berbanding|difference between)/gi, '').trim();
+  match = cleaned.match(/(.+?)\s+(?:dan|dengan|and|&)\s+(.+)/i);
+  if (match) return [match[1].trim(), match[2].trim()];
+
+  return null;
+}
+
 // Keyword patterns for each intent category
 const INTENT_PATTERNS = {
   greeting: {
@@ -58,6 +101,14 @@ function classifyIntent(message) {
   const lowerMessage = message.toLowerCase().trim();
   const words = lowerMessage.split(/\s+/);
   
+  // Check for comparison intent first (high priority)
+  if (COMPARISON_PATTERNS.test(lowerMessage) || COMPARISON_VS_PATTERN.test(lowerMessage)) {
+    const compareItems = extractCompareItems(message);
+    if (compareItems && compareItems.length === 2) {
+      return { intent: 'comparison', confidence: 0.9, needsRAG: true, compareItems };
+    }
+  }
+
   // Check for multiple course codes → timetable intent
   const courseCodes = message.match(COURSE_CODE_REGEX) || [];
   if (courseCodes.length >= 2) {
@@ -131,6 +182,8 @@ function getGreetingResponse(language) {
 module.exports = {
   classifyIntent,
   getGreetingResponse,
+  extractCompareItems,
   INTENT_PATTERNS,
+  COMPARISON_PATTERNS,
   COURSE_CODE_REGEX
 };

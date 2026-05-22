@@ -7,7 +7,7 @@ const { generateEmbedding, cosineSimilarity, isJinaEnabled, getEmbeddingDimensio
 const { generateResponse, generateSuggestions, estimateConfidence } = require('./llm');
 const { generateTemplateFallback } = require('./templateFallback');
 const { chunkText, extractText } = require('./chunking');
-const { classifyIntent, getGreetingResponse } = require('./intent');
+const { classifyIntent, getGreetingResponse, extractCompareItems } = require('./intent');
 const { getCachedResponse, cacheResponse } = require('./cache');
 const { flagLowConfidence } = require('./feedbackLoop');
 const Document = require('../models/Document');
@@ -209,8 +209,49 @@ async function queryRAG(query, options = {}) {
   console.log(`[${new Date().toISOString()}] RAG embedding: ${Date.now() - embedStart}ms`);
 
   // Step 4: Search for similar chunks in the vector store
+  // For comparison intent, search for BOTH items separately and combine
   const searchStart = Date.now();
-  const searchResults = await searchSimilarChunks(queryEmbedding, topK, query);
+  let searchResults;
+
+  if (intentResult.intent === 'comparison' && intentResult.compareItems && intentResult.compareItems.length === 2) {
+    const [itemA, itemB] = intentResult.compareItems;
+    console.log(`[${new Date().toISOString()}] Comparison search: "${itemA}" vs "${itemB}"`);
+
+    // Generate embeddings for each item
+    const [embeddingA, embeddingB] = await Promise.all([
+      generateEmbedding(itemA),
+      generateEmbedding(itemB)
+    ]);
+
+    // Search for each item separately
+    const halfK = Math.ceil(topK / 2);
+    const [resultsA, resultsB] = await Promise.all([
+      searchSimilarChunks(embeddingA, halfK, itemA),
+      searchSimilarChunks(embeddingB, halfK, itemB)
+    ]);
+
+    // Also search with the full query for broader context
+    const resultsQuery = await searchSimilarChunks(queryEmbedding, halfK, query);
+
+    // Combine and deduplicate results (by chunk content to avoid duplicates)
+    const seen = new Set();
+    searchResults = [];
+    for (const result of [...resultsA, ...resultsB, ...resultsQuery]) {
+      const key = `${result.documentId}-${result.chunk.index}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        searchResults.push(result);
+      }
+    }
+
+    // Sort by score and limit to topK
+    searchResults.sort((a, b) => b.score - a.score);
+    searchResults = searchResults.slice(0, topK);
+
+    console.log(`[${new Date().toISOString()}] Comparison search: ${resultsA.length} for "${itemA}", ${resultsB.length} for "${itemB}", ${resultsQuery.length} from full query | Combined: ${searchResults.length}`);
+  } else {
+    searchResults = await searchSimilarChunks(queryEmbedding, topK, query);
+  }
   console.log(`[${new Date().toISOString()}] RAG vector search: ${Date.now() - searchStart}ms | Results: ${searchResults.length}`);
 
   // Step 5: Check confidence
@@ -267,7 +308,8 @@ async function queryRAG(query, options = {}) {
     language,
     conversationHistory,
     intent: intentResult.intent,
-    userContext
+    userContext,
+    compareItems: intentResult.compareItems || null
   });
   console.log(`[${new Date().toISOString()}] RAG LLM generation: ${Date.now() - llmStart}ms`);
 

@@ -62,9 +62,12 @@ const CEREBRAS_BASE_URL = 'https://api.cerebras.ai/v1/chat/completions';
  * @returns {object} Generated response with metadata
  */
 async function generateResponse(query, contexts = [], options = {}) {
-  const { language = 'mixed', conversationHistory = [], intent = 'general', userContext = '' } = options;
+  const { language = 'mixed', conversationHistory = [], intent = 'general', userContext = '', compareItems = null } = options;
 
-  const systemPrompt = buildSystemPrompt(contexts, language, intent, userContext);
+  // Use comparison-specific prompt when intent is comparison
+  const systemPrompt = (intent === 'comparison' && compareItems)
+    ? buildComparisonPrompt(contexts, language, compareItems, userContext)
+    : buildSystemPrompt(contexts, language, intent, userContext);
 
   const messages = [
     { role: 'system', content: systemPrompt },
@@ -441,6 +444,60 @@ function generateSuggestions(query, response, intent = 'general', language = 'mi
 }
 
 /**
+ * Build comparison-specific system prompt
+ * Instructs LLM to format response as structured comparison
+ */
+function buildComparisonPrompt(contexts, language, compareItems, userContext = '') {
+  const [itemA, itemB] = compareItems;
+  
+  let prompt = `You are UMPSABot, an AI assistant for UMPSA (Universiti Malaysia Pahang Al-Sultan Abdullah) students.
+
+The student is asking for a COMPARISON between "${itemA}" and "${itemB}".
+
+RULES:
+1. Format your response as a STRUCTURED COMPARISON with clear categories.
+2. Use these categories where applicable: Tempoh/Duration, Kos/Cost, Syarat Kemasukan/Entry Requirements, Prospek Kerjaya/Career Prospects, Tahap Kelayakan/Qualification Level, and any other relevant categories from the context.
+3. For each category, clearly state the difference between the two items.
+4. Use a simple format like:
+   [Category]:
+   - ${itemA}: [details]
+   - ${itemB}: [details]
+5. At the end, provide a brief summary or recommendation if appropriate.
+6. Be SPECIFIC and DETAILED. Include exact information from the documents.
+7. Do NOT use markdown bold (**text**) or any markdown formatting. Write plain text only.
+8. Do NOT hallucinate specific details not found in the context.
+9. If information for one item is missing, say so honestly rather than making it up.
+10. FORMAT your response with proper spacing. Separate categories with blank lines.
+
+`;
+
+  if (userContext) {
+    prompt += `STUDENT INFO: ${userContext}Tailor your answer to this student's context when relevant.\n\n`;
+  }
+
+  if (language === 'ms') {
+    prompt += 'IMPORTANT: Respond ENTIRELY in Bahasa Melayu. Guna BM yang natural dan santai.\n';
+  } else if (language === 'en') {
+    prompt += 'IMPORTANT: Respond ENTIRELY in English.\n';
+  } else {
+    prompt += 'Respond in the same language the student uses. If they mix BM and English, you can too.\n';
+  }
+
+  if (contexts.length > 0) {
+    prompt += `\n=== CONTEXT DOCUMENTS ===\n\n`;
+    contexts.forEach((ctx) => {
+      prompt += `${ctx}\n\n`;
+    });
+    prompt += `=== END OF CONTEXT DOCUMENTS ===\n\n`;
+    prompt += `Compare "${itemA}" and "${itemB}" using the information above. Structure your answer with clear categories.`;
+  } else {
+    prompt += `\nNo specific documents found. Provide general guidance about the differences between "${itemA}" and "${itemB}" in the context of UMPSA or Malaysian higher education. Be honest about what you're unsure of.`;
+  }
+
+  return prompt;
+}
+
+/**
  * Build system prompt with RAG context - HELPFUL version
  */
 function buildSystemPrompt(contexts, language, intent = 'general', userContext = '') {
@@ -621,5 +678,6 @@ module.exports = {
   generateSuggestions,
   estimateConfidence,
   getFallbackResponse,
-  stripMarkdown
+  stripMarkdown,
+  buildComparisonPrompt
 };
