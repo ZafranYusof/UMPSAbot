@@ -59,9 +59,9 @@ function getEmbeddingDimension() {
  */
 function getOllamaUrl() {
   if (process.env.OLLAMA_EMBED_URL) return process.env.OLLAMA_EMBED_URL;
-  // Use same base as LLM but switch to embeddings endpoint
+  // Use same base as LLM but switch to embed endpoint
   const base = (process.env.OPENAI_BASE_URL || '').replace(/\/v1\/?$/, '').replace(/\/api\/?$/, '');
-  return `${base}/api/embeddings`;
+  return `${base}/api/embed`;
 }
 
 /**

@@ -224,9 +224,16 @@ async function tryDeepSeek(messages) {
  */
 async function tryOllama(messages) {
   try {
-    const response = await fetch(`${OLLAMA_BASE_URL}/api/chat`, {
+    // Support both local (http://localhost:11434) and cloud (https://ollama.com/api)
+    const chatUrl = OLLAMA_BASE_URL.includes('ollama.com') 
+      ? `${OLLAMA_BASE_URL}/chat` 
+      : `${OLLAMA_BASE_URL}/api/chat`;
+    const response = await fetch(chatUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        ...(process.env.OPENAI_API_KEY ? { 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` } : {})
+      },
       body: JSON.stringify({
         model: OLLAMA_MODEL,
         messages,
