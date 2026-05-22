@@ -6,7 +6,7 @@
 
 const Groq = require('groq-sdk');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
 
 /**
  * Strip markdown formatting from LLM output
@@ -262,6 +262,7 @@ async function tryOllama(messages) {
  * Try Groq model chain — returns result or null if all models fail
  */
 async function tryGroqChain(messages) {
+  if (!groq) return null;
   for (let i = 0; i < MODEL_CHAIN.length; i++) {
     const model = MODEL_CHAIN[i];
     try {
