@@ -10,6 +10,7 @@ const { chunkText, extractText } = require('./chunking');
 const { classifyIntent, getGreetingResponse, extractCompareItems } = require('./intent');
 const { getCachedResponse, cacheResponse } = require('./cache');
 const { flagLowConfidence } = require('./feedbackLoop');
+const { processWithMalaya } = require('./malaya');
 const Document = require('../models/Document');
 const UserPreference = require('../models/UserPreference');
 
@@ -203,9 +204,21 @@ async function queryRAG(query, options = {}) {
     };
   }
 
-  // Step 3b: Generate embedding for the query
+  // Step 3b: Enhance query with Malaya NLP before embedding
+  let enhancedQuery = query;
+  try {
+    const malayaResult = await processWithMalaya(query);
+    if (malayaResult && malayaResult.expanded && malayaResult.expanded !== query.toLowerCase()) {
+      enhancedQuery = malayaResult.expanded;
+      console.log(`[${new Date().toISOString()}] Malaya enhanced query: "${query}" → "${enhancedQuery}"`);
+    }
+  } catch (err) {
+    // Non-critical
+  }
+
+  // Step 3c: Generate embedding for the (enhanced) query
   const embedStart = Date.now();
-  const queryEmbedding = await generateEmbedding(query);
+  const queryEmbedding = await generateEmbedding(enhancedQuery);
   console.log(`[${new Date().toISOString()}] RAG embedding: ${Date.now() - embedStart}ms`);
 
   // Step 4: Search for similar chunks in the vector store
@@ -506,6 +519,18 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
   // Extract keywords from query
   const rawWords = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
 
+  // Malaya NLP: get stems for better keyword matching (non-blocking, graceful fallback)
+  let malayaStems = [];
+  try {
+    const malayaResult = await processWithMalaya(query);
+    if (malayaResult && malayaResult.stems) {
+      malayaStems = malayaResult.stems.filter(s => s.length > 2);
+      console.log(`[${new Date().toISOString()}] Malaya stems: [${malayaStems.join(', ')}]`);
+    }
+  } catch (err) {
+    // Non-critical — continue without stems
+  }
+
   // Normalize Manglish shortforms/slang to standard BM/EN
   const shortformMap = {
     'brapa': 'berapa', 'brape': 'berapa',
@@ -548,7 +573,8 @@ async function searchSimilarChunks(queryEmbedding, topK = TOP_K, query = '') {
   const uniqueNormalized = [...new Set(normalizedWords)];
 
   // Expand with synonyms (using normalized words for better matching)
-  const queryWords = [...new Set([...uniqueNormalized, ...uniqueNormalized.flatMap(w => synonyms[w] || [])])];
+  // Also include Malaya stems for root-word matching (e.g. pendaftaran → daftar)
+  const queryWords = [...new Set([...uniqueNormalized, ...uniqueNormalized.flatMap(w => synonyms[w] || []), ...malayaStems])];
 
 
   for (const doc of documents) {
