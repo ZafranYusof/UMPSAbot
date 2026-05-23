@@ -149,12 +149,36 @@ class _TimetableScreenState extends State<TimetableScreen>
         semester: _semester,
       );
 
-      final schedule = response['schedule'] as List<dynamic>? ??
-          response['timetable'] as List<dynamic>? ??
-          [];
+      final valid = response['valid'] as List<dynamic>? ?? [];
+      
+      // Flatten nested structure into flat list for grid/card display
+      // API returns: valid[].sections[].slots[]
+      final List<Map<String, dynamic>> flatItems = [];
+      for (final combo in valid) {
+        final sections = combo['sections'] as List<dynamic>? ?? [];
+        for (final section in sections) {
+          final courseCode = section['courseCode'] as String? ?? '';
+          final courseName = section['courseName'] as String? ?? '';
+          final sectionName = section['section'] as String? ?? '';
+          final slots = section['slots'] as List<dynamic>? ?? [];
+          for (final slot in slots) {
+            flatItems.add({
+              'courseCode': courseCode,
+              'course': courseCode,
+              'courseName': courseName,
+              'section': sectionName,
+              'day': slot['day'] ?? '',
+              'time': '${slot['startTime'] ?? ''}-${slot['endTime'] ?? ''}',
+              'venue': slot['venue'] ?? '',
+              'type': slot['type'] ?? '',
+            });
+          }
+        }
+        break; // Only show first (best) combination
+      }
 
       setState(() {
-        _results = schedule.cast<Map<String, dynamic>>();
+        _results = flatItems;
         _isLoading = false;
       });
     } on ApiException catch (e) {
