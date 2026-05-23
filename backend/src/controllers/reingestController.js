@@ -1,22 +1,16 @@
 /**
  * Re-ingestion Controller
- * Re-embeds all existing documents with the current embedding provider (Jina AI)
+ * Re-embeds all existing documents with the current embedding provider
  */
 
 const Document = require('../models/Document');
-const { generateEmbeddings, isJinaEnabled, getEmbeddingDimension } = require('../services/embedding');
+const { generateEmbeddings, getEmbeddingDimension } = require('../services/embedding');
 
 /**
  * GET /api/admin/reingest
  * Re-embeds all processed documents with the current embedding provider
  */
 async function reingestDocuments(req, res) {
-  if (!isJinaEnabled()) {
-    return res.status(400).json({
-      error: 'JINA_API_KEY not configured. Set it in .env to use Jina AI embeddings.',
-      currentProvider: 'local-tfidf'
-    });
-  }
 
   const expectedDims = getEmbeddingDimension();
   const forceAll = req.query.force === 'true';
@@ -147,9 +141,6 @@ async function debugDocs(req, res) {
  * Re-embed docs in small batches. ?skip=N&limit=M to control range.
  */
 async function reingestBatch(req, res) {
-  if (!isJinaEnabled()) {
-    return res.status(400).json({ error: 'JINA_API_KEY not configured' });
-  }
 
   const skip = parseInt(req.query.skip) || 0;
   const limit = parseInt(req.query.limit) || 10;
