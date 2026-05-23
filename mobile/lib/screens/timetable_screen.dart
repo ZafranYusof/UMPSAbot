@@ -124,7 +124,10 @@ class _TimetableScreenState extends State<TimetableScreen>
   }
 
   void _removeCourse(String code) {
-    setState(() => _courses.remove(code));
+    setState(() {
+      _courses.remove(code);
+      _results = [];
+    });
   }
 
   Future<void> _planTimetable() async {
@@ -402,12 +405,37 @@ class _TimetableScreenState extends State<TimetableScreen>
                         const SizedBox(width: 6),
                         GestureDetector(
                           onTap: () => _removeCourse(code),
-                          child: const Icon(Icons.close, size: 16, color: AppColors.textMuted),
+                          child: Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.close, size: 14, color: AppColors.error),
+                          ),
                         ),
                       ],
                     ),
                   );
                 }).toList(),
+              ),
+            if (_courses.length > 1)
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      _courses.clear();
+                      _results = [];
+                    });
+                  },
+                  icon: const Icon(Icons.clear_all, size: 16, color: AppColors.error),
+                  label: Text(
+                    'Clear All',
+                    style: AppTheme.body(fontSize: 12, color: AppColors.error),
+                  ),
+                ),
               ),
             const SizedBox(height: 20),
 
