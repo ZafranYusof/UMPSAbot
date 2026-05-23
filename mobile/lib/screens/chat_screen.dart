@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../config/theme.dart';
 import '../providers/chat_provider.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/chat_bubble.dart';
 import '../widgets/typing_indicator.dart';
 import '../widgets/suggestion_chips.dart';
@@ -304,9 +305,17 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              AppStrings.get('greeting', lang),
-              style: AppTheme.heading(fontSize: 24),
+            Consumer<AuthProvider>(
+              builder: (context, auth, _) {
+                final name = auth.userName ?? '';
+                final greeting = name.isNotEmpty
+                    ? (isBm ? 'Hello, $name! 👋' : 'Hello, $name! 👋')
+                    : AppStrings.get('greeting', lang);
+                return Text(
+                  greeting,
+                  style: AppTheme.heading(fontSize: 24),
+                );
+              },
             ),
             const SizedBox(height: 8),
             Text(
