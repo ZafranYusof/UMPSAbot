@@ -577,16 +577,22 @@ function estimateConfidence(scores) {
 
   const topScore = Math.max(...scores);
   const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+  const numResults = scores.length;
 
-  // Raw confidence from similarity scores
-  const raw = (topScore * 0.7) + (avgScore * 0.3);
+  // nomic-embed-text returns lower raw cosine scores (typically 0.1-0.4)
+  // Scale up: multiply by 2.5 to normalize into a more meaningful range
+  const scaledTop = Math.min(1, topScore * 2.5);
+  const scaledAvg = Math.min(1, avgScore * 2.5);
 
-  // Floor: if we have results, minimum confidence is 0.5
-  // This accounts for nomic-embed-text returning lower raw cosine scores
-  const floored = scores.length > 0 ? Math.max(0.5, raw) : raw;
+  // Base confidence from scaled similarity
+  let confidence = (scaledTop * 0.6) + (scaledAvg * 0.2);
 
-  // Clamp to [0, 1] to prevent validation errors
-  return Math.min(1, Math.max(0, floored));
+  // Boost for having multiple relevant results (more docs = more confident)
+  if (numResults >= 3) confidence += 0.1;
+  else if (numResults >= 2) confidence += 0.05;
+
+  // Clamp to [0.1, 0.95] — never show 0% or 100%
+  return Math.min(0.95, Math.max(0.1, confidence));
 }
 
 /**

@@ -161,7 +161,13 @@ function classifyIntent(message) {
   }
 
   // Timetable intent from keywords — only skip RAG if course codes present (for planner)
+  // But disambiguate: if message mentions facilities (bus, shuttle, etc), it's facilities not timetable
   if (topIntent === 'timetable') {
+    const facilityWords = ['bas', 'bus', 'shuttle', 'van', 'transport', 'pengangkutan', 'kenderaan'];
+    const hasFacilityContext = facilityWords.some(w => words.includes(w));
+    if (hasFacilityContext) {
+      return { intent: 'facilities', confidence: 0.8, needsRAG: true };
+    }
     const needsRAG = courseCodes.length === 0; // no course codes = general timetable question, use RAG
     return { intent: 'timetable', confidence: Math.min(0.95, 0.5 + (topScore * 0.1)), needsRAG, courseCodes };
   }
