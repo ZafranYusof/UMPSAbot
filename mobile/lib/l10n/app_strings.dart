@@ -162,6 +162,20 @@ class AppStrings {
       'admin_manage_data': 'Manage Knowledge Base',
       'admin_manage_data_desc': 'Update chatbot training data and responses',
       'admin_coming_soon': 'Coming soon!',
+
+      // Profile
+      'profile': 'Profile',
+      'profile_subtitle': 'View and edit your info',
+      'profile_account': 'Account',
+      'profile_name': 'Name',
+      'profile_email': 'Email',
+      'profile_faculty': 'Faculty',
+      'profile_matric': 'Matric No',
+      'profile_language': 'Language Preference',
+      'profile_lang_mixed': 'Mixed (BM + EN)',
+      'profile_save': 'Save Changes',
+      'profile_updated': 'Profile updated successfully!',
+      'profile_update_failed': 'Failed to update profile.',
     },
     'ms': {
       // Bottom nav
@@ -321,6 +335,20 @@ class AppStrings {
       'admin_manage_data': 'Urus Pangkalan Pengetahuan',
       'admin_manage_data_desc': 'Kemas kini data latihan dan respons chatbot',
       'admin_coming_soon': 'Akan datang!',
+
+      // Profile
+      'profile': 'Profil',
+      'profile_subtitle': 'Lihat dan edit maklumat anda',
+      'profile_account': 'Akaun',
+      'profile_name': 'Nama',
+      'profile_email': 'Emel',
+      'profile_faculty': 'Fakulti',
+      'profile_matric': 'No Matrik',
+      'profile_language': 'Bahasa Pilihan',
+      'profile_lang_mixed': 'Campuran (BM + EN)',
+      'profile_save': 'Simpan Perubahan',
+      'profile_updated': 'Profil berjaya dikemas kini!',
+      'profile_update_failed': 'Gagal mengemas kini profil.',
     },
   };
 }

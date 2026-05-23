@@ -13,6 +13,7 @@ import 'screens/history_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/timetable_screen.dart';
 import 'screens/admin_screen_mobile.dart';
+import 'screens/profile_screen.dart';
 import 'l10n/app_strings.dart';
 
 class UmpsaChatbotApp extends StatelessWidget {
@@ -35,6 +36,7 @@ class UmpsaChatbotApp extends StatelessWidget {
             '/login': (context) => const LoginScreen(),
             '/register': (context) => const RegisterScreen(),
             '/home': (context) => HomeScreen(key: HomeScreen.homeKey),
+            '/profile': (context) => const ProfileScreen(),
           },
         );
       },

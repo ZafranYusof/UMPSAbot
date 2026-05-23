@@ -13,6 +13,9 @@ class AuthProvider extends ChangeNotifier {
   String _userRole = 'student';
   String? _userName;
   String? _userEmail;
+  String? _faculty;
+  String? _matricNo;
+  String _languagePreference = 'mixed';
 
   AuthProvider(this._apiService, this._storageService) {
     _checkExistingToken();
@@ -25,6 +28,9 @@ class AuthProvider extends ChangeNotifier {
   bool get isAdmin => _userRole == 'admin';
   String? get userName => _userName;
   String? get userEmail => _userEmail;
+  String? get faculty => _faculty;
+  String? get matricNo => _matricNo;
+  String get languagePreference => _languagePreference;
 
   void _checkExistingToken() {
     final token = _storageService.authToken;
@@ -34,6 +40,8 @@ class AuthProvider extends ChangeNotifier {
       _userRole = _storageService.userRole ?? 'student';
       _userName = _storageService.userName;
       _userEmail = _storageService.userEmail;
+      _faculty = _storageService.faculty;
+      _matricNo = _storageService.matricNo;
     }
   }
 
@@ -161,6 +169,84 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  /// Fetch profile from server and sync local state
+  Future<void> fetchProfile() async {
+    if (!_isAuthenticated) return;
+    try {
+      final userData = await _apiService.getProfile();
+      _userName = userData['username'] as String? ?? _userName;
+      _userEmail = userData['email'] as String? ?? _userEmail;
+      _userRole = userData['role'] as String? ?? _userRole;
+      _faculty = userData['faculty'] as String? ?? '';
+      _matricNo = userData['matricNo'] as String? ?? '';
+      final prefs = userData['preferences'] as Map<String, dynamic>?;
+      if (prefs != null) {
+        _languagePreference = prefs['language'] as String? ?? 'mixed';
+      }
+
+      // Persist locally
+      if (_userName != null) await _storageService.setUserName(_userName!);
+      if (_userEmail != null) await _storageService.setUserEmail(_userEmail!);
+      await _storageService.setUserRole(_userRole);
+      if (_faculty != null && _faculty!.isNotEmpty) {
+        await _storageService.setFaculty(_faculty!);
+      }
+
+      notifyListeners();
+    } catch (_) {
+      // Silently fail - use cached data
+    }
+  }
+
+  /// Update profile on server and sync local state
+  Future<bool> updateProfile({
+    String? name,
+    String? faculty,
+    String? matricNo,
+    String? language,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final userData = await _apiService.updateProfile(
+        name: name,
+        faculty: faculty,
+        matricNo: matricNo,
+        language: language,
+      );
+
+      _userName = userData['username'] as String? ?? _userName;
+      _faculty = userData['faculty'] as String? ?? _faculty;
+      _matricNo = userData['matricNo'] as String? ?? _matricNo;
+      final prefs = userData['preferences'] as Map<String, dynamic>?;
+      if (prefs != null) {
+        _languagePreference = prefs['language'] as String? ?? _languagePreference;
+      }
+
+      // Persist locally
+      if (_userName != null) await _storageService.setUserName(_userName!);
+      if (_faculty != null && _faculty!.isNotEmpty) {
+        await _storageService.setFaculty(_faculty!);
+      }
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _error = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _error = 'Failed to update profile.';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> logout() async {
     _apiService.clearAuthToken();
     await _storageService.clearAuthToken();
@@ -168,6 +254,9 @@ class AuthProvider extends ChangeNotifier {
     _userRole = 'student';
     _userName = null;
     _userEmail = null;
+    _faculty = null;
+    _matricNo = null;
+    _languagePreference = 'mixed';
     notifyListeners();
   }
 

@@ -267,6 +267,44 @@ class ApiService {
     }
   }
 
+  /// Fetch authenticated user's profile from server
+  Future<Map<String, dynamic>> getProfile() async {
+    try {
+      final response = await _dio.get('/auth/profile');
+      final data = response.data;
+      return data['user'] as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException(
+        message: _getErrorMessage(e),
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
+  /// Update authenticated user's profile
+  Future<Map<String, dynamic>> updateProfile({
+    String? name,
+    String? faculty,
+    String? matricNo,
+    String? language,
+  }) async {
+    try {
+      final data = <String, dynamic>{};
+      if (name != null) data['username'] = name;
+      if (faculty != null) data['faculty'] = faculty;
+      if (matricNo != null) data['matricNo'] = matricNo;
+      if (language != null) data['language'] = language;
+
+      final response = await _dio.put('/auth/profile', data: data);
+      return response.data['user'] as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw ApiException(
+        message: _getErrorMessage(e),
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
   String _getErrorMessage(DioException e) {
     switch (e.type) {
       case DioExceptionType.connectionTimeout:

@@ -63,6 +63,15 @@ class StorageService {
     await _prefs.setString(_userEmailKey, email);
   }
 
+  // Matric No
+  static const String _matricNoKey = 'user_matric_no';
+
+  String? get matricNo => _prefs.getString(_matricNoKey);
+
+  Future<void> setMatricNo(String matricNo) async {
+    await _prefs.setString(_matricNoKey, matricNo);
+  }
+
   // Faculty
   String? get faculty => _prefs.getString(_facultyKey);
 

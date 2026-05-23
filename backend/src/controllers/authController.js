@@ -132,8 +132,62 @@ async function getProfile(req, res, next) {
   }
 }
 
+/**
+ * Get authenticated user's profile
+ */
+async function getMyProfile(req, res, next) {
+  try {
+    const user = await User.findById(req.user._id).select('-password').lean();
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ success: true, user });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * Update authenticated user's profile
+ */
+async function updateProfile(req, res, next) {
+  try {
+    const { username, name, faculty, matricNo, language } = req.body;
+    const updateData = {};
+
+    if (username || name) {
+      updateData.username = username || name;
+    }
+    if (faculty !== undefined) {
+      updateData.faculty = faculty;
+    }
+    if (matricNo !== undefined) {
+      updateData.matricNo = matricNo;
+    }
+    if (language !== undefined) {
+      updateData['preferences.language'] = language;
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).select('-password').lean();
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ success: true, user });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   login,
   register,
-  getProfile
+  getProfile,
+  getMyProfile,
+  updateProfile
 };

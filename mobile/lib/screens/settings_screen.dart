@@ -168,6 +168,27 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
+              // Account section
+              _buildSectionHeader(AppStrings.get('profile_account', lang)),
+              _buildSettingsCard(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.person_outline, color: AppColors.primary),
+                    title: Text(
+                      AppStrings.get('profile', lang),
+                      style: AppTheme.body(color: AppColors.textPrimary),
+                    ),
+                    subtitle: Text(
+                      AppStrings.get('profile_subtitle', lang),
+                      style: AppTheme.body(fontSize: 13, color: AppColors.textMuted),
+                    ),
+                    trailing: const Icon(Icons.chevron_right, size: 20, color: AppColors.textMuted),
+                    onTap: () => Navigator.pushNamed(context, '/profile'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
               // Logout section
               _buildSettingsCard(
                 children: [

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:provider/provider.dart';
 import '../config/theme.dart';
 import '../services/storage_service.dart';
+import '../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -40,6 +41,8 @@ class _SplashScreenState extends State<SplashScreen>
       if (!mounted) return;
       final storage = Provider.of<StorageService>(context, listen: false);
       if (storage.authToken != null && storage.authToken!.isNotEmpty) {
+        // Sync profile from server in background
+        Provider.of<AuthProvider>(context, listen: false).fetchProfile();
         Navigator.of(context).pushReplacementNamed('/home');
       } else {
         Navigator.of(context).pushReplacementNamed('/login');
