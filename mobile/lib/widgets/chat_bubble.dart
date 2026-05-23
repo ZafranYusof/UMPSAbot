@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../config/theme.dart';
 import '../models/message.dart';
 import '../providers/chat_provider.dart';
@@ -91,6 +92,14 @@ class ChatBubble extends StatelessWidget {
                         data: message.content,
                         selectable: false,
                         shrinkWrap: true,
+                        onTapLink: (text, href, title) {
+                          if (href != null && href.isNotEmpty) {
+                            launchUrl(
+                              Uri.parse(href),
+                              mode: LaunchMode.externalApplication,
+                            );
+                          }
+                        },
                         styleSheet: MarkdownStyleSheet(
                           p: AppTheme.body(
                             fontSize: 15,
