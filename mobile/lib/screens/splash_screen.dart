@@ -39,10 +39,10 @@ class _SplashScreenState extends State<SplashScreen>
     Timer(const Duration(seconds: 2), () {
       if (!mounted) return;
       final storage = Provider.of<StorageService>(context, listen: false);
-      if (storage.isOnboardingComplete) {
+      if (storage.authToken != null && storage.authToken!.isNotEmpty) {
         Navigator.of(context).pushReplacementNamed('/home');
       } else {
-        Navigator.of(context).pushReplacementNamed('/onboarding');
+        Navigator.of(context).pushReplacementNamed('/login');
       }
     });
   }

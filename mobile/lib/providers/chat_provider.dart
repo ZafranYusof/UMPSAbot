@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../models/message.dart';
@@ -20,12 +21,16 @@ class ChatProvider extends ChangeNotifier {
   String _sessionId = '';
   String _language = 'en';
   StreamSubscription? _streamSubscription;
+  StreamSubscription? _connectivitySubscription;
+  final List<_QueuedMessage> _offlineQueue = [];
+  bool _isProcessingQueue = false;
 
   ChatProvider(this._api, this._storage) {
     _initSession();
     _language = _storage.language; // Load saved language preference
     _loadConversations();
     _loadBookmarks();
+    _initConnectivityListener();
   }
 
   List<Message> get messages => _messages;
@@ -36,6 +41,7 @@ class ChatProvider extends ChangeNotifier {
   bool get isLoadingHistory => _isLoadingHistory;
   String get sessionId => _sessionId;
   String get language => _language;
+  List<_QueuedMessage> get offlineQueue => List.unmodifiable(_offlineQueue);
 
   void _initSession() {
     final stored = _storage.sessionId;
@@ -66,9 +72,24 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void _initConnectivityListener() {
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((result) {
+      final wasOffline = !_isOnline;
+      _isOnline = result != ConnectivityResult.none;
+      notifyListeners();
+      if (wasOffline && _isOnline) {
+        _processOfflineQueue();
+      }
+    });
+  }
+
   void setOnlineStatus(bool online) {
+    final wasOffline = !_isOnline;
     _isOnline = online;
     notifyListeners();
+    if (wasOffline && online) {
+      _processOfflineQueue();
+    }
   }
 
   void setLanguage(String lang) {
@@ -92,24 +113,16 @@ class ChatProvider extends ChangeNotifier {
     notifyListeners();
 
     if (!_isOnline) {
-      // Try offline cache when no internet
-      final cachedAnswer = await _api.offlineCache.getCachedAnswer(text.trim());
-      if (cachedAnswer != null) {
-        _messages.add(Message(
-          id: const Uuid().v4(),
-          content: '$cachedAnswer\n\n_(Jawapan dari cache — mungkin tak terkini)_',
-          isUser: false,
-          timestamp: DateTime.now(),
-          isCached: true,
-        ));
-      } else {
-        _messages.add(Message(
-          id: const Uuid().v4(),
-          content: 'No internet connection. Please check your network and try again.',
-          isUser: false,
-          timestamp: DateTime.now(),
-          isError: true,
-        ));
+      // Queue message for later sending
+      _offlineQueue.add(_QueuedMessage(
+        id: userMessage.id,
+        text: text.trim(),
+        timestamp: DateTime.now(),
+      ));
+      // Mark the user message as pending
+      final idx = _messages.indexWhere((m) => m.id == userMessage.id);
+      if (idx >= 0) {
+        _messages[idx] = _messages[idx].copyWith(isPending: true);
       }
       _isTyping = false;
       notifyListeners();
@@ -343,9 +356,69 @@ class ChatProvider extends ChangeNotifier {
     return _storage.getCachedConversations();
   }
 
+  Future<void> _processOfflineQueue() async {
+    if (_isProcessingQueue || _offlineQueue.isEmpty) return;
+    _isProcessingQueue = true;
+
+    while (_offlineQueue.isNotEmpty && _isOnline) {
+      final queued = _offlineQueue.first;
+
+      // Remove pending indicator from the queued user message
+      final userIdx = _messages.indexWhere((m) => m.id == queued.id);
+      if (userIdx >= 0) {
+        _messages[userIdx] = _messages[userIdx].copyWith(isPending: false);
+        notifyListeners();
+      }
+
+      _isTyping = true;
+      notifyListeners();
+
+      try {
+        await _sendWithStreaming(queued.text);
+        _offlineQueue.removeAt(0);
+      } catch (_) {
+        try {
+          final botMessage = await _api.sendMessage(
+            message: queued.text,
+            sessionId: _sessionId,
+            language: _language,
+          );
+          _messages.add(botMessage);
+          _offlineQueue.removeAt(0);
+        } catch (e) {
+          // If still failing, stop processing - will retry on next connectivity change
+          break;
+        }
+      } finally {
+        _isTyping = false;
+        notifyListeners();
+      }
+    }
+
+    _isProcessingQueue = false;
+    await _saveCurrentConversation();
+  }
+
+  bool isMessagePending(String messageId) {
+    return _offlineQueue.any((q) => q.id == messageId);
+  }
+
   @override
   void dispose() {
     _streamSubscription?.cancel();
+    _connectivitySubscription?.cancel();
     super.dispose();
   }
+}
+
+class _QueuedMessage {
+  final String id;
+  final String text;
+  final DateTime timestamp;
+
+  _QueuedMessage({
+    required this.id,
+    required this.text,
+    required this.timestamp,
+  });
 }

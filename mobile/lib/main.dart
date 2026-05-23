@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'providers/auth_provider.dart';
 import 'providers/chat_provider.dart';
 import 'providers/settings_provider.dart';
 import 'services/api_service.dart';
@@ -16,6 +17,12 @@ void main() async {
   final apiService = ApiService(storageService: storageService);
   await apiService.initOfflineCache();
 
+  // If user has a saved token, set it on ApiService at startup
+  final savedToken = storageService.authToken;
+  if (savedToken != null && savedToken.isNotEmpty) {
+    apiService.setAuthToken(savedToken);
+  }
+
   runApp(
     MultiProvider(
       providers: [
@@ -26,6 +33,9 @@ void main() async {
         ),
         ChangeNotifierProvider(
           create: (_) => ChatProvider(apiService, storageService),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(apiService, storageService),
         ),
       ],
       child: const ConnectivityWrapper(),

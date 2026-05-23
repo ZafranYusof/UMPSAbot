@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../config/theme.dart';
 import '../services/api_service.dart';
@@ -13,19 +12,46 @@ class TimetableScreen extends StatefulWidget {
   State<TimetableScreen> createState() => _TimetableScreenState();
 }
 
-class _TimetableScreenState extends State<TimetableScreen> {
+class _TimetableScreenState extends State<TimetableScreen>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _courseController = TextEditingController();
   final List<String> _courses = [];
   String _semester = 'SEM2-2025/2026';
   List<Map<String, dynamic>> _results = [];
   bool _isLoading = false;
   String? _error;
+  late TabController _viewTabController;
 
   final List<String> _semesters = [
     'SEM1-2025/2026',
     'SEM2-2025/2026',
     'SEM3-2025/2026',
   ];
+
+  // Color palette for course blocks
+  static const List<Color> _courseColors = [
+    Color(0xFF6FB58A),
+    Color(0xFFC9A961),
+    Color(0xFF7BAFD4),
+    Color(0xFFE08584),
+    Color(0xFFB07DD1),
+    Color(0xFFE0B470),
+    Color(0xFF5DADE2),
+    Color(0xFF48C9B0),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _viewTabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _courseController.dispose();
+    _viewTabController.dispose();
+    super.dispose();
+  }
 
   void _addCourse() {
     final code = _courseController.text.trim().toUpperCase();
@@ -90,10 +116,10 @@ class _TimetableScreenState extends State<TimetableScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _courseController.dispose();
-    super.dispose();
+  Color _getColorForCourse(String courseCode) {
+    final index = _courses.indexOf(courseCode);
+    if (index >= 0) return _courseColors[index % _courseColors.length];
+    return _courseColors[courseCode.hashCode.abs() % _courseColors.length];
   }
 
   @override
@@ -285,14 +311,68 @@ class _TimetableScreenState extends State<TimetableScreen> {
                 ),
               ),
 
-            // Results
+            // Results with view toggle
             if (_results.isNotEmpty) ...[
-              Text(
-                AppStrings.get('your_schedule', lang),
-                style: AppTheme.heading(fontSize: 18),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppStrings.get('your_schedule', lang),
+                    style: AppTheme.heading(fontSize: 18),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: TabBar(
+                      controller: _viewTabController,
+                      isScrollable: true,
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      indicator: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      labelColor: AppColors.background,
+                      unselectedLabelColor: AppColors.textMuted,
+                      labelStyle: AppTheme.body(fontSize: 12, fontWeight: FontWeight.w600),
+                      unselectedLabelStyle: AppTheme.body(fontSize: 12),
+                      dividerHeight: 0,
+                      tabAlignment: TabAlignment.center,
+                      tabs: [
+                        Tab(
+                          height: 32,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Icon(Icons.list_rounded, size: 18),
+                          ),
+                        ),
+                        Tab(
+                          height: 32,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Icon(Icons.grid_view_rounded, size: 18),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 12),
-              ..._results.map((item) => _buildScheduleCard(item, lang)),
+              AnimatedBuilder(
+                animation: _viewTabController,
+                builder: (context, child) {
+                  if (_viewTabController.index == 0) {
+                    return Column(
+                      children: _results.map((item) => _buildScheduleCard(item, lang)).toList(),
+                    );
+                  } else {
+                    return _buildWeeklyGrid(lang);
+                  }
+                },
+              ),
             ],
 
             // Empty results
@@ -322,6 +402,255 @@ class _TimetableScreenState extends State<TimetableScreen> {
     );
   }
 
+  Widget _buildWeeklyGrid(String lang) {
+    final days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+    const startHour = 8;
+    const endHour = 18;
+    const hourHeight = 60.0;
+    const dayWidth = 140.0;
+    const timeColumnWidth = 50.0;
+
+    // Parse schedule items into grid positions
+    final gridItems = <_GridItem>[];
+    for (final item in _results) {
+      final course = item['course'] as String? ?? item['courseCode'] as String? ?? '';
+      final day = item['day'] as String? ?? '';
+      final time = item['time'] as String? ?? '';
+      final venue = item['venue'] as String? ?? item['location'] as String? ?? '';
+      final section = item['section'] as String? ?? '';
+
+      final dayIndex = _parseDayIndex(day);
+      if (dayIndex < 0) continue;
+
+      final timeRange = _parseTimeRange(time);
+      if (timeRange == null) continue;
+
+      gridItems.add(_GridItem(
+        course: course,
+        section: section,
+        venue: venue,
+        dayIndex: dayIndex,
+        startHour: timeRange.$1,
+        endHour: timeRange.$2,
+        color: _getColorForCourse(course),
+      ));
+    }
+
+    final totalHeight = (endHour - startHour) * hourHeight;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SizedBox(
+          width: timeColumnWidth + (dayWidth * days.length),
+          child: Column(
+            children: [
+              // Day headers
+              Row(
+                children: [
+                  SizedBox(width: timeColumnWidth),
+                  ...days.map((day) => Container(
+                    width: dayWidth,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(color: AppColors.border),
+                        left: BorderSide(color: AppColors.border),
+                      ),
+                    ),
+                    child: Center(
+                      child: Text(
+                        day,
+                        style: AppTheme.body(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  )),
+                ],
+              ),
+              // Grid body
+              SizedBox(
+                height: totalHeight,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Time column
+                    SizedBox(
+                      width: timeColumnWidth,
+                      height: totalHeight,
+                      child: Stack(
+                        children: List.generate(endHour - startHour, (i) {
+                          return Positioned(
+                            top: i * hourHeight,
+                            left: 0,
+                            right: 0,
+                            child: SizedBox(
+                              height: hourHeight,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 2, right: 6),
+                                child: Text(
+                                  '${(startHour + i).toString().padLeft(2, '0')}:00',
+                                  textAlign: TextAlign.right,
+                                  style: AppTheme.body(
+                                    fontSize: 10,
+                                    color: AppColors.textMuted,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
+                    ),
+                    // Day columns
+                    ...List.generate(days.length, (dayIdx) {
+                      final dayItems = gridItems.where((g) => g.dayIndex == dayIdx).toList();
+                      return Container(
+                        width: dayWidth,
+                        height: totalHeight,
+                        decoration: BoxDecoration(
+                          border: Border(
+                            left: BorderSide(color: AppColors.border),
+                          ),
+                        ),
+                        child: Stack(
+                          children: [
+                            // Hour lines
+                            ...List.generate(endHour - startHour, (i) {
+                              return Positioned(
+                                top: i * hourHeight,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  height: 1,
+                                  color: AppColors.border,
+                                ),
+                              );
+                            }),
+                            // Course blocks
+                            ...dayItems.map((item) {
+                              final top = (item.startHour - startHour) * hourHeight;
+                              final height = (item.endHour - item.startHour) * hourHeight;
+                              return Positioned(
+                                top: top,
+                                left: 2,
+                                right: 2,
+                                height: height,
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(vertical: 1),
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: item.color.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: item.color.withOpacity(0.6),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.course,
+                                        style: AppTheme.body(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color: item.color,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      if (item.section.isNotEmpty && height > 40)
+                                        Text(
+                                          'S${item.section}',
+                                          style: AppTheme.body(
+                                            fontSize: 9,
+                                            color: item.color.withOpacity(0.8),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      if (item.venue.isNotEmpty && height > 55)
+                                        Text(
+                                          item.venue,
+                                          style: AppTheme.body(
+                                            fontSize: 9,
+                                            color: AppColors.textMuted,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  int _parseDayIndex(String day) {
+    final d = day.toLowerCase().trim();
+    if (d.startsWith('mon') || d == 'isnin') return 0;
+    if (d.startsWith('tue') || d == 'selasa') return 1;
+    if (d.startsWith('wed') || d == 'rabu') return 2;
+    if (d.startsWith('thu') || d == 'khamis') return 3;
+    if (d.startsWith('fri') || d == 'jumaat') return 4;
+    return -1;
+  }
+
+  (double, double)? _parseTimeRange(String time) {
+    // Try formats like "8:00-10:00", "08:00 - 10:00", "0800-1000"
+    final cleaned = time.replaceAll(' ', '');
+    final parts = cleaned.split(RegExp(r'[-–]'));
+    if (parts.length != 2) return null;
+
+    final start = _parseHour(parts[0]);
+    final end = _parseHour(parts[1]);
+    if (start == null || end == null) return null;
+    return (start, end);
+  }
+
+  double? _parseHour(String s) {
+    // Handle "8:00", "08:00", "0800", "8.00"
+    s = s.replaceAll('.', ':');
+    if (s.contains(':')) {
+      final parts = s.split(':');
+      final h = int.tryParse(parts[0]);
+      final m = int.tryParse(parts[1]);
+      if (h == null || m == null) return null;
+      return h + m / 60.0;
+    } else if (s.length == 4) {
+      final h = int.tryParse(s.substring(0, 2));
+      final m = int.tryParse(s.substring(2, 4));
+      if (h == null || m == null) return null;
+      return h + m / 60.0;
+    } else if (s.length <= 2) {
+      final h = int.tryParse(s);
+      if (h == null) return null;
+      return h.toDouble();
+    }
+    return null;
+  }
+
   Widget _buildScheduleCard(Map<String, dynamic> item, String lang) {
     final course = item['course'] as String? ?? item['courseCode'] as String? ?? 'Unknown';
     final day = item['day'] as String? ?? '';
@@ -329,6 +658,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
     final venue = item['venue'] as String? ?? item['location'] as String? ?? '';
     final section = item['section'] as String? ?? '';
     final lecturer = item['lecturer'] as String? ?? '';
+    final color = _getColorForCourse(course);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -349,7 +679,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary,
+                  color: color,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -377,7 +707,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
           if (day.isNotEmpty || time.isNotEmpty)
             Row(
               children: [
-                const Icon(Icons.access_time, size: 16, color: AppColors.primary),
+                Icon(Icons.access_time, size: 16, color: color),
                 const SizedBox(width: 6),
                 Text(
                   '$day ${time.isNotEmpty ? "• $time" : ""}'.trim(),
@@ -389,7 +719,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
             const SizedBox(height: 6),
             Row(
               children: [
-                const Icon(Icons.location_on_outlined, size: 16, color: AppColors.primary),
+                Icon(Icons.location_on_outlined, size: 16, color: color),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -404,7 +734,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
             const SizedBox(height: 6),
             Row(
               children: [
-                const Icon(Icons.person_outline, size: 16, color: AppColors.primary),
+                Icon(Icons.person_outline, size: 16, color: color),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -419,4 +749,24 @@ class _TimetableScreenState extends State<TimetableScreen> {
       ),
     );
   }
+}
+
+class _GridItem {
+  final String course;
+  final String section;
+  final String venue;
+  final int dayIndex;
+  final double startHour;
+  final double endHour;
+  final Color color;
+
+  _GridItem({
+    required this.course,
+    required this.section,
+    required this.venue,
+    required this.dayIndex,
+    required this.startHour,
+    required this.endHour,
+    required this.color,
+  });
 }

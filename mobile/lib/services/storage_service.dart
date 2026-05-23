@@ -13,6 +13,10 @@ class StorageService {
   static const String _cachedConversationsKey = 'cached_conversations';
   static const String _facultyKey = 'user_faculty';
   static const String _yearKey = 'user_year';
+  static const String _authTokenKey = 'auth_token';
+  static const String _userRoleKey = 'user_role';
+  static const String _userNameKey = 'user_name';
+  static const String _userEmailKey = 'user_email';
 
   late SharedPreferences _prefs;
 
@@ -25,6 +29,38 @@ class StorageService {
 
   Future<void> setOnboardingComplete() async {
     await _prefs.setBool(_onboardingKey, true);
+  }
+
+  // Auth Token
+  String? get authToken => _prefs.getString(_authTokenKey);
+
+  Future<void> setAuthToken(String token) async {
+    await _prefs.setString(_authTokenKey, token);
+  }
+
+  Future<void> clearAuthToken() async {
+    await _prefs.remove(_authTokenKey);
+  }
+
+  // User Role
+  String? get userRole => _prefs.getString(_userRoleKey);
+
+  Future<void> setUserRole(String role) async {
+    await _prefs.setString(_userRoleKey, role);
+  }
+
+  // User Name
+  String? get userName => _prefs.getString(_userNameKey);
+
+  Future<void> setUserName(String name) async {
+    await _prefs.setString(_userNameKey, name);
+  }
+
+  // User Email
+  String? get userEmail => _prefs.getString(_userEmailKey);
+
+  Future<void> setUserEmail(String email) async {
+    await _prefs.setString(_userEmailKey, email);
   }
 
   // Faculty

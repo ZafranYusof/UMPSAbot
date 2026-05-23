@@ -11,6 +11,7 @@ class Message {
   final bool isStreaming;
   final bool isError;
   final bool isCached;
+  final bool isPending;
 
   Message({
     required this.id,
@@ -25,6 +26,7 @@ class Message {
     this.isStreaming = false,
     this.isError = false,
     this.isCached = false,
+    this.isPending = false,
   });
 
   Message copyWith({
@@ -40,6 +42,7 @@ class Message {
     bool? isStreaming,
     bool? isError,
     bool? isCached,
+    bool? isPending,
   }) {
     return Message(
       id: id ?? this.id,
@@ -54,6 +57,7 @@ class Message {
       isStreaming: isStreaming ?? this.isStreaming,
       isError: isError ?? this.isError,
       isCached: isCached ?? this.isCached,
+      isPending: isPending ?? this.isPending,
     );
   }
 
@@ -68,6 +72,7 @@ class Message {
         'intent': intent,
         'isBookmarked': isBookmarked,
         'isCached': isCached,
+        'isPending': isPending,
       };
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
@@ -81,5 +86,6 @@ class Message {
         intent: json['intent'] as String?,
         isBookmarked: json['isBookmarked'] as bool? ?? false,
         isCached: json['isCached'] as bool? ?? false,
+        isPending: json['isPending'] as bool? ?? false,
       );
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../config/theme.dart';
+import '../providers/auth_provider.dart';
 import '../providers/chat_provider.dart';
 import '../providers/settings_provider.dart';
 import '../app.dart';
@@ -165,6 +166,21 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 24),
+
+              // Logout section
+              _buildSettingsCard(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.logout, color: AppColors.error),
+                    title: Text(
+                      AppStrings.get('logout', lang),
+                      style: AppTheme.body(color: AppColors.error),
+                    ),
+                    onTap: () => _showLogoutDialog(context, lang),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
             ],
           );
@@ -224,6 +240,38 @@ class SettingsScreen extends StatelessWidget {
             },
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: Text(AppStrings.get('clear', lang)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context, String lang) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(AppStrings.get('logout', lang)),
+        content: Text(
+          AppStrings.get('logout_desc', lang),
+          style: AppTheme.body(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(AppStrings.get('cancel', lang)),
+          ),
+          TextButton(
+            onPressed: () async {
+              final navigator = Navigator.of(context);
+              Navigator.pop(ctx);
+              await context.read<AuthProvider>().logout();
+              navigator.pushNamedAndRemoveUntil(
+                '/login',
+                (route) => false,
+              );
+            },
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: Text(AppStrings.get('logout', lang)),
           ),
         ],
       ),

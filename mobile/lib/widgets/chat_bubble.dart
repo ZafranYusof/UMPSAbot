@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../config/theme.dart';
 import '../models/message.dart';
 import '../providers/chat_provider.dart';
@@ -13,27 +15,6 @@ class ChatBubble extends StatelessWidget {
     super.key,
     required this.message,
   });
-
-  String _stripMarkdown(String text) {
-    var result = text;
-    // Strip **bold**
-    result = result.replaceAllMapped(RegExp(r'\*\*(.+?)\*\*'), (m) => m.group(1) ?? '');
-    // Strip *italic*
-    result = result.replaceAllMapped(RegExp(r'\*(.+?)\*'), (m) => m.group(1) ?? '');
-    // Strip __bold__
-    result = result.replaceAllMapped(RegExp(r'__(.+?)__'), (m) => m.group(1) ?? '');
-    // Strip _italic_
-    result = result.replaceAllMapped(RegExp(r'_(.+?)_'), (m) => m.group(1) ?? '');
-    // Strip headers
-    result = result.replaceAll(RegExp(r'^#{1,6}\s+', multiLine: true), '');
-    // Strip `code`
-    result = result.replaceAllMapped(RegExp(r'`(.+?)`'), (m) => m.group(1) ?? '');
-    // Normalize whitespace: collapse 3+ newlines to 2
-    result = result.replaceAll(RegExp(r'\n{3,}'), '\n\n');
-    // Remove blank lines that only have spaces
-    result = result.replaceAll(RegExp(r'^\s+$', multiLine: true), '');
-    return result.trim();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,15 +59,126 @@ class ChatBubble extends StatelessWidget {
                   children: [
                     if (message.isStreaming && message.content.isEmpty)
                       _buildStreamingCursor()
+                    else if (isUser)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (message.isPending)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 6),
+                              child: Icon(
+                                Icons.access_time_rounded,
+                                size: 14,
+                                color: AppColors.background.withOpacity(0.6),
+                              ),
+                            ),
+                          Flexible(
+                            child: Text(
+                              message.content,
+                              textAlign: TextAlign.start,
+                              style: AppTheme.body(
+                                fontSize: 15,
+                                color: message.isPending
+                                    ? AppColors.background.withOpacity(0.6)
+                                    : AppColors.background,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
                     else
-                      Text(
-                        _stripMarkdown(message.content),
-                        textAlign: isUser ? TextAlign.start : TextAlign.justify,
-                        style: AppTheme.body(
-                          fontSize: 15,
-                          color: isUser
-                              ? AppColors.background
-                              : AppColors.textPrimary,
+                      MarkdownBody(
+                        data: message.content,
+                        selectable: false,
+                        shrinkWrap: true,
+                        styleSheet: MarkdownStyleSheet(
+                          p: AppTheme.body(
+                            fontSize: 15,
+                            color: AppColors.textPrimary,
+                          ),
+                          h1: AppTheme.heading(
+                            fontSize: 20,
+                            color: AppColors.textPrimary,
+                          ),
+                          h2: AppTheme.heading(
+                            fontSize: 18,
+                            color: AppColors.textPrimary,
+                          ),
+                          h3: AppTheme.heading(
+                            fontSize: 16,
+                            color: AppColors.textPrimary,
+                          ),
+                          h4: AppTheme.body(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                          h5: AppTheme.body(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                          h6: AppTheme.body(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
+                          strong: AppTheme.body(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                          em: AppTheme.body(
+                            fontSize: 15,
+                            color: AppColors.textSecondary,
+                          ),
+                          code: AppTheme.body(
+                            fontSize: 13,
+                            color: AppColors.primaryLight,
+                          ),
+                          codeblockDecoration: BoxDecoration(
+                            color: AppColors.surfaceLight,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          codeblockPadding: const EdgeInsets.all(12),
+                          blockquoteDecoration: BoxDecoration(
+                            border: Border(
+                              left: BorderSide(
+                                color: AppColors.primary,
+                                width: 3,
+                              ),
+                            ),
+                          ),
+                          blockquotePadding: const EdgeInsets.only(left: 12),
+                          listBullet: AppTheme.body(
+                            fontSize: 15,
+                            color: AppColors.primary,
+                          ),
+                          a: AppTheme.body(
+                            fontSize: 15,
+                            color: AppColors.primary,
+                          ),
+                          tableHead: AppTheme.body(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                          tableBody: AppTheme.body(
+                            fontSize: 14,
+                            color: AppColors.textPrimary,
+                          ),
+                          tableBorder: TableBorder.all(
+                            color: AppColors.border,
+                            width: 1,
+                          ),
+                          horizontalRuleDecoration: BoxDecoration(
+                            border: Border(
+                              top: BorderSide(
+                                color: AppColors.border,
+                                width: 1,
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     if (message.isStreaming && message.content.isNotEmpty)
@@ -316,14 +408,8 @@ class ChatBubble extends StatelessWidget {
                       style: AppTheme.body(color: AppColors.textPrimary)),
                   onTap: () {
                     HapticFeedback.lightImpact();
-                    Clipboard.setData(ClipboardData(text: message.content));
                     Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(AppStrings.get('copied_for_sharing', lang)),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
+                    Share.share(message.content);
                   },
                 ),
             ],
