@@ -131,7 +131,8 @@ async function sendMessage(req, res, next) {
     const intentResult = classifyIntent(message);
 
     // Quick-response path: greetings and simple intents skip full RAG pipeline
-    if (!intentResult.needsRAG) {
+    // BUT let timetable requests with course codes pass through to RAG (which calls the planner)
+    if (!intentResult.needsRAG && !(intentResult.intent === 'timetable' && intentResult.courseCodes?.length >= 2)) {
       const greetingResponse = getGreetingResponse(detectedLanguage);
       const suggestions = detectedLanguage === 'en'
         ? ['How do I register for courses?', 'What are the semester fees?', 'How do I apply for hostel?']

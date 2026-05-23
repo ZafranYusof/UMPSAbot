@@ -93,28 +93,30 @@ async function queryRAG(query, options = {}) {
       try {
         const { findValidCombinations } = require('./timetable');
         const result = await findValidCombinations(intentResult.courseCodes);
-        const combinations = result.combinations || [];
+        const validCombos = result.valid || [];
         let content;
-        if (combinations.length === 0) {
+        if (validCombos.length === 0) {
           content = language === 'en'
-            ? `No valid non-clashing combinations found for: ${intentResult.courseCodes.join(', ')}. Some courses may have time conflicts in all available sections.`
-            : `Tiada kombinasi jadual yang tidak clash ditemui untuk: ${intentResult.courseCodes.join(', ')}. Sesetengah kursus mungkin bertembung dalam semua seksyen yang ada.`;
+            ? `No valid non-clashing combinations found for: ${intentResult.courseCodes.join(', ')}. ${result.missingCourses ? 'Missing courses: ' + result.missingCourses.join(', ') + '. ' : ''}Some courses may have time conflicts in all available sections.`
+            : `Tiada kombinasi jadual yang tidak clash ditemui untuk: ${intentResult.courseCodes.join(', ')}. ${result.missingCourses ? 'Kursus tidak dijumpai: ' + result.missingCourses.join(', ') + '. ' : ''}Sesetengah kursus mungkin bertembung dalam semua seksyen yang ada.`;
         } else {
-          const topCombos = combinations.slice(0, 3);
+          const topCombos = validCombos.slice(0, 3);
           content = language === 'en'
-            ? `Found ${combinations.length} valid timetable combination(s) for ${intentResult.courseCodes.join(', ')}:\n\n`
-            : `Ditemui ${combinations.length} kombinasi jadual yang valid untuk ${intentResult.courseCodes.join(', ')}:\n\n`;
+            ? `Found ${validCombos.length} valid timetable combination(s) for ${intentResult.courseCodes.join(', ')}:\n\n`
+            : `Ditemui ${validCombos.length} kombinasi jadual yang valid untuk ${intentResult.courseCodes.join(', ')}:\n\n`;
           topCombos.forEach((combo, idx) => {
             content += `**Option ${idx + 1}:**\n`;
-            combo.slots.forEach(slot => {
-              content += `- ${slot.courseCode} (Section ${slot.section}): ${slot.day} ${slot.startTime}-${slot.endTime} @ ${slot.venue || 'TBA'}\n`;
+            combo.sections.forEach(section => {
+              section.slots.forEach(slot => {
+                content += `- ${section.courseCode} (Section ${section.section}): ${slot.day} ${slot.startTime}-${slot.endTime} @ ${slot.venue || 'TBA'}\n`;
+              });
             });
             content += '\n';
           });
-          if (combinations.length > 3) {
+          if (validCombos.length > 3) {
             content += language === 'en'
-              ? `...and ${combinations.length - 3} more combinations available.`
-              : `...dan ${combinations.length - 3} lagi kombinasi tersedia.`;
+              ? `...and ${validCombos.length - 3} more combinations available.`
+              : `...dan ${validCombos.length - 3} lagi kombinasi tersedia.`;
           }
         }
         return {
