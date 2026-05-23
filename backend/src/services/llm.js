@@ -578,8 +578,15 @@ function estimateConfidence(scores) {
   const topScore = Math.max(...scores);
   const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
 
+  // Raw confidence from similarity scores
+  const raw = (topScore * 0.7) + (avgScore * 0.3);
+
+  // Floor: if we have results, minimum confidence is 0.5
+  // This accounts for nomic-embed-text returning lower raw cosine scores
+  const floored = scores.length > 0 ? Math.max(0.5, raw) : raw;
+
   // Clamp to [0, 1] to prevent validation errors
-  return Math.min(1, Math.max(0, (topScore * 0.7) + (avgScore * 0.3)));
+  return Math.min(1, Math.max(0, floored));
 }
 
 /**
