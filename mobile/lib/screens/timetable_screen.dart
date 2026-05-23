@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../config/theme.dart';
@@ -21,6 +22,11 @@ class _TimetableScreenState extends State<TimetableScreen>
   bool _isLoading = false;
   String? _error;
   late TabController _viewTabController;
+
+  // Autocomplete
+  List<Map<String, dynamic>> _searchResults = [];
+  bool _isSearching = false;
+  Timer? _debounceTimer;
 
   final List<String> _semesters = [
     'SEM1-2025/2026',
@@ -50,7 +56,55 @@ class _TimetableScreenState extends State<TimetableScreen>
   void dispose() {
     _courseController.dispose();
     _viewTabController.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    _debounceTimer?.cancel();
+    if (query.length < 2) {
+      setState(() {
+        _searchResults = [];
+        _isSearching = false;
+      });
+      return;
+    }
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      _searchCourses(query);
+    });
+  }
+
+  Future<void> _searchCourses(String query) async {
+    setState(() => _isSearching = true);
+    try {
+      final api = context.read<ApiService>();
+      final results = await api.searchCourses(query);
+      if (mounted) {
+        setState(() {
+          _searchResults = results;
+          _isSearching = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSearching = false);
+      }
+    }
+  }
+
+  void _selectCourse(String courseCode) {
+    if (_courses.contains(courseCode)) {
+      final lang = context.read<ChatProvider>().language;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppStrings.get('course_already_added', lang))),
+      );
+      return;
+    }
+    setState(() {
+      _courses.add(courseCode);
+      _courseController.clear();
+      _searchResults = [];
+    });
   }
 
   void _addCourse() {
@@ -205,7 +259,18 @@ class _TimetableScreenState extends State<TimetableScreen>
                         horizontal: 16,
                         vertical: 12,
                       ),
+                      suffixIcon: _isSearching
+                          ? const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                              ),
+                            )
+                          : null,
                     ),
+                    onChanged: _onSearchChanged,
                     onSubmitted: (_) => _addCourse(),
                   ),
                 ),
@@ -224,6 +289,66 @@ class _TimetableScreenState extends State<TimetableScreen>
                 ),
               ],
             ),
+
+            // Autocomplete suggestions
+            if (_searchResults.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(top: 4),
+                constraints: const BoxConstraints(maxHeight: 200),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  border: Border.all(color: AppColors.border),
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  itemCount: _searchResults.length,
+                  separatorBuilder: (_, __) => Divider(
+                    height: 1,
+                    color: AppColors.border.withOpacity(0.5),
+                  ),
+                  itemBuilder: (context, index) {
+                    final course = _searchResults[index];
+                    final code = course['courseCode'] as String;
+                    final name = course['courseName'] as String;
+                    final alreadyAdded = _courses.contains(code);
+                    return ListTile(
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                      title: Text(
+                        code,
+                        style: AppTheme.body(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: alreadyAdded ? AppColors.textMuted : AppColors.primary,
+                        ),
+                      ),
+                      subtitle: Text(
+                        name,
+                        style: AppTheme.body(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: alreadyAdded
+                          ? const Icon(Icons.check_circle, color: AppColors.primary, size: 18)
+                          : const Icon(Icons.add_circle_outline, color: AppColors.textMuted, size: 18),
+                      onTap: alreadyAdded ? null : () => _selectCourse(code),
+                    );
+                  },
+                ),
+              ),
+
             const SizedBox(height: 12),
 
             // Course chips

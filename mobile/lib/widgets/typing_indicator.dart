@@ -1,4 +1,6 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../config/theme.dart';
 
 class TypingIndicator extends StatefulWidget {
   const TypingIndicator({super.key});
@@ -12,8 +14,6 @@ class _TypingIndicatorState extends State<TypingIndicator>
   late final AnimationController _appearController;
   late final Animation<double> _appearAnimation;
   late final List<AnimationController> _dotControllers;
-  late final List<Animation<double>> _dotAnimations;
-  late final List<Animation<double>> _opacityAnimations;
 
   @override
   void initState() {
@@ -30,30 +30,18 @@ class _TypingIndicatorState extends State<TypingIndicator>
     );
     _appearController.forward();
 
-    // Dot bounce animations with staggered start
+    // Sine-wave dot animations with staggered start (600ms cycle, 200ms stagger)
     _dotControllers = List.generate(3, (index) {
       return AnimationController(
-        duration: const Duration(milliseconds: 800),
+        duration: const Duration(milliseconds: 600),
         vsync: this,
       );
     });
 
-    _dotAnimations = _dotControllers.map((controller) {
-      return Tween<double>(begin: 0, end: -6).animate(
-        CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic),
-      );
-    }).toList();
-
-    _opacityAnimations = _dotControllers.map((controller) {
-      return Tween<double>(begin: 0.4, end: 1.0).animate(
-        CurvedAnimation(parent: controller, curve: Curves.easeInOut),
-      );
-    }).toList();
-
     for (int i = 0; i < 3; i++) {
-      Future.delayed(Duration(milliseconds: i * 180), () {
+      Future.delayed(Duration(milliseconds: i * 200), () {
         if (mounted) {
-          _dotControllers[i].repeat(reverse: true);
+          _dotControllers[i].repeat();
         }
       });
     }
@@ -70,8 +58,6 @@ class _TypingIndicatorState extends State<TypingIndicator>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return ScaleTransition(
       scale: _appearAnimation,
       alignment: Alignment.bottomLeft,
@@ -83,6 +69,7 @@ class _TypingIndicatorState extends State<TypingIndicator>
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
+              // Avatar - gradient style
               Container(
                 width: 30,
                 height: 30,
@@ -95,8 +82,8 @@ class _TypingIndicatorState extends State<TypingIndicator>
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF003366).withOpacity(0.3),
-                      blurRadius: 4,
+                      color: const Color(0xFF003366).withOpacity(0.4),
+                      blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
                   ],
@@ -108,23 +95,13 @@ class _TypingIndicatorState extends State<TypingIndicator>
                 ),
               ),
               const SizedBox(width: 8),
+              // Typing bubble
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(6),
-                    bottomRight: Radius.circular(20),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.border),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -132,30 +109,41 @@ class _TypingIndicatorState extends State<TypingIndicator>
                     return AnimatedBuilder(
                       animation: _dotControllers[index],
                       builder: (context, child) {
+                        // Sine wave for smooth up/down motion
+                        final sineValue = math.sin(
+                          _dotControllers[index].value * 2 * math.pi,
+                        );
+                        // Translate Y: negative = up, range -8 to 0
+                        final translateY = sineValue * -8.0;
+                        // Scale: 1.0 at rest, up to 1.3 at peak
+                        final scale = 1.0 + (sineValue.clamp(0.0, 1.0) * 0.3);
+                        // Glow opacity: stronger at peak
+                        final glowOpacity = (sineValue.clamp(0.0, 1.0) * 0.6) + 0.2;
+
                         return Transform.translate(
-                          offset: Offset(0, _dotAnimations[index].value),
-                          child: Opacity(
-                            opacity: _opacityAnimations[index].value,
-                            child: child,
+                          offset: Offset(0, translateY),
+                          child: Transform.scale(
+                            scale: scale,
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: 9,
+                              height: 9,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD4AF37),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFFD4AF37)
+                                        .withOpacity(glowOpacity),
+                                    blurRadius: 8,
+                                    spreadRadius: 1,
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         );
                       },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFD4AF37),
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFFD4AF37).withOpacity(0.3),
-                              blurRadius: 3,
-                              offset: const Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                      ),
                     );
                   }),
                 ),

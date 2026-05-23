@@ -8,6 +8,7 @@ import '../config/theme.dart';
 import '../models/message.dart';
 import '../providers/chat_provider.dart';
 import '../l10n/app_strings.dart';
+import 'timetable_card.dart';
 
 class ChatBubble extends StatelessWidget {
   final Message message;
@@ -87,6 +88,8 @@ class ChatBubble extends StatelessWidget {
                           ),
                         ],
                       )
+                    else if (!message.isUser && isTimetableMessage(message.content))
+                      TimetableCard(content: message.content)
                     else
                       MarkdownBody(
                         data: message.content,
@@ -433,13 +436,23 @@ class ChatBubble extends StatelessWidget {
       width: 30,
       height: 30,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF003366), Color(0xFF1A4D80)],
+        ),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF003366).withOpacity(0.4),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: const Icon(
         Icons.school_rounded,
-        color: AppColors.primary,
+        color: Color(0xFFD4AF37),
         size: 16,
       ),
     );

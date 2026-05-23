@@ -217,6 +217,21 @@ class ApiService {
     }
   }
 
+  Future<List<Map<String, dynamic>>> searchCourses(String query) async {
+    try {
+      final response = await _dio.get('/timetable/search', queryParameters: {
+        'q': query,
+      });
+      final data = response.data as Map<String, dynamic>;
+      return List<Map<String, dynamic>>.from(data['results'] ?? []);
+    } on DioException catch (e) {
+      throw ApiException(
+        message: _getErrorMessage(e),
+        statusCode: e.response?.statusCode,
+      );
+    }
+  }
+
   Future<String> login({
     required String email,
     required String password,
