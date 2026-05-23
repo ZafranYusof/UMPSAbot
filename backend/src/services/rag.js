@@ -90,17 +90,50 @@ async function queryRAG(query, options = {}) {
   if (!intentResult.needsRAG) {
     // Timetable intent with course codes → use planner
     if (intentResult.intent === 'timetable' && intentResult.courseCodes?.length >= 2) {
-      const greetingResponse = getGreetingResponse(language);
-      return {
-        content: greetingResponse,
-        sources: [],
-        confidence: 1.0,
-        isLowConfidence: false,
-        intent: intentResult.intent,
-        suggestions: getSuggestionsForGreeting(language),
-        handoff: false,
-        handoffContact: null
-      };
+      try {
+        const { findValidCombinations } = require('./timetable');
+        const result = await findValidCombinations(intentResult.courseCodes);
+        const combinations = result.combinations || [];
+        let content;
+        if (combinations.length === 0) {
+          content = language === 'en'
+            ? `No valid non-clashing combinations found for: ${intentResult.courseCodes.join(', ')}. Some courses may have time conflicts in all available sections.`
+            : `Tiada kombinasi jadual yang tidak clash ditemui untuk: ${intentResult.courseCodes.join(', ')}. Sesetengah kursus mungkin bertembung dalam semua seksyen yang ada.`;
+        } else {
+          const topCombos = combinations.slice(0, 3);
+          content = language === 'en'
+            ? `Found ${combinations.length} valid timetable combination(s) for ${intentResult.courseCodes.join(', ')}:\n\n`
+            : `Ditemui ${combinations.length} kombinasi jadual yang valid untuk ${intentResult.courseCodes.join(', ')}:\n\n`;
+          topCombos.forEach((combo, idx) => {
+            content += `**Option ${idx + 1}:**\n`;
+            combo.slots.forEach(slot => {
+              content += `- ${slot.courseCode} (Section ${slot.section}): ${slot.day} ${slot.startTime}-${slot.endTime} @ ${slot.venue || 'TBA'}\n`;
+            });
+            content += '\n';
+          });
+          if (combinations.length > 3) {
+            content += language === 'en'
+              ? `...and ${combinations.length - 3} more combinations available.`
+              : `...dan ${combinations.length - 3} lagi kombinasi tersedia.`;
+          }
+        }
+        return {
+          content,
+          sources: [],
+          confidence: 0.95,
+          isLowConfidence: false,
+          intent: 'timetable',
+          suggestions: language === 'en'
+            ? ['Show me more combinations', 'What other courses are available?', 'How to register courses?']
+            : ['Tunjuk lagi kombinasi', 'Apa kursus lain yang ada?', 'Macam mana nak daftar kursus?'],
+          handoff: false,
+          handoffContact: null,
+          timetableResult: result
+        };
+      } catch (err) {
+        console.error('Timetable planner error:', err.message);
+        // Fall through to guidance message
+      }
     }
     const greetingResponse = getGreetingResponse(language);
     lowConfidenceTracker.delete(sessionId);
