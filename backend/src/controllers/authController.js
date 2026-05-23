@@ -1,24 +1,43 @@
 /**
  * Auth Controller
- * Basic authentication for admin panel
+ * JWT-based authentication
  */
 
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'umpsa-chatbot-secret-2026';
+
+function generateToken(user) {
+  return jwt.sign(
+    {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      name: user.username
+    },
+    JWT_SECRET,
+    { expiresIn: '30d' }
+  );
+}
+
 /**
- * Login (simplified - no bcrypt for hackathon demo)
+ * Login - accepts email or username
  */
 async function login(req, res, next) {
   try {
-    const { username, password } = req.body;
+    const { email, username, password } = req.body;
+    const identifier = email || username;
 
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password required' });
+    if (!identifier || !password) {
+      return res.status(400).json({ error: 'Email/username and password required' });
     }
 
-    // For hackathon demo: simple auth
-    // In production, use bcrypt + JWT
-    const user = await User.findOne({ username });
+    // Find by email or username
+    const user = await User.findOne({
+      $or: [{ email: identifier.toLowerCase() }, { username: identifier }]
+    });
 
     if (!user || user.password !== password) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -27,11 +46,15 @@ async function login(req, res, next) {
     user.lastActive = new Date();
     await user.save();
 
+    const token = generateToken(user);
+
     res.json({
       success: true,
+      token,
       user: {
         id: user._id,
         username: user.username,
+        email: user.email,
         role: user.role,
         faculty: user.faculty
       }
@@ -46,22 +69,27 @@ async function login(req, res, next) {
  */
 async function register(req, res, next) {
   try {
-    const { username, email, password, faculty, matricNo } = req.body;
+    const { name, username, email, password, faculty, matricNo } = req.body;
+    const uname = username || name;
 
-    if (!username || !email || !password) {
-      return res.status(400).json({ error: 'Username, email, and password required' });
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password required' });
+    }
+
+    if (!uname) {
+      return res.status(400).json({ error: 'Name is required' });
     }
 
     // Check if user exists
-    const existing = await User.findOne({ $or: [{ username }, { email }] });
+    const existing = await User.findOne({ $or: [{ username: uname }, { email: email.toLowerCase() }] });
     if (existing) {
       return res.status(409).json({ error: 'Username or email already exists' });
     }
 
     const user = new User({
-      username,
-      email,
-      password, // In production: hash with bcrypt
+      username: uname,
+      email: email.toLowerCase(),
+      password,
       faculty: faculty || '',
       matricNo: matricNo || '',
       role: 'student'
@@ -69,11 +97,15 @@ async function register(req, res, next) {
 
     await user.save();
 
+    const token = generateToken(user);
+
     res.status(201).json({
       success: true,
+      token,
       user: {
         id: user._id,
         username: user.username,
+        email: user.email,
         role: user.role
       }
     });

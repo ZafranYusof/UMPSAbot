@@ -226,7 +226,11 @@ class ApiService {
         'email': email,
         'password': password,
       });
-      final token = response.data['token'] as String;
+      final data = response.data;
+      final token = data['token'] as String?;
+      if (token == null || token.isEmpty) {
+        throw ApiException(message: 'No token received', statusCode: 500);
+      }
       setAuthToken(token);
       return token;
     } on DioException catch (e) {
@@ -248,7 +252,11 @@ class ApiService {
         'email': email,
         'password': password,
       });
-      final token = response.data['token'] as String;
+      final data = response.data;
+      final token = data['token'] as String?;
+      if (token == null || token.isEmpty) {
+        throw ApiException(message: 'No token received', statusCode: 500);
+      }
       setAuthToken(token);
       return token;
     } on DioException catch (e) {
