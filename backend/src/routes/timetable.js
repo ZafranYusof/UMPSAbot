@@ -117,4 +117,35 @@ router.delete('/slots', async (req, res) => {
   }
 });
 
+// GET /api/timetable/search - Search courses by partial code or name
+router.get('/search', async (req, res) => {
+  try {
+    const { q, semester } = req.query;
+    if (!q || q.length < 2) {
+      return res.status(400).json({ error: 'Query must be at least 2 characters' });
+    }
+    
+    const sem = semester || 'SEM2-2025/2026';
+    const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    
+    const courses = await CourseSlot.aggregate([
+      { $match: { semester: sem, $or: [{ courseCode: regex }, { courseName: regex }] } },
+      { $group: { _id: '$courseCode', courseName: { $first: '$courseName' }, sections: { $addToSet: '$section' } } },
+      { $sort: { _id: 1 } },
+      { $limit: 10 }
+    ]);
+    
+    res.json({
+      results: courses.map(c => ({
+        courseCode: c._id,
+        courseName: c.courseName,
+        sections: c.sections.sort()
+      }))
+    });
+  } catch (error) {
+    console.error('Timetable search error:', error);
+    res.status(500).json({ error: 'Failed to search courses' });
+  }
+});
+
 module.exports = router;
