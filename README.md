@@ -62,24 +62,6 @@ Not a generic ChatGPT wrapper, trained specifically on UMPSA data.
 | Ollama Cloud (nomic-embed-text) | Semantic vector embeddings (768-dim) for document search |
 | HuggingFace (MiniLM-L12-v2) | Fallback embedding provider (384-dim) |
 
-## Project Structure
-
-```
-umpsa-chatbot/
-├── frontend/          React + Vite web app
-├── backend/
-│   ├── src/
-│   │   ├── controllers/   Chat, feedback, reingest
-│   │   ├── services/      RAG, LLM, embedding, cache, chunking, ingest
-│   │   ├── models/        MongoDB schemas
-│   │   ├── routes/        API routes
-│   │   ├── middleware/    Rate limiting, auth, error handling
-│   │   └── jobs/          Auto-scrape cron
-│   └── docs/              96 UMPSA knowledge base files (.txt)
-├── mobile/            Flutter Android app
-└── README.md
-```
-
 ## Setup
 
 ### Prerequisites
