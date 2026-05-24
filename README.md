@@ -4,7 +4,6 @@ Answers questions about fees, registration, hostel, academic calendar, and more 
 
 ## Live Demo
 - **API (Primary):** [http://103.40.204.158](http://103.40.204.158) (IPServerOne VPS, Malaysia)
-- **API (Backup):** [https://umpsa-chatbot-api.onrender.com](https://umpsa-chatbot-api.onrender.com)
 - **Mobile:** Android APK available in [Releases](https://github.com/ZafranYusof/UMPSAbot/releases)
 
 ## What It Does
